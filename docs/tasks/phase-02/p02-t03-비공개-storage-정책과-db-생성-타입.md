@@ -1,7 +1,7 @@
 ---
 id: P02-T03
 title: 비공개 Storage 정책과 DB 생성 타입
-status: in_progress
+status: review
 type: migration
 depends_on: ["P02-T02"]
 parallel_group: ""
@@ -10,7 +10,7 @@ started_at: "2026-08-02T23:36:35+09:00"
 blocked_reason: ""
 owned_files: ["supabase/migrations/202608020003_storage.sql", "src/types/database.ts", "supabase/tests/storage.sql", "src/types/index.ts"]
 shared_files: []
-implementation_commit: ""
+implementation_commit: "7a60725"
 reviewer: ""
 review_commit: ""
 ---
@@ -75,7 +75,13 @@ P02-T02가 모두 done이면 ready로 전환한다.
 
 # 리뷰 증거
 
-작업 전 실패, 완료 명령 결과, 구현 커밋, 구현자와 다른 리뷰어, 승인 커밋을 이 절에 기록한다.
+- RED: 테스트 선작성 커밋 `55c7762`에서 `npx supabase --agent no test db supabase/tests/storage.sql`을 실행해 `attachments` 버킷 부재와 service role 객체 삽입 FK 오류(`23503`)를 확인했다.
+- 정책 보강 RED: 임시 `authenticated` SELECT 정책을 로컬 DB에 주입했을 때 새 정책 카탈로그·회원·운영자 SELECT 검사 3개가 실패하고, 제거 후 Storage 24/24가 통과했다.
+- GREEN: `npx supabase --agent no db reset && npx supabase --agent no test db`에서 core/RLS/Storage 합계 134개 pgTAP 검사가 통과했다.
+- 생성 타입: Supabase CLI `2.111.0`의 `gen types typescript --local --schema public` 출력 EOF를 단일 LF로 정규화해 `src/types/database.ts`를 생성했고, 재생성 비교와 `npm run typecheck`가 통과했다.
+- 공통 검사: `./scripts/check-harness.sh`, `npm run lint`, `npm run typecheck`, `npm run test`(3), `npm run test:e2e`(2), `npm run build`, `git diff --check`가 모두 통과했다.
+- 구현 커밋: `7a60725` (RED `55c7762`, migration `87d7d92`, 타입 `cbb7db0`, EOF 정리 `064acc7` 포함)
+- 독립 리뷰: `Codex/p02_t03_policy`가 실제 객체 기반 역할별 직접 CRUD 거부와 service role 삭제 경계를, `Codex/p02_t03_types`가 public 생성 타입·export·비밀 비노출을 검토해 Critical/Important 없음으로 승인했다.
 
 # 커밋
 
