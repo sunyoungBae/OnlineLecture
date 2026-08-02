@@ -40,6 +40,7 @@ npm run build
 | @types/node | 22.20.1 | MIT |
 | @types/react | 19.2.18 | MIT |
 | @types/react-dom | 19.2.4 | MIT |
+| @base-ui/react | 1.6.0 | MIT |
 
 ## MVP 범위
 

@@ -1,8 +1,9 @@
-import type { ComponentPropsWithoutRef } from "react";
+import { Button as ButtonPrimitive } from "@base-ui/react/button";
+import type { ComponentProps } from "react";
 
 type ButtonTone = "accent" | "outline" | "destructive";
 
-export type ButtonProps = ComponentPropsWithoutRef<"button"> & {
+export type ButtonProps = ComponentProps<typeof ButtonPrimitive> & {
   tone?: ButtonTone;
 };
 
@@ -14,7 +15,7 @@ const toneClasses: Record<ButtonTone, string> = {
 
 export function Button({ className = "", tone = "accent", type = "button", ...props }: ButtonProps) {
   return (
-    <button
+    <ButtonPrimitive
       className={`inline-flex min-h-11 items-center justify-center rounded-sm border px-4 py-2 text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 ${toneClasses[tone]} ${className}`}
       type={type}
       {...props}
