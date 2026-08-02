@@ -39,7 +39,7 @@
 | P01-T02 | Sera 기반 토큰·폰트·필수 UI | done | F-A |
 | P01-T03 | 공개 헤더·모바일 메뉴·홈·오류 틀 | done | F-A |
 | P02-T01 | 테이블·제약·인덱스 migration | done | D-A |
-| P02-T02 | 역할별 RLS와 SQL 권한 테스트 | in_progress | - |
+| P02-T02 | 역할별 RLS와 SQL 권한 테스트 | review | - |
 | P02-T03 | 비공개 Storage 정책과 DB 생성 타입 | blocked | - |
 | P03-T01 | Google OAuth·콜백·세션 경계 | blocked | - |
 | P03-T02 | 별명 검증·중복 차단·온보딩 | blocked | - |
@@ -64,8 +64,8 @@
 
 ## 현재 흐름
 
-- 진행 중: P02-T02 역할별 RLS와 SQL 권한 테스트 (Codex/p02_t02)
-- 리뷰 대기: 없음
+- 진행 중: 없음
+- 리뷰 대기: P02-T02 역할별 RLS와 SQL 권한 테스트
 - 다음 실행 가능: 없음 (P02-T02 진행 중)
 - 향후 외부 차단: OAuth, YouTube, Resend, Supabase, GitHub와 Vercel 체크포인트는 각 카드의 선행 작업 완료 후 외부 준비를 확인해 해제
 
