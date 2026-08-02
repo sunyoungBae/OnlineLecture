@@ -1,12 +1,12 @@
 ---
 id: P02-T03
 title: 비공개 Storage 정책과 DB 생성 타입
-status: ready
+status: in_progress
 type: migration
 depends_on: ["P02-T02"]
 parallel_group: ""
-owner: ""
-started_at: ""
+owner: "Codex/p02_t03"
+started_at: "2026-08-02T23:36:35+09:00"
 blocked_reason: ""
 owned_files: ["supabase/migrations/202608020003_storage.sql", "src/types/database.ts", "supabase/tests/storage.sql", "src/types/index.ts"]
 shared_files: []
