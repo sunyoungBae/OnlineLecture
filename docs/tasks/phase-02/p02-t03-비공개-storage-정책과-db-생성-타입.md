@@ -1,7 +1,7 @@
 ---
 id: P02-T03
 title: 비공개 Storage 정책과 DB 생성 타입
-status: review
+status: done
 type: migration
 depends_on: ["P02-T02"]
 parallel_group: ""
@@ -11,8 +11,8 @@ blocked_reason: ""
 owned_files: ["supabase/migrations/202608020003_storage.sql", "src/types/database.ts", "supabase/tests/storage.sql", "src/types/index.ts"]
 shared_files: []
 implementation_commit: "7a60725"
-reviewer: ""
-review_commit: ""
+reviewer: "Codex/p02_t03_policy"
+review_commit: "7f8f166"
 ---
 
 # 목표
@@ -82,6 +82,7 @@ P02-T02가 모두 done이면 ready로 전환한다.
 - 공통 검사: `./scripts/check-harness.sh`, `npm run lint`, `npm run typecheck`, `npm run test`(3), `npm run test:e2e`(2), `npm run build`, `git diff --check`가 모두 통과했다.
 - 구현 커밋: `7a60725` (RED `55c7762`, migration `87d7d92`, 타입 `cbb7db0`, EOF 정리 `064acc7` 포함)
 - 독립 리뷰: `Codex/p02_t03_policy`가 실제 객체 기반 역할별 직접 CRUD 거부와 service role 삭제 경계를, `Codex/p02_t03_types`가 public 생성 타입·export·비밀 비노출을 검토해 Critical/Important 없음으로 승인했다.
+- 승인 커밋: `7f8f166` (`리뷰: P02-T03 독립 승인`)
 
 # 커밋
 
