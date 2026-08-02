@@ -24,7 +24,7 @@ OnlineLecture MVP 계획을 저장소 안의 실행 가능한 작업 체계로 �
 
 ## 작업 카드 계약
 
-각 작업 카드는 셸에서도 안정적으로 검사할 수 있는 고정 YAML front matter를 사용한다. `id`, `title`, `status`, `type`, `depends_on`, `parallel_group`, `owner`, `blocked_reason`, `owned_files`, `shared_files`, `reviewer`, `review_commit` 필드를 같은 순서로 기록한다. 배열은 한 줄 대괄호 형식만 사용하고 값이 없으면 `[]` 또는 빈 문자열로 표기한다.
+각 작업 카드는 셸에서도 안정적으로 검사할 수 있는 고정 YAML front matter를 사용한다. `id`, `title`, `status`, `type`, `depends_on`, `parallel_group`, `owner`, `started_at`, `blocked_reason`, `owned_files`, `shared_files`, `reviewer`, `review_commit` 필드를 같은 순서로 기록한다. 배열은 한 줄 대괄호 형식만 사용하고 값이 없으면 `[]` 또는 빈 문자열로 표기한다. 시각 값은 시간대를 포함한 ISO 8601 형식을 사용한다.
 
 본문에는 다음 정보를 반드시 포함한다.
 
