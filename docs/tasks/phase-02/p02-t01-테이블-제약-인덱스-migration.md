@@ -1,12 +1,12 @@
 ---
 id: P02-T01
 title: 테이블·제약·인덱스 migration
-status: ready
+status: in_progress
 type: migration
 depends_on: ["P01-T01"]
 parallel_group: "D-A"
-owner: ""
-started_at: ""
+owner: "Codex/p02_t01"
+started_at: "2026-08-02T22:18:00+09:00"
 blocked_reason: ""
 owned_files: ["supabase/migrations/202608020001_core_schema.sql", "supabase/tests/core_schema.sql"]
 shared_files: []
