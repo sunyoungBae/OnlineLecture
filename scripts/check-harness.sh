@@ -4,6 +4,7 @@ set -eu
 root=${HARNESS_ROOT:-.}
 cards_dir="$root/docs/tasks"
 dashboard="$cards_dir/README.md"
+master_plan="$root/docs/superpowers/plans/2026-08-02-online-lecture-mvp.md"
 
 fail() {
   echo "하네스 검사 실패: $*" >&2
@@ -12,6 +13,7 @@ fail() {
 
 [ -d "$cards_dir" ] || fail "작업 카드 디렉터리 없음"
 [ -f "$dashboard" ] || fail "대시보드 없음"
+[ -f "$master_plan" ] || fail "마스터 계획 없음"
 
 tmp_dir=$(mktemp -d "${TMPDIR:-/tmp}/online-lecture-check.XXXXXX")
 trap 'rm -rf "$tmp_dir"' 0 HUP INT TERM
@@ -44,15 +46,22 @@ while IFS= read -r file; do
   group=$(value_of parallel_group "$file" | sed 's/^"//; s/"$//')
   blocked=$(value_of blocked_reason "$file" | sed 's/^"//; s/"$//')
   owned=$(value_of owned_files "$file")
+  shared=$(value_of shared_files "$file")
+  owner=$(value_of owner "$file" | sed 's/^"//; s/"$//')
+  started=$(value_of started_at "$file" | sed 's/^"//; s/"$//')
+  implementation=$(value_of implementation_commit "$file" | sed 's/^"//; s/"$//')
+  reviewer=$(value_of reviewer "$file" | sed 's/^"//; s/"$//')
+  review_commit=$(value_of review_commit "$file" | sed 's/^"//; s/"$//')
 
-  printf '%s|%s|%s|%s|%s|%s|%s|%s\n' \
-    "$id" "$status" "$type" "$depends" "$group" "$blocked" "$owned" "$file" >> "$meta"
+  printf '%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s\n' \
+    "$id" "$status" "$type" "$depends" "$group" "$blocked" "$owned" "$shared" \
+    "$owner" "$started" "$implementation" "$reviewer" "$review_commit" "$file" >> "$meta"
 done < "$cards"
 
 duplicate=$(cut -d '|' -f1 "$meta" | sort | uniq -d | sed -n '1p')
 [ -z "$duplicate" ] || fail "중복 작업 ID: $duplicate"
 
-while IFS='|' read -r id status type depends group blocked owned file; do
+while IFS='|' read -r id status type depends group blocked owned shared owner started implementation reviewer review_commit file; do
   printf '%s\n' "$id" | grep -Eq '^P[0-9]{2}-T[0-9]{2}$' || fail "작업 ID 형식 오류: $file"
   case "$status" in
     blocked|ready|in_progress|review|done) ;;
@@ -67,9 +76,24 @@ while IFS='|' read -r id status type depends group blocked owned file; do
   elif [ -n "$blocked" ]; then
     fail "blocked_reason은 빈 값이어야 함: $id"
   fi
+  case "$status" in
+    in_progress)
+      [ -n "$owner" ] && [ -n "$started" ] || fail "담당자와 시작 시각 필요: $id"
+      ;;
+    review)
+      [ -n "$owner" ] && [ -n "$started" ] || fail "담당자와 시작 시각 필요: $id"
+      printf '%s\n' "$implementation" | grep -Eq '^[0-9a-f]{7,40}$' || fail "구현 커밋 필요: $id"
+      ;;
+    done)
+      [ -n "$owner" ] && [ -n "$started" ] || fail "담당자와 시작 시각 필요: $id"
+      printf '%s\n' "$implementation" | grep -Eq '^[0-9a-f]{7,40}$' || fail "구현 커밋 필요: $id"
+      [ -n "$reviewer" ] && [ "$reviewer" != "$owner" ] || fail "독립 리뷰어 필요: $id"
+      printf '%s\n' "$review_commit" | grep -Eq '^[0-9a-f]{7,40}$' || fail "승인 커밋 필요: $id"
+      ;;
+  esac
 done < "$meta"
 
-while IFS='|' read -r id status type depends group blocked owned file; do
+while IFS='|' read -r id status type depends group blocked owned shared owner started implementation reviewer review_commit file; do
   deps=$(printf '%s' "$depends" | sed 's/^\[//; s/\]$//; s/"//g; s/,/ /g')
   unmet=0
   for dep in $deps; do
@@ -86,23 +110,61 @@ while IFS='|' read -r id status type depends group blocked owned file; do
   fi
 done < "$meta"
 
-while IFS='|' read -r id status type depends group blocked owned file; do
-  [ -n "$group" ] || continue
-  paths=$(printf '%s' "$owned" | sed 's/^\[//; s/\]$//; s/"//g; s/,/\n/g; s/^ *//; s/ *$//')
-  for path in $paths; do
-    [ -n "$path" ] || continue
-    conflicts=$(awk -F '|' -v self="$id" -v grp="$group" -v needle="\"$path\"" '
-      $1 != self && $5 == grp && index($7, needle) { print $1; exit }
-    ' "$meta")
-    [ -z "$conflicts" ] || fail "병렬 파일 소유권 충돌: $id <-> $conflicts ($path)"
-  done
-done < "$meta"
+conflict=$(awk -F '|' '
+  function clean(s) { gsub(/^\[|\]$/, "", s); gsub(/"/, "", s); return s }
+  function trim(s) { gsub(/^ +| +$/, "", s); return s }
+  function overlaps(a,b) { return a == b || index(a, b "/") == 1 || index(b, a "/") == 1 }
+  {
+    ids[NR]=$1; groups[NR]=$5; owned[NR]=clean($7)
+  }
+  END {
+    for (i=1; i<=NR; i++) for (j=i+1; j<=NR; j++) {
+      if (groups[i] == "" || groups[i] != groups[j]) continue
+      ni=split(owned[i], ai, ","); nj=split(owned[j], aj, ",")
+      for (x=1; x<=ni; x++) for (y=1; y<=nj; y++) {
+        a=trim(ai[x]); b=trim(aj[y])
+        if (a != "" && b != "" && overlaps(a,b)) { print ids[i] " <-> " ids[j] " (" a " / " b ")"; exit }
+      }
+    }
+  }
+' "$meta")
+[ -z "$conflict" ] || fail "병렬 파일 소유권 충돌: $conflict"
 
-while IFS='|' read -r id status type depends group blocked owned file; do
+orphan=$(awk -F '|' '
+  function clean(s) { gsub(/^\[|\]$/, "", s); gsub(/"/, "", s); return s }
+  function trim(s) { gsub(/^ +| +$/, "", s); return s }
+  function covers(owner,shared) { return owner == shared || index(shared, owner "/") == 1 }
+  {
+    owned[NR]=clean($7); shared[NR]=clean($8)
+  }
+  END {
+    for (i=1; i<=NR; i++) {
+      ns=split(shared[i], ss, ",")
+      for (s=1; s<=ns; s++) {
+        target=trim(ss[s]); if (target == "") continue
+        count=0
+        for (j=1; j<=NR; j++) {
+          no=split(owned[j], oo, ",")
+          for (o=1; o<=no; o++) if (covers(trim(oo[o]), target)) count++
+        }
+        if (count == 0) { print target; exit }
+      }
+    }
+  }
+' "$meta")
+[ -z "$orphan" ] || fail "공유 파일 통합 소유자 없음: $orphan"
+
+while IFS='|' read -r id status type depends group blocked owned shared owner started implementation reviewer review_commit file; do
   count=$(grep -F -c "| $id |" "$dashboard" || true)
   [ "$count" -ne 0 ] || fail "대시보드 누락: $id"
   [ "$count" -eq 1 ] || fail "대시보드 중복: $id"
 done < "$meta"
+
+card_ids="$tmp_dir/card-ids.txt"
+plan_ids="$tmp_dir/plan-ids.txt"
+cut -d '|' -f1 "$meta" | sort > "$card_ids"
+sed -n 's/^| \(P[0-9][0-9]-T[0-9][0-9]\) |.*/\1/p' "$master_plan" | sort -u > "$plan_ids"
+cmp -s "$card_ids" "$plan_ids" || fail "마스터 계획 불일치"
 
 count=$(wc -l < "$meta" | tr -d ' ')
 echo "하네스 검사 통과: ${count}개 작업 카드"

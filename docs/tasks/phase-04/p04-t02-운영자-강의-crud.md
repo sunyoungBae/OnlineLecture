@@ -8,8 +8,8 @@ parallel_group: "C-A"
 owner: ""
 started_at: ""
 blocked_reason: dependency
-owned_files: ["src/app/admin/courses/page.tsx", "src/app/admin/courses/actions.ts", "src/features/admin/courses.test.ts"]
-shared_files: ["src/app/admin/layout.tsx"]
+owned_files: ["src/app/admin/courses/page.tsx", "src/app/admin/courses/actions.ts", "src/features/admin/courses.test.ts", "src/app/admin/layout.tsx"]
+shared_files: []
 implementation_commit: ""
 reviewer: ""
 review_commit: ""
@@ -24,7 +24,7 @@ review_commit: ""
 - 생성 또는 수정: src/app/admin/courses/page.tsx
 - 생성 또는 수정: src/app/admin/courses/actions.ts
 - 생성 또는 수정: src/features/admin/courses.test.ts
-- 통합 소유 시에만 수정: src/app/admin/layout.tsx
+- 생성 또는 수정: src/app/admin/layout.tsx
 
 # 제외
 

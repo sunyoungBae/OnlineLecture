@@ -9,7 +9,7 @@ owner: ""
 started_at: ""
 blocked_reason: dependency
 owned_files: ["docs/operations/deployment.md", "vercel.json"]
-shared_files: ["Vercel 환경 변수"]
+shared_files: []
 implementation_commit: ""
 reviewer: ""
 review_commit: ""
@@ -23,7 +23,7 @@ GitHub·Vercel 연결과 배포 문서을 완료해 다음 의존 작업이 사�
 
 - 생성 또는 수정: docs/operations/deployment.md
 - 생성 또는 수정: vercel.json
-- 통합 소유 시에만 수정: Vercel 환경 변수
+- Vercel 환경 변수는 저장소 파일이 아니라 배포 프로젝트에서만 설정한다.
 
 # 제외
 
@@ -31,13 +31,12 @@ GitHub·Vercel 연결과 배포 문서을 완료해 다음 의존 작업이 사�
 
 # 선행조건과 차단 해제
 
-P08-T01가 모두 done이면 ready로 전환한다.
+P08-T01가 done이면 `blocked_reason: external`로 바꾸고 GitHub 저장소·Vercel 프로젝트·환경 변수 입력 권한을 확인한 뒤 ready로 전환한다.
 
 # 파일
 
 - docs/operations/deployment.md
 - vercel.json
-- Vercel 환경 변수
 
 # 인터페이스
 

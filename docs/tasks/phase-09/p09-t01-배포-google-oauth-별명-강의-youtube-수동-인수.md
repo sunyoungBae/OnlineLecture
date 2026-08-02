@@ -7,9 +7,9 @@ depends_on: ["P08-T03"]
 parallel_group: "M-A"
 owner: ""
 started_at: ""
-blocked_reason: external
+blocked_reason: dependency
 owned_files: ["docs/acceptance/oauth-video.md"]
-shared_files: ["Google OAuth", "YouTube"]
+shared_files: []
 implementation_commit: ""
 reviewer: ""
 review_commit: ""
@@ -22,8 +22,7 @@ review_commit: ""
 # 범위
 
 - 생성 또는 수정: docs/acceptance/oauth-video.md
-- 통합 소유 시에만 수정: Google OAuth
-- 통합 소유 시에만 수정: YouTube
+- Google OAuth와 YouTube는 외부 검증 대상이며 저장소 파일이 아니다.
 
 # 제외
 
@@ -31,13 +30,11 @@ review_commit: ""
 
 # 선행조건과 차단 해제
 
-P08-T03가 모두 done이면 ready로 전환한다.
+P08-T03가 done이면 `blocked_reason: external`로 바꾸고 Google OAuth 승인·배포 리디렉션 URL·공개 테스트 영상 준비를 확인한 뒤 ready로 전환한다.
 
 # 파일
 
 - docs/acceptance/oauth-video.md
-- Google OAuth
-- YouTube
 
 # 인터페이스
 

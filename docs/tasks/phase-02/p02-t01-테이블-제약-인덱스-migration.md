@@ -31,7 +31,7 @@ review_commit: ""
 
 # 선행조건과 차단 해제
 
-P01-T01가 모두 done이면 ready로 전환한다.
+P01-T01가 done이면 Supabase 로컬 CLI 설정을 확인한다. 원격 개발 프로젝트 적용 증거가 필요한 시점에는 `blocked_reason: external`로 바꾸고 프로젝트 접근 승인을 받은 뒤 진행한다.
 
 # 파일
 

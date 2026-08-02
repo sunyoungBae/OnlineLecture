@@ -8,8 +8,8 @@ parallel_group: ""
 owner: ""
 started_at: ""
 blocked_reason: dependency
-owned_files: ["supabase/migrations/202608020003_storage.sql", "src/types/database.ts", "supabase/tests/storage.sql"]
-shared_files: ["src/types/index.ts"]
+owned_files: ["supabase/migrations/202608020003_storage.sql", "src/types/database.ts", "supabase/tests/storage.sql", "src/types/index.ts"]
+shared_files: []
 implementation_commit: ""
 reviewer: ""
 review_commit: ""
@@ -24,7 +24,7 @@ review_commit: ""
 - 생성 또는 수정: supabase/migrations/202608020003_storage.sql
 - 생성 또는 수정: src/types/database.ts
 - 생성 또는 수정: supabase/tests/storage.sql
-- 통합 소유 시에만 수정: src/types/index.ts
+- 생성 또는 수정: src/types/index.ts
 
 # 제외
 

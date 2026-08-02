@@ -7,9 +7,9 @@ depends_on: ["P08-T03"]
 parallel_group: "M-A"
 owner: ""
 started_at: ""
-blocked_reason: external
+blocked_reason: dependency
 owned_files: ["docs/acceptance/email-advisor.md"]
-shared_files: ["Resend", "Supabase Advisor"]
+shared_files: []
 implementation_commit: ""
 reviewer: ""
 review_commit: ""
@@ -22,8 +22,7 @@ Resend 경고 도착·Supabase Advisor 수동 인수을 완료해 다음 의존 
 # 범위
 
 - 생성 또는 수정: docs/acceptance/email-advisor.md
-- 통합 소유 시에만 수정: Resend
-- 통합 소유 시에만 수정: Supabase Advisor
+- Resend와 Supabase Advisor는 외부 검증 대상이며 저장소 파일이 아니다.
 
 # 제외
 
@@ -31,13 +30,11 @@ Resend 경고 도착·Supabase Advisor 수동 인수을 완료해 다음 의존 
 
 # 선행조건과 차단 해제
 
-P08-T03가 모두 done이면 ready로 전환한다.
+P08-T03가 done이면 `blocked_reason: external`로 바꾸고 Resend 수신 주소와 Supabase 프로젝트 접근을 확인한 뒤 ready로 전환한다.
 
 # 파일
 
 - docs/acceptance/email-advisor.md
-- Resend
-- Supabase Advisor
 
 # 인터페이스
 

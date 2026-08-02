@@ -22,6 +22,20 @@ write_card() {
   blocked=$7
   owned=$8
   implementation=${9:-}
+  shared=${10:-[]}
+  owner='""'
+  started='""'
+  reviewer='""'
+  review_commit='""'
+  if [ "$status" = review ]; then
+    owner='"작업자"'
+    started='"2026-08-02T00:00:00+09:00"'
+  elif [ "$status" = done ]; then
+    owner='"작업자"'
+    started='"2026-08-02T00:00:00+09:00"'
+    reviewer='"리뷰어"'
+    review_commit='"abcdef2"'
+  fi
   mkdir -p "$root/docs/tasks/phase-01"
   printf '%s\n' \
     '---' \
@@ -31,14 +45,14 @@ write_card() {
     'type: feature' \
     "depends_on: $depends" \
     "parallel_group: \"$group\"" \
-    'owner: ""' \
-    'started_at: ""' \
+    "owner: $owner" \
+    "started_at: $started" \
     "blocked_reason: $blocked" \
     "owned_files: $owned" \
-    'shared_files: []' \
+    "shared_files: $shared" \
     "implementation_commit: \"$implementation\"" \
-    'reviewer: ""' \
-    'review_commit: ""' \
+    "reviewer: $reviewer" \
+    "review_commit: $review_commit" \
     '---' \
     '' \
     '# 목표' > "$root/docs/tasks/phase-01/$file"
@@ -56,6 +70,18 @@ write_dashboard() {
   } > "$root/docs/tasks/README.md"
 }
 
+write_master_plan() {
+  root=$1
+  shift
+  mkdir -p "$root/docs/superpowers/plans"
+  {
+    printf '%s\n' '# 마스터 계획' '| ID | 산출물 |'
+    for id in "$@"; do
+      printf '| %s | 검사 |\n' "$id"
+    done
+  } > "$root/docs/superpowers/plans/2026-08-02-online-lecture-mvp.md"
+}
+
 new_fixture() {
   name=$1
   root="$tmp_root/$name"
@@ -63,6 +89,7 @@ new_fixture() {
   write_card "$root" a.md P01-T01 done '[]' A '""' '["src/a.ts"]' abcdef1
   write_card "$root" b.md P01-T02 ready '["P01-T01"]' A '""' '["src/b.ts"]'
   write_dashboard "$root" P01-T01 P01-T02
+  write_master_plan "$root" P01-T01 P01-T02
   printf '%s\n' "$root"
 }
 
@@ -113,6 +140,14 @@ root=$(new_fixture ownership-overlap)
 write_card "$root" b.md P01-T02 ready '["P01-T01"]' A '""' '["src/a.ts"]'
 expect_fail "$root" '병렬 파일 소유권 충돌'
 
+root=$(new_fixture nested-ownership-overlap)
+write_card "$root" b.md P01-T02 ready '["P01-T01"]' A '""' '["src/a.ts/child.ts"]'
+expect_fail "$root" '병렬 파일 소유권 충돌'
+
+root=$(new_fixture orphan-shared-file)
+write_card "$root" b.md P01-T02 ready '["P01-T01"]' A '""' '["src/b.ts"]' '' '["src/orphan.ts"]'
+expect_fail "$root" '공유 파일 통합 소유자 없음'
+
 root=$(new_fixture unfinished-dependency)
 write_card "$root" a.md P01-T01 blocked '[]' A external '["src/a.ts"]'
 expect_fail "$root" '미완료 의존 작업'
@@ -129,4 +164,13 @@ root=$(new_fixture dashboard-duplicate)
 write_dashboard "$root" P01-T01 P01-T02 P01-T02
 expect_fail "$root" '대시보드 중복'
 
-echo '하네스 검사기 테스트 통과: 11개 시나리오'
+root=$(new_fixture master-traceability)
+rm "$root/docs/tasks/phase-01/b.md"
+write_dashboard "$root" P01-T01
+expect_fail "$root" '마스터 계획 불일치'
+
+root=$(new_fixture missing-review-evidence)
+write_card "$root" b.md P01-T02 review '["P01-T01"]' A '""' '["src/b.ts"]'
+expect_fail "$root" '구현 커밋 필요'
+
+echo '하네스 검사기 테스트 통과: 15개 시나리오'

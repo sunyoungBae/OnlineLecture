@@ -33,7 +33,7 @@ review_commit: ""
 
 # 선행조건과 차단 해제
 
-P03-T03가 모두 done이면 ready로 전환한다.
+P03-T03가 done이면 단위 구현은 ready로 전환할 수 있다. 브라우저 영상 인수 전에는 `blocked_reason: external`로 바꾸고 공개 YouTube 테스트 영상 준비를 확인한다.
 
 # 파일
 

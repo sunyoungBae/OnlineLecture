@@ -8,8 +8,8 @@ parallel_group: ""
 owner: ""
 started_at: ""
 blocked_reason: dependency
-owned_files: ["src/app/auth/callback/route.ts", "src/app/(public)/login/page.tsx", "src/lib/supabase/client.ts", "src/lib/supabase/server.ts", "tests/e2e/auth.spec.ts"]
-shared_files: ["src/middleware.ts"]
+owned_files: ["src/app/auth/callback/route.ts", "src/app/(public)/login/page.tsx", "src/lib/supabase/client.ts", "src/lib/supabase/server.ts", "tests/e2e/auth.spec.ts", "src/middleware.ts"]
+shared_files: []
 implementation_commit: ""
 reviewer: ""
 review_commit: ""
@@ -26,7 +26,7 @@ Google OAuth·콜백·세션 경계을 완료해 다음 의존 작업이 사용�
 - 생성 또는 수정: src/lib/supabase/client.ts
 - 생성 또는 수정: src/lib/supabase/server.ts
 - 생성 또는 수정: tests/e2e/auth.spec.ts
-- 통합 소유 시에만 수정: src/middleware.ts
+- 생성 또는 수정: src/middleware.ts
 
 # 제외
 
@@ -34,7 +34,7 @@ Google OAuth·콜백·세션 경계을 완료해 다음 의존 작업이 사용�
 
 # 선행조건과 차단 해제
 
-P01-T03, P02-T03가 모두 done이면 ready로 전환한다.
+P01-T03, P02-T03가 모두 done이면 `blocked_reason: external`로 바꾸고 Google Cloud OAuth 앱·기본 신원 범위·로컬 리디렉션 URL 준비를 확인한 뒤 ready로 전환한다.
 
 # 파일
 
