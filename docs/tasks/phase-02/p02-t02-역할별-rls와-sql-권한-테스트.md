@@ -1,7 +1,7 @@
 ---
 id: P02-T02
 title: 역할별 RLS와 SQL 권한 테스트
-status: review
+status: done
 type: migration
 depends_on: ["P02-T01"]
 parallel_group: ""
@@ -11,8 +11,8 @@ blocked_reason: ""
 owned_files: ["supabase/migrations/202608020002_rls.sql", "supabase/tests/rls.sql"]
 shared_files: []
 implementation_commit: "c7e2bcd"
-reviewer: ""
-review_commit: ""
+reviewer: "Codex/p02_t02_security"
+review_commit: "1c2415d"
 ---
 
 # 목표
@@ -77,6 +77,7 @@ P02-T01가 모두 done이면 ready로 전환한다.
 - 공통 검사: `npm run lint`, `npm run typecheck`, `npm run test`(3), `npm run test:e2e`(2), `npm run build`, `./scripts/check-harness.sh`가 모두 통과했다.
 - 구현 커밋: `c7e2bcd` (`데이터: RLS 독립 리뷰 경계 보강`; 최초 구현 `e7fc587` 포함)
 - 독립 리뷰: `Codex/p02_t02_matrix`와 `Codex/p02_t02_security`가 역할 행렬, 공개 프로필 투영, 공지·작성자 불변성, 비공개 helper와 권한 경계를 검토해 Critical/Important 없음으로 승인했다.
+- 승인 커밋: `1c2415d` (`리뷰: P02-T02 독립 승인`)
 
 # 커밋
 
