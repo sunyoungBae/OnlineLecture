@@ -1,7 +1,7 @@
 ---
 id: P02-T01
 title: 테이블·제약·인덱스 migration
-status: review
+status: done
 type: migration
 depends_on: ["P01-T01"]
 parallel_group: "D-A"
@@ -11,8 +11,8 @@ blocked_reason: ""
 owned_files: ["supabase/.gitignore", "supabase/config.toml", "supabase/migrations/202608020001_core_schema.sql", "supabase/tests/core_schema.sql"]
 shared_files: []
 implementation_commit: "3ee77ed"
-reviewer: ""
-review_commit: ""
+reviewer: "Codex/p02_t01_review"
+review_commit: "4e87136"
 ---
 
 # 목표
@@ -88,6 +88,7 @@ P01-T01가 done이면 Supabase 로컬 CLI 설정을 확인한다. 원격 개발 
 - GREEN: 공유 DB 경합을 제거한 단독 실행에서 `npx supabase --agent no db reset && npx supabase --agent no test db`가 종료 코드 0으로 migration을 재적용하고 29개 pgTAP 검사를 통과했다. `--agent no`는 로컬 검사와 무관한 CLI 에이전트 프로필 조회만 비활성화한다.
 - 공통 검증: `npm run lint`, `npm run typecheck`, `npm run test` 3개, `npm run test:e2e` 2개, `npm run build`, `./scripts/check-harness.sh`가 통과했다.
 - 독립 재검토: `Codex/p02_t01_review`가 스키마, 정상·거부 경계, mutation 포착력, 소유권과 비밀 부재를 확인해 Critical/Important 잔여 없음으로 승인했다.
+- 승인 커밋: `4e87136` (`리뷰: P02-T01 독립 승인`).
 
 # 커밋
 
