@@ -1,6 +1,6 @@
 begin;
 
-select plan(28);
+select plan(29);
 
 select has_table('public', 'profiles', 'profiles 테이블이 있다');
 select has_table('public', 'courses', 'courses 테이블이 있다');
@@ -99,6 +99,13 @@ select throws_ok(
   '23505',
   'duplicate key value violates unique constraint "storage_settings_pkey"',
   '저장 설정은 singleton을 유지한다'
+);
+
+select throws_ok(
+  $$ insert into public.storage_settings (id) values (false) $$,
+  '23514',
+  'new row for relation "storage_settings" violates check constraint "storage_settings_id_check"',
+  '저장 설정은 false ID를 거부한다'
 );
 
 select is(
