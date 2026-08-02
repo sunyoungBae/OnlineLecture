@@ -1,0 +1,36 @@
+{
+  "name": "online-lecture",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint src --no-config-lookup --ext .ts,.tsx --parser @typescript-eslint/parser --rule 'no-undef:error'",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "test:e2e": "env -u NO_COLOR playwright test --pass-with-no-tests"
+  },
+  "dependencies": {
+    "@tailwindcss/postcss": "4.1.18",
+    "next": "16.2.12",
+    "postcss": "8.5.25",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "tailwindcss": "4.1.18"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.1",
+    "@typescript-eslint/parser": "8.65.0",
+    "@types/node": "22.20.1",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "eslint": "9.39.5",
+    "typescript": "5.9.3",
+    "vitest": "4.1.10"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  }
+}
