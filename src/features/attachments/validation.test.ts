@@ -89,6 +89,19 @@ describe("validateAttachmentFile", () => {
       }),
     ).toEqual({ valid: false, reason: "invalid_size" });
   });
+
+  it.each([1.5, Number.MAX_SAFE_INTEGER + 1])(
+    "안전한 정수 바이트가 아닌 파일 크기 %s를 거부한다",
+    (size) => {
+      expect(
+        validateAttachmentFile({
+          name: "bad.pdf",
+          type: "application/pdf",
+          size,
+        }),
+      ).toEqual({ valid: false, reason: "invalid_size" });
+    },
+  );
 });
 
 describe("validateAttachmentCount", () => {

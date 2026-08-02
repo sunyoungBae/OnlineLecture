@@ -60,7 +60,7 @@ export type AttachmentCountValidationResult =
 export function validateAttachmentFile(
   file: AttachmentFileInput,
 ): AttachmentValidationResult {
-  if (!Number.isFinite(file.size) || file.size < 0) {
+  if (!Number.isSafeInteger(file.size) || file.size < 0) {
     return { valid: false, reason: "invalid_size" };
   }
 

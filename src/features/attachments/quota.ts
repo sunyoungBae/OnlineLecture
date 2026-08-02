@@ -22,15 +22,18 @@ export function assessStorageQuota({
   warningArmed,
 }: StorageQuotaInput): StorageQuotaAssessment {
   if (
-    !Number.isFinite(currentUsageBytes) ||
+    !Number.isSafeInteger(currentUsageBytes) ||
     currentUsageBytes < 0 ||
-    !Number.isFinite(incomingBytes) ||
+    !Number.isSafeInteger(incomingBytes) ||
     incomingBytes < 0
   ) {
     throw new RangeError("사용량은 0 이상의 유한한 값이어야 합니다.");
   }
 
   const projectedUsageBytes = currentUsageBytes + incomingBytes;
+  if (!Number.isSafeInteger(projectedUsageBytes)) {
+    throw new RangeError("예상 사용량은 안전한 정수 범위여야 합니다.");
+  }
   const warningThreshold = STORAGE_QUOTA_BYTES * STORAGE_WARNING_RATIO;
   const blockThreshold = STORAGE_QUOTA_BYTES * STORAGE_BLOCK_RATIO;
   const uploadAllowed = projectedUsageBytes < blockThreshold;
