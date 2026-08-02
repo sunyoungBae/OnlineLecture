@@ -1,7 +1,7 @@
 ---
 id: P01-T02
 title: Sera 기반 토큰·폰트·필수 UI
-status: in_progress
+status: review
 type: feature
 depends_on: ["P01-T01"]
 parallel_group: "F-A"
@@ -10,7 +10,7 @@ started_at: "2026-08-02T14:34:25+09:00"
 blocked_reason: ""
 owned_files: ["src/app/globals.css", "src/lib/design-tokens.ts", "src/lib/design-tokens.test.ts", "src/components/ui", "package.json", "package-lock.json", "README.md"]
 shared_files: []
-implementation_commit: ""
+implementation_commit: "4527b02"
 reviewer: ""
 review_commit: ""
 ---
@@ -82,6 +82,15 @@ P01-T01가 모두 done이면 ready로 전환한다.
 # 리뷰 증거
 
 작업 전 실패, 완료 명령 결과, 구현 커밋, 구현자와 다른 리뷰어, 승인 커밋을 이 절에 기록한다.
+
+- RED 1: `npm run test -- src/lib/design-tokens.test.ts` → `Cannot find module './design-tokens'`로 1개 suite 실패. 토큰 모듈 부재라는 예상 이유를 확인했다.
+- GREEN 1: 같은 명령 → 1개 파일, 2개 테스트 통과. 지정 토큰과 알 수 없는 경로 거부를 확인했다.
+- 최초 구현 커밋: `4f4054e` (`기능: Sera 기반 토큰·폰트·필수 UI`).
+- RED 2: CSS/UI 산출물 계약 테스트를 추가한 뒤 기존 Button에 `@base-ui/react/button` import가 없어 3개 중 1개 테스트가 예상대로 실패했다.
+- GREEN 2: Base UI 1.6.0 기반 Button·Input·Textarea·Label과 44px Label을 구현한 뒤 같은 테스트 3개가 모두 통과했다.
+- 최종 구현 커밋: `4527b02` (`수정: Base UI 프리미티브와 접근성 계약 보완`).
+- 완료 검증: `npm run lint`, `npm run typecheck`, `npm run test`, `npm run test:e2e`, `npm run build`, `./scripts/check-harness.sh`가 통합 상태에서 통과했다. 단위 3개, E2E 2개가 통과했고 하네스는 31개 카드를 확인했다.
+- 독립 재검토: `Codex/p01_t02_review`가 Base UI 직접 기반, CSS/UI 계약, 44px Label, Noto 변수 연결, 버전·라이선스·소유권을 확인해 Critical/Important 잔여 없음으로 승인했다.
 
 # 커밋
 
