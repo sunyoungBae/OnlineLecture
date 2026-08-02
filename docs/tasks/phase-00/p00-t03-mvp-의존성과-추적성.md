@@ -11,7 +11,7 @@ blocked_reason: ""
 owned_files: ["docs/superpowers/plans/2026-08-02-online-lecture-mvp.md"]
 shared_files: []
 reviewer: "검토 에이전트"
-review_commit: "기존 커밋 참조"
+review_commit: "c52db4a"
 ---
 
 # 목표
@@ -72,4 +72,3 @@ P00-T01가 모두 done이면 ready로 전환한다.
 # 커밋
 
 권장 메시지: 문서: MVP 의존성과 추적성
-

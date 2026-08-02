@@ -58,7 +58,7 @@ P08-T03가 모두 done이면 ready로 전환한다.
 - 증거 유형: 수동 승인
 - 작업 전 명령: test -s docs/acceptance/email-advisor.md
 - 예상 작업 전 결과: 이메일·Advisor 수동 증거가 없어 실패
-- 완료 명령: test -s docs/acceptance/email-advisor.md
+- 완료 명령: test -s docs/acceptance/email-advisor.md && rg -q '환경|수행 시각|승인자|80%|재무장|Resend|Advisor' docs/acceptance/email-advisor.md
 - 기대 완료 결과: 80% 이메일 수신, 재무장과 Advisor 조치·승인자가 기록된다.
 
 # 인수 조건
@@ -75,4 +75,3 @@ P08-T03가 모두 done이면 ready로 전환한다.
 # 커밋
 
 권장 메시지: 검증: Resend 경고 도착·Supabase Advisor 수동 인수
-

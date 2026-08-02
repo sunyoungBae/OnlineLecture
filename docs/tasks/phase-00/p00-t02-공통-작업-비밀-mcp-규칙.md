@@ -11,7 +11,7 @@ blocked_reason: ""
 owned_files: ["AGENTS.md", ".env.example", ".codex/config.toml.example"]
 shared_files: []
 reviewer: "검토 에이전트"
-review_commit: "기존 커밋 참조"
+review_commit: "62f940f"
 ---
 
 # 목표
@@ -76,4 +76,3 @@ review_commit: "기존 커밋 참조"
 # 커밋
 
 권장 메시지: 설정: 공통 작업·비밀·MCP 규칙
-

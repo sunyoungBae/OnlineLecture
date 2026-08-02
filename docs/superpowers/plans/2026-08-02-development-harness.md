@@ -219,7 +219,7 @@ git commit -m "문서: MVP 작업 의존성 정의"
 
 - [ ] **Step 1: Create all cards from the canonical schema**
 
-Create one kebab-case Markdown file for each ID in Task 3. P00 harness cards are `done` only when their referenced commit exists; P01-T01 is `ready`; all unmet dependency cards are `blocked` with `blocked_reason: dependency`; external acceptance cards use `blocked_reason: external`. Each body must give exact paths, consumed/produced interfaces, ordered test or verification actions, expected failure/pass evidence, acceptance criteria, exclusions, and a commit message.
+Create one kebab-case Markdown file for each ID in Task 3. P00 harness cards are `done` only when their referenced commit exists; the card-writing task is `review` until independent approval; P01-T01 remains `blocked` until P00-T05 is `done`; all other unmet dependency cards are `blocked` with `blocked_reason: dependency`; external acceptance cards use `blocked_reason: external`. Each body must give exact paths, consumed/produced interfaces, ordered test or verification actions, expected failure/pass evidence, acceptance criteria, exclusions, and a commit message.
 
 - [ ] **Step 2: Make parallel ownership explicit**
 

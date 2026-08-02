@@ -52,7 +52,7 @@ flowchart TD
 | P00-T04 | 31개 작업 카드와 대시보드 | blocked | P00-T02,P00-T03 | - | `docs/tasks/phase-*`, 대시보드 | 없음 |
 | P00-T05 | 하네스 자동 검사 | blocked | P00-T04 | - | `scripts/check-harness.sh`, 검사 테스트 | `AGENTS.md`, 대시보드 |
 | P01-T01 | Next.js·TypeScript·Tailwind·Vitest·Playwright 기반 | blocked | P00-T05 | - | 프로젝트 설정, `src` 기본 구조 | `package.json`, lockfile, 테스트 설정, README |
-| P01-T02 | Sera 기반 토큰·폰트·필수 UI | blocked | P01-T01 | F-A | `src/components/ui`, 전역 스타일 | `package.json` 변경은 P01-T01 소유 버전에서 통합 |
+| P01-T02 | Sera 기반 토큰·폰트·필수 UI | blocked | P01-T01 | F-A | `src/components/ui`, 전역 스타일, 필요한 UI 패키지 | `package.json`과 lockfile은 P01-T02가 통합 소유 |
 | P01-T03 | 공개 헤더·모바일 메뉴·홈·오류 틀 | blocked | P01-T01 | F-A | 공개 라우트와 레이아웃 | 루트 레이아웃 통합 소유 |
 | P02-T01 | 테이블·제약·인덱스 migration | blocked | P01-T01 | D-A | 첫 schema migration | migration 번호 |
 | P02-T02 | 역할별 RLS와 SQL 권한 테스트 | blocked | P02-T01 | - | RLS migration·테스트 | migration 번호 |
@@ -63,12 +63,12 @@ flowchart TD
 | P04-T01 | 회원 강의 목록·상세·YouTube 플레이어 | blocked | P03-T03 | C-A | 회원 강의 라우트와 YouTube 검증 | 공개 레이아웃 없음 |
 | P04-T02 | 운영자 강의 CRUD | blocked | P03-T03 | C-A | 관리자 강의 라우트·서버 액션 | 관리자 내비게이션은 통합 소유 |
 | P04-T03 | 운영자 회차 CRUD·위아래 순서 이동 | blocked | P04-T02 | - | 회차 관리·순서 로직 | 강의 관리자 화면 |
-| P05-T01 | Tiptap 제한 편집기와 게시글 CRUD | blocked | P03-T03 | B-A | 게시글 편집 라우트·콘텐츠 검증 | `package.json` 의존성 통합 |
+| P05-T01 | Tiptap 제한 편집기와 게시글 CRUD | blocked | P03-T03 | B-A | 게시글 편집 라우트·콘텐츠 검증·Tiptap 패키지 | `package.json`과 lockfile은 P05-T01이 통합 소유 |
 | P05-T02 | 공개 목록·escaped ILIKE 검색·필터·페이지네이션 | blocked | P05-T01 | - | 게시판 조회 라우트·검색 파서 | 게시판 내비게이션 |
 | P05-T03 | 댓글 CRUD·공지·운영자 삭제 | blocked | P05-T02 | - | 댓글·관리 액션 | 게시글 본문 화면 |
 | P06-T01 | 파일 allowlist·10MB/3개·80/95% 용량 로직 | blocked | P02-T03 | U-A | 파일·용량 순수 검증 모듈 | 없음 |
 | P06-T02 | 게시글 첨부 업로드·서명 다운로드·정리 | blocked | P05-T03,P06-T01 | U-B | 게시글 첨부 서버 로직 | 게시글 편집·본문 통합 소유자 P06-T02 |
-| P06-T03 | 회차 자료 업로드·다운로드·삭제 | blocked | P04-T03,P06-T01 | U-B | 회차 첨부 서버 로직 | 회차 관리자·플레이어 통합 소유자 P06-T03 |
+| P06-T03 | 회차 자료 업로드·다운로드·삭제 | blocked | P04-T01,P04-T03,P06-T01 | U-B | 회차 첨부 서버 로직 | 회차 관리자·플레이어 통합 소유자 P06-T03 |
 | P06-T04 | 80% Resend 1회·재무장·95% 차단/복구 | blocked | P06-T02,P06-T03 | - | 경고 발송·보상 처리 | storage_settings |
 | P07-T01 | 오류·404·권한·빈 상태·로딩 공통 마감 | blocked | P04-T03,P05-T03,P06-T04 | Q-A | 공통 상태 컴포넌트·라우트 파일 | 각 기능 연결은 이 작업 소유 |
 | P07-T02 | 키보드·포커스·라벨·44px·WCAG AA·모바일 점검 | blocked | P07-T01 | - | 접근성 수정과 Playwright 검사 | 전 기능 UI |

@@ -48,17 +48,19 @@ P05-T02가 모두 done이면 ready로 전환한다.
 # 실행 순서
 
 1. AGENTS.md와 이 카드를 읽고 ready 여부를 확인한 뒤 owner, started_at, status를 갱신한다.
-2. 다음 작업 전 검사를 실행한다: npm run test -- src/features/comments/actions.test.ts
-3. 기대 결과를 확인한다: 댓글 권한 로직이 없어 실패.
-4. 범위 안의 최소 변경만 구현한다.
-5. 다음 통과 검사를 실행한다: npm run test -- src/features/comments/actions.test.ts && npm run typecheck
-6. ./scripts/check-harness.sh와 사용 가능한 공통 완료 명령을 실행한다.
-7. 카드와 대시보드를 review로 바꾸고 구현 커밋을 기록한다.
-8. 구현자와 다른 리뷰어가 승인하면 reviewer, review_commit과 done 상태를 같은 커밋에 기록한다.
+2. 인수 조건을 가장 좁게 증명하는 실패 테스트를 owned_files의 테스트 경로에 먼저 작성한다.
+3. 다음 작업 전 검사를 실행한다: npm run test -- src/features/comments/actions.test.ts
+4. 기대 결과를 확인한다: 댓글 권한 로직이 없어 실패.
+5. 범위 안의 최소 변경만 구현한다.
+6. 다음 통과 검사를 실행한다: npm run test -- src/features/comments/actions.test.ts && npm run typecheck
+7. ./scripts/check-harness.sh와 사용 가능한 공통 완료 명령을 실행한다.
+8. 카드와 대시보드를 review로 바꾸고 구현 커밋을 기록한다.
+9. 구현자와 다른 리뷰어가 승인하면 reviewer, review_commit과 done 상태를 같은 커밋에 기록한다.
 
 # 검증
 
 - 증거 유형: RED/GREEN
+- 작업 전 필수 행동: 실패 테스트를 먼저 작성한다.
 - 작업 전 명령: npm run test -- src/features/comments/actions.test.ts
 - 예상 작업 전 결과: 댓글 권한 로직이 없어 실패
 - 완료 명령: npm run test -- src/features/comments/actions.test.ts && npm run typecheck
@@ -78,4 +80,3 @@ P05-T02가 모두 done이면 ready로 전환한다.
 # 커밋
 
 권장 메시지: 기능: 댓글 CRUD·공지·운영자 삭제
-

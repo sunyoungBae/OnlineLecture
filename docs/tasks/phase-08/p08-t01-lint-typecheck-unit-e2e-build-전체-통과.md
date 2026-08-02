@@ -9,7 +9,7 @@ owner: ""
 started_at: ""
 blocked_reason: dependency
 owned_files: ["docs/verification/release-check.md"]
-shared_files: ["전체 저장소"]
+shared_files: []
 reviewer: ""
 review_commit: ""
 ---
@@ -21,7 +21,7 @@ lint·typecheck·unit·E2E·build 전체 통과을 완료해 다음 의존 작�
 # 범위
 
 - 생성 또는 수정: docs/verification/release-check.md
-- 통합 소유 시에만 수정: 전체 저장소
+- 제품 결함이 발견되면 이 카드에서 범위를 넓혀 수정하지 않고, 정확한 파일 소유권을 가진 결함 카드를 먼저 추가한다.
 
 # 제외
 
@@ -34,7 +34,6 @@ P07-T02가 모두 done이면 ready로 전환한다.
 # 파일
 
 - docs/verification/release-check.md
-- 전체 저장소
 
 # 인터페이스
 
@@ -73,4 +72,3 @@ P07-T02가 모두 done이면 ready로 전환한다.
 # 커밋
 
 권장 메시지: 설정: lint·typecheck·unit·E2E·build 전체 통과
-

@@ -58,7 +58,7 @@ P08-T03가 모두 done이면 ready로 전환한다.
 - 증거 유형: 수동 승인
 - 작업 전 명령: test -s docs/acceptance/oauth-video.md
 - 예상 작업 전 결과: 배포 수동 증거가 없어 실패
-- 완료 명령: test -s docs/acceptance/oauth-video.md
+- 완료 명령: test -s docs/acceptance/oauth-video.md && rg -q '환경|수행 시각|승인자|Google OAuth|별명|YouTube|공개 영상 한계' docs/acceptance/oauth-video.md
 - 기대 완료 결과: 배포 URL, 환경, 시각, 승인자와 로그인→별명→영상 재생 결과가 기록된다.
 
 # 인수 조건
@@ -75,4 +75,3 @@ P08-T03가 모두 done이면 ready로 전환한다.
 # 커밋
 
 권장 메시지: 검증: 배포 Google OAuth·별명·강의·YouTube 수동 인수
-
