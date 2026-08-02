@@ -1,7 +1,9 @@
 import { expect, test } from "@playwright/test";
 
+test.use({ baseURL: "http://localhost:3000" });
+
 test("홈에서 로그인 CTA로 로그인 화면에 이동한다", async ({ page }) => {
-  await page.goto("http://localhost:3000/");
+  await page.goto("/");
 
   await expect(page.getByRole("banner")).toBeVisible();
   await expect(
@@ -28,7 +30,7 @@ test("홈에서 로그인 CTA로 로그인 화면에 이동한다", async ({ pag
 
 test("모바일 메뉴를 키보드로 열고 Escape로 닫는다", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("http://localhost:3000/");
+  await page.goto("/");
 
   const menuButton = page.getByRole("button", { name: "메뉴 열기" });
   const buttonBox = await menuButton.boundingBox();
@@ -47,6 +49,13 @@ test("모바일 메뉴를 키보드로 열고 Escape로 닫는다", async ({ pag
     mobileNavigation.getByRole("link", { name: "로그인" }),
   ).toBeVisible();
 
+  await page.keyboard.press("Tab");
+  await expect(
+    mobileNavigation.getByRole("link", { name: "홈" }),
+  ).toBeFocused();
+
   await page.keyboard.press("Escape");
   await expect(mobileNavigation).toBeHidden();
+  await expect(menuButton).toBeFocused();
+  await expect(menuButton).toHaveAttribute("aria-expanded", "false");
 });

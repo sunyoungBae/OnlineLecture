@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useId, useState } from "react";
+import { type ComponentRef, useId, useRef, useState } from "react";
 
 const menuItems = [
   { href: "/", label: "홈" },
@@ -11,13 +11,16 @@ const menuItems = [
 export function MobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const menuId = useId();
+  const menuButtonRef = useRef<ComponentRef<"button">>(null);
 
   return (
     <div
       className="relative md:hidden"
       onKeyDown={(event) => {
         if (event.key === "Escape") {
+          event.preventDefault();
           setIsOpen(false);
+          menuButtonRef.current?.focus();
         }
       }}
     >
@@ -27,6 +30,7 @@ export function MobileMenu() {
         aria-label={isOpen ? "메뉴 닫기" : "메뉴 열기"}
         className="flex min-h-11 min-w-11 items-center justify-center border border-[var(--border)] bg-[var(--surface)] text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2"
         onClick={() => setIsOpen((open) => !open)}
+        ref={menuButtonRef}
         type="button"
       >
         <span aria-hidden="true">☰</span>
