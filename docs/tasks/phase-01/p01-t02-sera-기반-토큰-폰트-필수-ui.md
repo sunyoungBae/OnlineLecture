@@ -8,7 +8,7 @@ parallel_group: "F-A"
 owner: "Codex/p01_t02"
 started_at: "2026-08-02T14:34:25+09:00"
 blocked_reason: ""
-owned_files: ["src/app/globals.css", "src/lib/design-tokens.ts", "src/lib/design-tokens.test.ts", "src/components/ui", "package.json", "package-lock.json"]
+owned_files: ["src/app/globals.css", "src/lib/design-tokens.ts", "src/lib/design-tokens.test.ts", "src/components/ui", "package.json", "package-lock.json", "README.md"]
 shared_files: []
 implementation_commit: ""
 reviewer: ""
@@ -27,6 +27,7 @@ Sera 기반 토큰·폰트·필수 UI을 완료해 다음 의존 작업이 사�
 - 생성 또는 수정: src/components/ui
 - 생성 또는 수정: package.json
 - 생성 또는 수정: package-lock.json
+- 생성 또는 수정: README.md (추가 UI 패키지의 정확 버전과 라이선스)
 
 # 제외
 
@@ -44,6 +45,7 @@ P01-T01가 모두 done이면 ready로 전환한다.
 - src/components/ui
 - package.json
 - package-lock.json
+- README.md
 
 # 인터페이스
 
