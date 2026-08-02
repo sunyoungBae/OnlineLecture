@@ -14,11 +14,11 @@ fail() {
 [ -f "$dashboard" ] || fail "대시보드 없음"
 
 tmp_dir=$(mktemp -d "${TMPDIR:-/tmp}/online-lecture-check.XXXXXX")
-trap 'rm -rf "$tmp_dir"' EXIT HUP INT TERM
+trap 'rm -rf "$tmp_dir"' 0 HUP INT TERM
 cards="$tmp_dir/cards.txt"
 meta="$tmp_dir/meta.tsv"
 
-find "$cards_dir" -path '*/phase-*/*.md' -type f | sort > "$cards"
+find "$cards_dir" -type f | grep '/phase-[0-9][0-9]/.*\.md$' | sort > "$cards" || true
 [ -s "$cards" ] || fail "작업 카드 없음"
 
 expected_keys='id title status type depends_on parallel_group owner started_at blocked_reason owned_files shared_files implementation_commit reviewer review_commit'
@@ -71,10 +71,19 @@ done < "$meta"
 
 while IFS='|' read -r id status type depends group blocked owned file; do
   deps=$(printf '%s' "$depends" | sed 's/^\[//; s/\]$//; s/"//g; s/,/ /g')
+  unmet=0
   for dep in $deps; do
     awk -F '|' -v wanted="$dep" '$1 == wanted { found=1 } END { exit !found }' "$meta" \
       || fail "알 수 없는 의존 작업: $id -> $dep"
+    dep_status=$(awk -F '|' -v wanted="$dep" '$1 == wanted { print $2; exit }' "$meta")
+    if [ "$dep_status" != done ]; then
+      unmet=1
+      [ "$status" = blocked ] || fail "미완료 의존 작업: $id -> $dep ($dep_status)"
+    fi
   done
+  if [ "$status" = blocked ] && [ "$blocked" = dependency ] && [ "$unmet" -eq 0 ]; then
+    fail "dependency 차단 사유 불일치: $id"
+  fi
 done < "$meta"
 
 while IFS='|' read -r id status type depends group blocked owned file; do

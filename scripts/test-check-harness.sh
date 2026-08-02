@@ -10,7 +10,7 @@ if [ ! -x "$checker" ]; then
 fi
 
 tmp_root=$(mktemp -d "${TMPDIR:-/tmp}/online-lecture-harness.XXXXXX")
-trap 'rm -rf "$tmp_root"' EXIT HUP INT TERM
+trap 'rm -rf "$tmp_root"' 0 HUP INT TERM
 
 write_card() {
   root=$1
@@ -61,7 +61,7 @@ new_fixture() {
   root="$tmp_root/$name"
   mkdir -p "$root"
   write_card "$root" a.md P01-T01 done '[]' A '""' '["src/a.ts"]' abcdef1
-  write_card "$root" b.md P01-T02 blocked '["P01-T01"]' A dependency '["src/b.ts"]'
+  write_card "$root" b.md P01-T02 ready '["P01-T01"]' A '""' '["src/b.ts"]'
   write_dashboard "$root" P01-T01 P01-T02
   printf '%s\n' "$root"
 }
@@ -110,8 +110,16 @@ write_card "$root" b.md P01-T02 ready '["P01-T01"]' A dependency '["src/b.ts"]'
 expect_fail "$root" 'blocked_reason은 빈 값이어야 함'
 
 root=$(new_fixture ownership-overlap)
-write_card "$root" b.md P01-T02 blocked '["P01-T01"]' A dependency '["src/a.ts"]'
+write_card "$root" b.md P01-T02 ready '["P01-T01"]' A '""' '["src/a.ts"]'
 expect_fail "$root" '병렬 파일 소유권 충돌'
+
+root=$(new_fixture unfinished-dependency)
+write_card "$root" a.md P01-T01 blocked '[]' A external '["src/a.ts"]'
+expect_fail "$root" '미완료 의존 작업'
+
+root=$(new_fixture resolved-dependency-blocked)
+write_card "$root" b.md P01-T02 blocked '["P01-T01"]' A dependency '["src/b.ts"]'
+expect_fail "$root" 'dependency 차단 사유 불일치'
 
 root=$(new_fixture dashboard-missing)
 write_dashboard "$root" P01-T01
@@ -121,4 +129,4 @@ root=$(new_fixture dashboard-duplicate)
 write_dashboard "$root" P01-T01 P01-T02 P01-T02
 expect_fail "$root" '대시보드 중복'
 
-echo '하네스 검사기 테스트 통과: 9개 시나리오'
+echo '하네스 검사기 테스트 통과: 11개 시나리오'
