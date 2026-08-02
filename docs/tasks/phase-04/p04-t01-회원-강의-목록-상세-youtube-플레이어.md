@@ -10,6 +10,7 @@ started_at: ""
 blocked_reason: dependency
 owned_files: ["src/app/courses/page.tsx", "src/app/courses/[slug]/page.tsx", "src/features/courses/youtube.ts", "src/features/courses/youtube.test.ts"]
 shared_files: []
+implementation_commit: ""
 reviewer: ""
 review_commit: ""
 ---

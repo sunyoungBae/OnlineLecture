@@ -10,6 +10,7 @@ started_at: ""
 blocked_reason: external
 owned_files: ["docs/acceptance/email-advisor.md"]
 shared_files: ["Resend", "Supabase Advisor"]
+implementation_commit: ""
 reviewer: ""
 review_commit: ""
 ---

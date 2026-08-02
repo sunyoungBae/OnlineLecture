@@ -12,12 +12,12 @@ blocked -> ready -> in_progress -> review -> done
 - 외부 계정·서비스 대기는 `blocked_reason: external`, 제품 결정 대기는 `blocked_reason: decision`을 사용한다.
 - `blocked`가 아닌 카드는 `blocked_reason`을 빈 문자열로 둔다.
 - `in_progress`에서는 `owner`와 시간대를 포함한 ISO 8601 `started_at`을 반드시 기록한다.
-- `review`에서는 구현 커밋 SHA를 기록한다.
-- `done`에서는 구현자와 다른 `reviewer` 및 승인 커밋 SHA인 `review_commit`을 반드시 기록한다.
+- `review`에서는 구현 커밋 SHA를 `implementation_commit`에 기록한다.
+- `done`에서는 `implementation_commit`을 유지하고 구현자와 다른 `reviewer` 및 승인 커밋 SHA인 `review_commit`을 반드시 기록한다.
 
 ## 공통 형식
 
-`TEMPLATE.md`의 front matter 키와 순서를 바꾸지 않는다. `depends_on`, `owned_files`, `shared_files`는 비어 있어도 한 줄 대괄호 배열로 기록한다. 모든 시각 값은 시간대를 포함한 ISO 8601 형식을 사용한다.
+`TEMPLATE.md`의 front matter 키와 순서를 바꾸지 않는다. `depends_on`, `owned_files`, `shared_files`는 비어 있어도 한 줄 대괄호 배열로 기록한다. 모든 시각 값은 시간대를 포함한 ISO 8601 형식을 사용한다. 커밋 필드는 7자 이상의 실제 Git SHA만 허용한다.
 
 ## 유형별 검증 증거
 

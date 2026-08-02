@@ -10,6 +10,7 @@ started_at: "2026-08-02T00:00:00+09:00"
 blocked_reason: ""
 owned_files: ["AGENTS.md", ".env.example", ".codex/config.toml.example"]
 shared_files: []
+implementation_commit: "92b4505"
 reviewer: "검토 에이전트"
 review_commit: "62f940f"
 ---

@@ -10,6 +10,7 @@ started_at: ""
 blocked_reason: dependency
 owned_files: []
 shared_files: []
+implementation_commit: ""
 reviewer: ""
 review_commit: ""
 ---
@@ -52,7 +53,7 @@ review_commit: ""
 
 # 리뷰 증거
 
-리뷰어, 구현 커밋과 승인 커밋을 기록한다.
+`implementation_commit`에 구현 커밋, `reviewer`에 구현자와 다른 리뷰어, `review_commit`에 승인 커밋을 기록한다.
 
 # 커밋
 

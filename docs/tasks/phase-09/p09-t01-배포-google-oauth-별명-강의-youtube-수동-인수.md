@@ -10,6 +10,7 @@ started_at: ""
 blocked_reason: external
 owned_files: ["docs/acceptance/oauth-video.md"]
 shared_files: ["Google OAuth", "YouTube"]
+implementation_commit: ""
 reviewer: ""
 review_commit: ""
 ---

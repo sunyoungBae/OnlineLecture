@@ -10,6 +10,7 @@ started_at: ""
 blocked_reason: dependency
 owned_files: ["src/app/admin/courses/[courseId]/lessons/page.tsx", "src/app/admin/courses/[courseId]/lessons/actions.ts", "src/features/admin/lesson-order.ts", "src/features/admin/lesson-order.test.ts"]
 shared_files: ["src/app/admin/courses/page.tsx"]
+implementation_commit: ""
 reviewer: ""
 review_commit: ""
 ---

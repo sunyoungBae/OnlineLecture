@@ -10,6 +10,7 @@ started_at: ""
 blocked_reason: dependency
 owned_files: ["supabase/migrations/202608020002_rls.sql", "supabase/tests/rls.sql"]
 shared_files: []
+implementation_commit: ""
 reviewer: ""
 review_commit: ""
 ---

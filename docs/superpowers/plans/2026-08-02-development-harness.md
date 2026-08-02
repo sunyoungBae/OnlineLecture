@@ -13,7 +13,7 @@
 - Do not add runtime or package-manager dependencies for the harness.
 - Task statuses are exactly `blocked`, `ready`, `in_progress`, `review`, or `done`.
 - Task types are exactly `feature`, `migration`, `config`, `docs`, or `manual-checkpoint`.
-- Every task card uses the exact front matter key order defined by the harness design.
+- Every task card uses the exact front matter key order defined by the harness design, including separate `implementation_commit` and `review_commit` fields.
 - Cards are the state source of truth; `docs/tasks/README.md` must list every task ID exactly once.
 - Parallel cards must have disjoint `owned_files`; common manifests, migrations, route indexes, schemas, test configuration, and environment files belong to `shared_files` and an integration owner.
 - No real secrets, account IDs, project references, user data, or signed URLs may be committed.
@@ -51,6 +51,7 @@ started_at: ""
 blocked_reason: dependency
 owned_files: []
 shared_files: []
+implementation_commit: ""
 reviewer: ""
 review_commit: ""
 ---

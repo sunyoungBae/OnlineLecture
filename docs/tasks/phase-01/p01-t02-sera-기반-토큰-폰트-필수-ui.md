@@ -10,6 +10,7 @@ started_at: ""
 blocked_reason: dependency
 owned_files: ["src/app/globals.css", "src/lib/design-tokens.ts", "src/lib/design-tokens.test.ts", "src/components/ui", "package.json", "package-lock.json"]
 shared_files: []
+implementation_commit: ""
 reviewer: ""
 review_commit: ""
 ---

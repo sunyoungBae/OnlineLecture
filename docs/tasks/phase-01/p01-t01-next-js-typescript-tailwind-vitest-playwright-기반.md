@@ -10,6 +10,7 @@ started_at: ""
 blocked_reason: dependency
 owned_files: ["package.json", "next.config.ts", "tsconfig.json", "vitest.config.ts", "playwright.config.ts", "src/app/layout.tsx", "src/app/page.tsx", "README.md"]
 shared_files: ["package-lock.json"]
+implementation_commit: ""
 reviewer: ""
 review_commit: ""
 ---
@@ -87,4 +88,3 @@ P00-T05가 모두 done이면 ready로 전환한다.
 # 커밋
 
 권장 메시지: 설정: Next.js·TypeScript·Tailwind·Vitest·Playwright 기반
-

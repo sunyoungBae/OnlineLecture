@@ -10,6 +10,7 @@ started_at: ""
 blocked_reason: dependency
 owned_files: ["src/features/comments/actions.ts", "src/features/comments/actions.test.ts", "src/features/moderation/actions.ts", "src/app/board/[postId]/page.tsx"]
 shared_files: []
+implementation_commit: ""
 reviewer: ""
 review_commit: ""
 ---

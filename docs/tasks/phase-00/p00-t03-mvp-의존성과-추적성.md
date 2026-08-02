@@ -10,6 +10,7 @@ started_at: "2026-08-02T00:00:00+09:00"
 blocked_reason: ""
 owned_files: ["docs/superpowers/plans/2026-08-02-online-lecture-mvp.md"]
 shared_files: []
+implementation_commit: "a51e375"
 reviewer: "검토 에이전트"
 review_commit: "c52db4a"
 ---

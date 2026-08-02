@@ -10,6 +10,7 @@ started_at: ""
 blocked_reason: dependency
 owned_files: ["src/app/auth/callback/route.ts", "src/app/(public)/login/page.tsx", "src/lib/supabase/client.ts", "src/lib/supabase/server.ts", "tests/e2e/auth.spec.ts"]
 shared_files: ["src/middleware.ts"]
+implementation_commit: ""
 reviewer: ""
 review_commit: ""
 ---

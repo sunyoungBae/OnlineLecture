@@ -10,6 +10,7 @@ started_at: ""
 blocked_reason: dependency
 owned_files: ["docs/operations/deployment.md", "vercel.json"]
 shared_files: ["Vercel 환경 변수"]
+implementation_commit: ""
 reviewer: ""
 review_commit: ""
 ---
@@ -75,4 +76,3 @@ P08-T01가 모두 done이면 ready로 전환한다.
 # 커밋
 
 권장 메시지: 설정: GitHub·Vercel 연결과 배포 문서
-

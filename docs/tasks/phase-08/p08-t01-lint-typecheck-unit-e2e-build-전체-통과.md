@@ -10,6 +10,7 @@ started_at: ""
 blocked_reason: dependency
 owned_files: ["docs/verification/release-check.md"]
 shared_files: []
+implementation_commit: ""
 reviewer: ""
 review_commit: ""
 ---

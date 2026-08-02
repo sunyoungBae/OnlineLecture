@@ -10,6 +10,7 @@ started_at: ""
 blocked_reason: dependency
 owned_files: ["src/features/posts/content.ts", "src/features/posts/content.test.ts", "src/features/posts/editor.tsx", "src/app/board/new/page.tsx", "src/app/board/[postId]/edit/page.tsx", "package.json", "package-lock.json"]
 shared_files: []
+implementation_commit: ""
 reviewer: ""
 review_commit: ""
 ---

@@ -10,6 +10,7 @@ started_at: ""
 blocked_reason: dependency
 owned_files: ["tests/e2e/accessibility.spec.ts", "tests/e2e/responsive.spec.ts"]
 shared_files: ["src/components/site-header.tsx", "src/components/mobile-menu.tsx", "src/app/(public)/page.tsx", "src/app/(public)/login/page.tsx", "src/app/courses/page.tsx", "src/app/courses/[slug]/page.tsx", "src/app/board/page.tsx", "src/app/board/[postId]/page.tsx", "src/app/admin/courses/page.tsx", "src/app/admin/storage/page.tsx"]
+implementation_commit: ""
 reviewer: ""
 review_commit: ""
 ---
