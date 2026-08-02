@@ -1,7 +1,7 @@
 ---
 id: P01-T02
 title: Sera 기반 토큰·폰트·필수 UI
-status: review
+status: done
 type: feature
 depends_on: ["P01-T01"]
 parallel_group: "F-A"
@@ -11,8 +11,8 @@ blocked_reason: ""
 owned_files: ["src/app/globals.css", "src/lib/design-tokens.ts", "src/lib/design-tokens.test.ts", "src/components/ui", "package.json", "package-lock.json", "README.md"]
 shared_files: []
 implementation_commit: "4527b02"
-reviewer: ""
-review_commit: ""
+reviewer: "Codex/p01_t02_review"
+review_commit: "83030c4"
 ---
 
 # 목표
@@ -91,6 +91,7 @@ P01-T01가 모두 done이면 ready로 전환한다.
 - 최종 구현 커밋: `4527b02` (`수정: Base UI 프리미티브와 접근성 계약 보완`).
 - 완료 검증: `npm run lint`, `npm run typecheck`, `npm run test`, `npm run test:e2e`, `npm run build`, `./scripts/check-harness.sh`가 통합 상태에서 통과했다. 단위 3개, E2E 2개가 통과했고 하네스는 31개 카드를 확인했다.
 - 독립 재검토: `Codex/p01_t02_review`가 Base UI 직접 기반, CSS/UI 계약, 44px Label, Noto 변수 연결, 버전·라이선스·소유권을 확인해 Critical/Important 잔여 없음으로 승인했다.
+- 승인 커밋: `83030c4` (`리뷰: P01-T02 독립 승인`).
 
 # 커밋
 
