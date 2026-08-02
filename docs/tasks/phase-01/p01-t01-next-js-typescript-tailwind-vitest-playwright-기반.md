@@ -1,12 +1,12 @@
 ---
 id: P01-T01
 title: Next.js·TypeScript·Tailwind·Vitest·Playwright 기반
-status: ready
+status: in_progress
 type: config
 depends_on: ["P00-T05"]
 parallel_group: ""
-owner: ""
-started_at: ""
+owner: "Codex"
+started_at: "2026-08-02T14:06:38+09:00"
 blocked_reason: ""
 owned_files: ["package.json", "next.config.ts", "tsconfig.json", "vitest.config.ts", "playwright.config.ts", "src/app/layout.tsx", "src/app/page.tsx", "README.md"]
 shared_files: ["package-lock.json"]
