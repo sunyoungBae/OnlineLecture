@@ -1,12 +1,12 @@
 ---
 id: P02-T02
 title: 역할별 RLS와 SQL 권한 테스트
-status: ready
+status: in_progress
 type: migration
 depends_on: ["P02-T01"]
 parallel_group: ""
-owner: ""
-started_at: ""
+owner: "Codex/p02_t02"
+started_at: "2026-08-02T22:55:12+09:00"
 blocked_reason: ""
 owned_files: ["supabase/migrations/202608020002_rls.sql", "supabase/tests/rls.sql"]
 shared_files: []
