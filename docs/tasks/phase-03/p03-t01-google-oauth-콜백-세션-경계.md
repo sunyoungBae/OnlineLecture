@@ -1,12 +1,12 @@
 ---
 id: P03-T01
 title: Google OAuth·콜백·세션 경계
-status: ready
+status: in_progress
 type: feature
 depends_on: ["P01-T03", "P02-T03"]
 parallel_group: ""
-owner: ""
-started_at: ""
+owner: "Codex/p03_t01"
+started_at: "2026-08-02T23:54:07+09:00"
 blocked_reason: ""
 owned_files: ["src/app/auth/callback/route.ts", "src/app/(public)/login/page.tsx", "src/lib/supabase/client.ts", "src/lib/supabase/server.ts", "tests/e2e/auth.spec.ts", "src/middleware.ts"]
 shared_files: []

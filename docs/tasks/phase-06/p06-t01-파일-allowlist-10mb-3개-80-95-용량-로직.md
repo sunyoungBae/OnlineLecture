@@ -1,12 +1,12 @@
 ---
 id: P06-T01
 title: 파일 allowlist·10MB/3개·80/95% 용량 로직
-status: ready
+status: in_progress
 type: feature
 depends_on: ["P02-T03"]
 parallel_group: "U-A"
-owner: ""
-started_at: ""
+owner: "Codex/p06_t01"
+started_at: "2026-08-02T23:54:07+09:00"
 blocked_reason: ""
 owned_files: ["src/features/attachments/validation.ts", "src/features/attachments/validation.test.ts", "src/features/attachments/quota.ts", "src/features/attachments/quota.test.ts"]
 shared_files: []

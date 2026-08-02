@@ -41,7 +41,7 @@
 | P02-T01 | 테이블·제약·인덱스 migration | done | D-A |
 | P02-T02 | 역할별 RLS와 SQL 권한 테스트 | done | - |
 | P02-T03 | 비공개 Storage 정책과 DB 생성 타입 | done | - |
-| P03-T01 | Google OAuth·콜백·세션 경계 | ready | - |
+| P03-T01 | Google OAuth·콜백·세션 경계 | in_progress | - |
 | P03-T02 | 별명 검증·중복 차단·온보딩 | blocked | - |
 | P03-T03 | 보호 경로·역할 가드·관리자 승격 절차 | blocked | - |
 | P04-T01 | 회원 강의 목록·상세·YouTube 플레이어 | blocked | C-A |
@@ -50,7 +50,7 @@
 | P05-T01 | Tiptap 제한 편집기와 게시글 CRUD | blocked | B-A |
 | P05-T02 | 공개 목록·escaped ILIKE 검색·필터·페이지네이션 | blocked | - |
 | P05-T03 | 댓글 CRUD·공지·운영자 삭제 | blocked | - |
-| P06-T01 | 파일 allowlist·10MB/3개·80/95% 용량 로직 | ready | U-A |
+| P06-T01 | 파일 allowlist·10MB/3개·80/95% 용량 로직 | in_progress | U-A |
 | P06-T02 | 게시글 첨부 업로드·서명 다운로드·정리 | blocked | U-B |
 | P06-T03 | 회차 자료 업로드·다운로드·삭제 | blocked | U-B |
 | P06-T04 | 80% Resend 1회·재무장·95% 차단/복구 | blocked | - |
@@ -64,9 +64,9 @@
 
 ## 현재 흐름
 
-- 진행 중: 없음
+- 진행 중: P03-T01 Google OAuth·콜백·세션 경계 (Codex/p03_t01), P06-T01 파일 allowlist·10MB/3개·80/95% 용량 로직 (Codex/p06_t01)
 - 리뷰 대기: 없음
-- 다음 실행 가능: P03-T01 Google OAuth·콜백·세션 경계, P06-T01 파일 allowlist·10MB/3개·80/95% 용량 로직
+- 다음 실행 가능: 없음 (P03-T01, P06-T01 진행 중)
 - 향후 외부 차단: OAuth, YouTube, Resend, Supabase, GitHub와 Vercel 체크포인트는 각 카드의 선행 작업 완료 후 외부 준비를 확인해 해제
 
 ## 상태 변경 체크
