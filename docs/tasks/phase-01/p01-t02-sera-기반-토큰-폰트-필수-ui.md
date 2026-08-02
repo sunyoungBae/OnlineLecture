@@ -1,12 +1,12 @@
 ---
 id: P01-T02
 title: Sera 기반 토큰·폰트·필수 UI
-status: ready
+status: in_progress
 type: feature
 depends_on: ["P01-T01"]
 parallel_group: "F-A"
-owner: ""
-started_at: ""
+owner: "Codex/p01_t02"
+started_at: "2026-08-02T14:34:25+09:00"
 blocked_reason: ""
 owned_files: ["src/app/globals.css", "src/lib/design-tokens.ts", "src/lib/design-tokens.test.ts", "src/components/ui", "package.json", "package-lock.json"]
 shared_files: []
