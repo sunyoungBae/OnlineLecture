@@ -15,7 +15,7 @@
 | 단계 | 완료/전체 |
 | --- | --- |
 | P00 하네스 | 5/5 |
-| P01 기반 | 0/3 |
+| P01 기반 | 1/3 |
 | P02 데이터 | 0/3 |
 | P03 신원 | 0/3 |
 | P04 강의 | 0/3 |
@@ -24,7 +24,7 @@
 | P07 마감 | 0/2 |
 | P08 출시 | 0/3 |
 | P09 수동 인수 | 0/2 |
-| 전체 | 5/31 |
+| 전체 | 6/31 |
 
 ## 전체 작업
 
@@ -35,10 +35,10 @@
 | P00-T03 | MVP 의존성과 추적성 | done | - |
 | P00-T04 | 31개 작업 카드와 대시보드 | done | - |
 | P00-T05 | 하네스 자동 검사 | done | - |
-| P01-T01 | Next.js·TypeScript·Tailwind·Vitest·Playwright 기반 | review | - |
-| P01-T02 | Sera 기반 토큰·폰트·필수 UI | blocked | F-A |
-| P01-T03 | 공개 헤더·모바일 메뉴·홈·오류 틀 | blocked | F-A |
-| P02-T01 | 테이블·제약·인덱스 migration | blocked | D-A |
+| P01-T01 | Next.js·TypeScript·Tailwind·Vitest·Playwright 기반 | done | - |
+| P01-T02 | Sera 기반 토큰·폰트·필수 UI | ready | F-A |
+| P01-T03 | 공개 헤더·모바일 메뉴·홈·오류 틀 | ready | F-A |
+| P02-T01 | 테이블·제약·인덱스 migration | ready | D-A |
 | P02-T02 | 역할별 RLS와 SQL 권한 테스트 | blocked | - |
 | P02-T03 | 비공개 Storage 정책과 DB 생성 타입 | blocked | - |
 | P03-T01 | Google OAuth·콜백·세션 경계 | blocked | - |
@@ -65,8 +65,8 @@
 ## 현재 흐름
 
 - 진행 중: 없음
-- 리뷰 대기: P01-T01 Next.js·TypeScript·Tailwind·Vitest·Playwright 기반
-- 다음 실행 가능: 없음 (P01-T01 진행 중)
+- 리뷰 대기: 없음
+- 다음 실행 가능: P01-T02 Sera 기반 토큰·폰트·필수 UI, P01-T03 공개 헤더·모바일 메뉴·홈·오류 틀, P02-T01 테이블·제약·인덱스 migration
 - 향후 외부 차단: OAuth, YouTube, Resend, Supabase, GitHub와 Vercel 체크포인트는 각 카드의 선행 작업 완료 후 외부 준비를 확인해 해제
 
 ## 상태 변경 체크

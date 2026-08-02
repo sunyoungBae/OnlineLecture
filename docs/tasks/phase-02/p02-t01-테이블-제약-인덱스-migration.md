@@ -1,13 +1,13 @@
 ---
 id: P02-T01
 title: 테이블·제약·인덱스 migration
-status: blocked
+status: ready
 type: migration
 depends_on: ["P01-T01"]
 parallel_group: "D-A"
 owner: ""
 started_at: ""
-blocked_reason: dependency
+blocked_reason: ""
 owned_files: ["supabase/migrations/202608020001_core_schema.sql", "supabase/tests/core_schema.sql"]
 shared_files: []
 implementation_commit: ""

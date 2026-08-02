@@ -1,7 +1,7 @@
 ---
 id: P01-T01
 title: Next.js·TypeScript·Tailwind·Vitest·Playwright 기반
-status: review
+status: done
 type: config
 depends_on: ["P00-T05"]
 parallel_group: ""
@@ -11,8 +11,8 @@ blocked_reason: ""
 owned_files: ["package.json", "next.config.ts", "tsconfig.json", "vitest.config.ts", "playwright.config.ts", "postcss.config.mjs", ".gitignore", "next-env.d.ts", "src/app/globals.css", "src/app/layout.tsx", "src/app/page.tsx", "README.md"]
 shared_files: ["package-lock.json"]
 implementation_commit: "2535dde"
-reviewer: ""
-review_commit: ""
+reviewer: "Codex/p01_t01_review"
+review_commit: "7f22aa3"
 ---
 
 # 목표
@@ -100,6 +100,7 @@ P00-T05가 모두 done이면 ready로 전환한다.
 - 범위 보정 커밋: `646aaf7` (`문서: P01-T01 Tailwind 기반 소유권 보완`).
 - 최종 구현 커밋: `2535dde` (`수정: P01-T01 독립 리뷰 반영`). Tailwind PostCSS·전역 CSS 연결, Playwright 설치 안내, 생성물 제외, lint 범위, 안전한 PostCSS·Sharp override를 반영했다.
 - 독립 재검토 (2026-08-02T14:34:00+09:00): 최초 코드·설정 지적 5건 해소 확인. `npm ls postcss sharp`, `npm audit --omit=dev --audit-level=high`, 다섯 완료 명령, 하네스 검사가 모두 통과했다.
+- 독립 승인: `Codex/p01_t01_review`가 Critical/Important 잔여 없음으로 승인했으며 승인 커밋은 `7f22aa3` (`리뷰: P01-T01 독립 승인`)이다.
 
 # 커밋
 
