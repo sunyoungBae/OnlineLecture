@@ -1,7 +1,7 @@
 ---
 id: P06-T01
 title: 파일 allowlist·10MB/3개·80/95% 용량 로직
-status: review
+status: done
 type: feature
 depends_on: ["P02-T03"]
 parallel_group: "U-A"
@@ -11,8 +11,8 @@ blocked_reason: ""
 owned_files: ["src/features/attachments/validation.ts", "src/features/attachments/validation.test.ts", "src/features/attachments/quota.ts", "src/features/attachments/quota.test.ts"]
 shared_files: []
 implementation_commit: "d912340"
-reviewer: ""
-review_commit: ""
+reviewer: "Codex/p06_t01_review"
+review_commit: "f322133"
 ---
 
 # 목표
@@ -82,6 +82,7 @@ P02-T03가 모두 done이면 ready로 전환한다.
 - 공통 검사: `./scripts/check-harness.sh`, `npm run lint`, `npm run typecheck`, `npm run test`(49), `npm run test:e2e`(2), `npm run build`, `git diff --check`가 모두 통과했다.
 - 구현 커밋: `d912340` (형식 검증 `099d8fa`, 용량 로직 `2ea4563` 포함)
 - 독립 리뷰: `Codex/p06_t01_review`가 안전 정수·overflow와 실제 정수 임계값 상태 전이를 재검토해 Critical/Important 없음으로 승인했다.
+- 승인 커밋: `f322133` (`리뷰: P06-T01 독립 승인`)
 
 # 커밋
 
