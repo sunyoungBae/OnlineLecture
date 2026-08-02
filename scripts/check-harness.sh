@@ -1,7 +1,13 @@
 #!/bin/sh
 set -eu
 
+if [ "${HARNESS_ROOT+x}" = x ]; then
+  verify_git_commits=0
+else
+  verify_git_commits=1
+fi
 root=${HARNESS_ROOT:-.}
+expected_count=${HARNESS_EXPECTED_COUNT:-31}
 cards_dir="$root/docs/tasks"
 dashboard="$cards_dir/README.md"
 master_plan="$root/docs/superpowers/plans/2026-08-02-online-lecture-mvp.md"
@@ -22,6 +28,8 @@ meta="$tmp_dir/meta.tsv"
 
 find "$cards_dir" -type f | grep '/phase-[0-9][0-9]/.*\.md$' | sort > "$cards" || true
 [ -s "$cards" ] || fail "작업 카드 없음"
+card_count=$(wc -l < "$cards" | tr -d ' ')
+[ "$card_count" -eq "$expected_count" ] || fail "작업 카드 수 불일치: 기대 $expected_count, 실제 $card_count"
 
 expected_keys='id title status type depends_on parallel_group owner started_at blocked_reason owned_files shared_files implementation_commit reviewer review_commit'
 
@@ -79,18 +87,29 @@ while IFS='|' read -r id status type depends group blocked owned shared owner st
   case "$status" in
     in_progress)
       [ -n "$owner" ] && [ -n "$started" ] || fail "담당자와 시작 시각 필요: $id"
+      printf '%s\n' "$started" | grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|[+-][0-9]{2}:[0-9]{2})$' || fail "시작 시각 형식 오류: $id"
       ;;
     review)
       [ -n "$owner" ] && [ -n "$started" ] || fail "담당자와 시작 시각 필요: $id"
+      printf '%s\n' "$started" | grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|[+-][0-9]{2}:[0-9]{2})$' || fail "시작 시각 형식 오류: $id"
       printf '%s\n' "$implementation" | grep -Eq '^[0-9a-f]{7,40}$' || fail "구현 커밋 필요: $id"
       ;;
     done)
       [ -n "$owner" ] && [ -n "$started" ] || fail "담당자와 시작 시각 필요: $id"
+      printf '%s\n' "$started" | grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|[+-][0-9]{2}:[0-9]{2})$' || fail "시작 시각 형식 오류: $id"
       printf '%s\n' "$implementation" | grep -Eq '^[0-9a-f]{7,40}$' || fail "구현 커밋 필요: $id"
       [ -n "$reviewer" ] && [ "$reviewer" != "$owner" ] || fail "독립 리뷰어 필요: $id"
       printf '%s\n' "$review_commit" | grep -Eq '^[0-9a-f]{7,40}$' || fail "승인 커밋 필요: $id"
       ;;
   esac
+  if [ "$verify_git_commits" -eq 1 ]; then
+    if [ -n "$implementation" ]; then
+      git -C "$root" cat-file -e "$implementation^{commit}" 2>/dev/null || fail "존재하지 않는 구현 커밋: $id ($implementation)"
+    fi
+    if [ -n "$review_commit" ]; then
+      git -C "$root" cat-file -e "$review_commit^{commit}" 2>/dev/null || fail "존재하지 않는 승인 커밋: $id ($review_commit)"
+    fi
+  fi
 done < "$meta"
 
 while IFS='|' read -r id status type depends group blocked owned shared owner started implementation reviewer review_commit file; do
@@ -166,5 +185,4 @@ cut -d '|' -f1 "$meta" | sort > "$card_ids"
 sed -n 's/^| \(P[0-9][0-9]-T[0-9][0-9]\) |.*/\1/p' "$master_plan" | sort -u > "$plan_ids"
 cmp -s "$card_ids" "$plan_ids" || fail "마스터 계획 불일치"
 
-count=$(wc -l < "$meta" | tr -d ' ')
-echo "하네스 검사 통과: ${count}개 작업 카드"
+echo "하네스 검사 통과: ${card_count}개 작업 카드"

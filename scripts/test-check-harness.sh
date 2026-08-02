@@ -95,14 +95,15 @@ new_fixture() {
 
 expect_pass() {
   root=$1
-  HARNESS_ROOT="$root" "$checker" >/dev/null
+  HARNESS_ROOT="$root" HARNESS_EXPECTED_COUNT=2 "$checker" >/dev/null
 }
 
 expect_fail() {
   root=$1
   expected=$2
+  expected_count=${3:-2}
   output="$tmp_root/output.txt"
-  if HARNESS_ROOT="$root" "$checker" >"$output" 2>&1; then
+  if HARNESS_ROOT="$root" HARNESS_EXPECTED_COUNT="$expected_count" "$checker" >"$output" 2>&1; then
     echo "실패해야 하는 fixture가 통과했습니다: $expected" >&2
     exit 1
   fi
@@ -118,7 +119,7 @@ expect_pass "$root"
 
 root=$(new_fixture duplicate-id)
 write_card "$root" c.md P01-T02 blocked '["P01-T01"]' B dependency '["src/c.ts"]'
-expect_fail "$root" '중복 작업 ID'
+expect_fail "$root" '중복 작업 ID' 3
 
 root=$(new_fixture unknown-dependency)
 write_card "$root" b.md P01-T02 blocked '["P99-T99"]' A dependency '["src/b.ts"]'
@@ -167,10 +168,24 @@ expect_fail "$root" '대시보드 중복'
 root=$(new_fixture master-traceability)
 rm "$root/docs/tasks/phase-01/b.md"
 write_dashboard "$root" P01-T01
-expect_fail "$root" '마스터 계획 불일치'
+expect_fail "$root" '마스터 계획 불일치' 1
 
 root=$(new_fixture missing-review-evidence)
 write_card "$root" b.md P01-T02 review '["P01-T01"]' A '""' '["src/b.ts"]'
 expect_fail "$root" '구현 커밋 필요'
 
-echo '하네스 검사기 테스트 통과: 15개 시나리오'
+root=$(new_fixture invalid-started-at)
+write_card "$root" b.md P01-T02 review '["P01-T01"]' A '""' '["src/b.ts"]' abcdef1
+sed 's/2026-08-02T00:00:00+09:00/2026-08-02/' "$root/docs/tasks/phase-01/b.md" > "$root/docs/tasks/phase-01/b.tmp"
+mv "$root/docs/tasks/phase-01/b.tmp" "$root/docs/tasks/phase-01/b.md"
+expect_fail "$root" '시작 시각 형식 오류'
+
+root=$(new_fixture fixed-card-count)
+output="$tmp_root/count-output.txt"
+if HARNESS_ROOT="$root" HARNESS_EXPECTED_COUNT=3 "$checker" >"$output" 2>&1; then
+  echo '고정 카드 수 불일치 fixture가 통과했습니다.' >&2
+  exit 1
+fi
+grep -F '작업 카드 수 불일치' "$output" >/dev/null
+
+echo '하네스 검사기 테스트 통과: 17개 시나리오'

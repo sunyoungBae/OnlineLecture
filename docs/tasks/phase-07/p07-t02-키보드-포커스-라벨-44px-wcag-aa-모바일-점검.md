@@ -8,8 +8,8 @@ parallel_group: ""
 owner: ""
 started_at: ""
 blocked_reason: dependency
-owned_files: ["tests/e2e/accessibility.spec.ts", "tests/e2e/responsive.spec.ts"]
-shared_files: ["src/components/site-header.tsx", "src/components/mobile-menu.tsx", "src/app/(public)/page.tsx", "src/app/(public)/login/page.tsx", "src/app/courses/page.tsx", "src/app/courses/[slug]/page.tsx", "src/app/board/page.tsx", "src/app/board/[postId]/page.tsx", "src/app/admin/courses/page.tsx", "src/app/admin/storage/page.tsx"]
+owned_files: ["tests/e2e/accessibility.spec.ts", "tests/e2e/responsive.spec.ts", "src/components/site-header.tsx", "src/components/mobile-menu.tsx", "src/app/(public)/page.tsx", "src/app/(public)/login/page.tsx", "src/app/courses/page.tsx", "src/app/courses/[slug]/page.tsx", "src/app/board/page.tsx", "src/app/board/[postId]/page.tsx", "src/app/admin/courses/page.tsx", "src/app/admin/storage/page.tsx"]
+shared_files: []
 implementation_commit: ""
 reviewer: ""
 review_commit: ""
@@ -23,16 +23,16 @@ review_commit: ""
 
 - 생성 또는 수정: tests/e2e/accessibility.spec.ts
 - 생성 또는 수정: tests/e2e/responsive.spec.ts
-- 통합 소유 시에만 수정: src/components/site-header.tsx
-- 통합 소유 시에만 수정: src/components/mobile-menu.tsx
-- 통합 소유 시에만 수정: src/app/(public)/page.tsx
-- 통합 소유 시에만 수정: src/app/(public)/login/page.tsx
-- 통합 소유 시에만 수정: src/app/courses/page.tsx
-- 통합 소유 시에만 수정: src/app/courses/[slug]/page.tsx
-- 통합 소유 시에만 수정: src/app/board/page.tsx
-- 통합 소유 시에만 수정: src/app/board/[postId]/page.tsx
-- 통합 소유 시에만 수정: src/app/admin/courses/page.tsx
-- 통합 소유 시에만 수정: src/app/admin/storage/page.tsx
+- 이 접근성 통합 카드가 수정: src/components/site-header.tsx
+- 이 접근성 통합 카드가 수정: src/components/mobile-menu.tsx
+- 이 접근성 통합 카드가 수정: src/app/(public)/page.tsx
+- 이 접근성 통합 카드가 수정: src/app/(public)/login/page.tsx
+- 이 접근성 통합 카드가 수정: src/app/courses/page.tsx
+- 이 접근성 통합 카드가 수정: src/app/courses/[slug]/page.tsx
+- 이 접근성 통합 카드가 수정: src/app/board/page.tsx
+- 이 접근성 통합 카드가 수정: src/app/board/[postId]/page.tsx
+- 이 접근성 통합 카드가 수정: src/app/admin/courses/page.tsx
+- 이 접근성 통합 카드가 수정: src/app/admin/storage/page.tsx
 
 # 제외
 
