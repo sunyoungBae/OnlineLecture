@@ -1,7 +1,7 @@
 ---
 id: P06-T01
 title: 파일 allowlist·10MB/3개·80/95% 용량 로직
-status: in_progress
+status: review
 type: feature
 depends_on: ["P02-T03"]
 parallel_group: "U-A"
@@ -10,7 +10,7 @@ started_at: "2026-08-02T23:54:07+09:00"
 blocked_reason: ""
 owned_files: ["src/features/attachments/validation.ts", "src/features/attachments/validation.test.ts", "src/features/attachments/quota.ts", "src/features/attachments/quota.test.ts"]
 shared_files: []
-implementation_commit: ""
+implementation_commit: "d912340"
 reviewer: ""
 review_commit: ""
 ---
@@ -76,7 +76,12 @@ P02-T03가 모두 done이면 ready로 전환한다.
 
 # 리뷰 증거
 
-작업 전 실패, 완료 명령 결과, 구현 커밋, 구현자와 다른 리뷰어, 승인 커밋을 이 절에 기록한다.
+- RED: `npm run test -- src/features/attachments/validation.test.ts src/features/attachments/quota.test.ts`에서 `./validation`, `./quota` 모듈 부재로 2개 suite가 실패했다.
+- 리뷰 보강 RED: 소수·unsafe 파일 크기, 소수·unsafe 사용량과 안전 정수 합계 overflow 신규 검사 7개가 기존 구현에서 실패했다.
+- GREEN: 대상 2개 파일의 46개 테스트가 통과했다. allowlist와 MIME 조합, 10MiB·3개, 80%·95% 실제 정수 floor/ceil, 경고 재무장·재상승과 차단 후 복구를 검증했다.
+- 공통 검사: `./scripts/check-harness.sh`, `npm run lint`, `npm run typecheck`, `npm run test`(49), `npm run test:e2e`(2), `npm run build`, `git diff --check`가 모두 통과했다.
+- 구현 커밋: `d912340` (형식 검증 `099d8fa`, 용량 로직 `2ea4563` 포함)
+- 독립 리뷰: `Codex/p06_t01_review`가 안전 정수·overflow와 실제 정수 임계값 상태 전이를 재검토해 Critical/Important 없음으로 승인했다.
 
 # 커밋
 
