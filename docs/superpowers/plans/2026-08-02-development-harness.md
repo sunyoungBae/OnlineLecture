@@ -90,7 +90,7 @@ Expected: every command exits 0 and `git diff --check` prints nothing.
 
 ```bash
 git add docs/tasks/TEMPLATE.md docs/tasks/CONTRIBUTING.md docs/superpowers/specs/2026-08-02-development-harness-design.md
-git commit -m "docs: define task card workflow"
+git commit -m "문서: 작업 카드 흐름 정의"
 ```
 
 ### Task 2: Establish repository-wide worker rules
@@ -142,7 +142,7 @@ Expected: every command exits 0 and the secret scan has no matches.
 
 ```bash
 git add AGENTS.md .env.example .codex/config.toml.example
-git commit -m "chore: establish repository working rules"
+git commit -m "설정: 저장소 공통 작업 규칙 추가"
 ```
 
 ### Task 3: Map the MVP into dependency-aware work packages
@@ -195,7 +195,7 @@ Expected: every phase and traceability term is present; all commands exit 0.
 
 ```bash
 git add docs/superpowers/plans/2026-08-02-online-lecture-mvp.md
-git commit -m "docs: map MVP delivery dependencies"
+git commit -m "문서: MVP 작업 의존성 정의"
 ```
 
 ### Task 4: Create junior-executable cards and the progress dashboard
@@ -250,7 +250,7 @@ Expected: 31 cards, 31 valid ID lines, 31 valid status lines, and no whitespace 
 
 ```bash
 git add docs/tasks/README.md docs/tasks/phase-*
-git commit -m "docs: add executable MVP task cards"
+git commit -m "문서: 실행 가능한 MVP 작업 카드 추가"
 ```
 
 ### Task 5: Add and prove the harness consistency check
@@ -305,7 +305,7 @@ git diff --check
 ./scripts/test-check-harness.sh
 ./scripts/check-harness.sh
 git add scripts/check-harness.sh scripts/test-check-harness.sh AGENTS.md docs/tasks/README.md
-git commit -m "test: validate development harness"
+git commit -m "테스트: 개발 하네스 검증 추가"
 ```
 
 Expected: all checks pass before the commit.
