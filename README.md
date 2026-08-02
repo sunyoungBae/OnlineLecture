@@ -6,10 +6,13 @@ Next.js App Router와 TypeScript로 구축하는 온라인 강의 및 커뮤니�
 
 ```bash
 npm install
+npx playwright install chromium
 npm run dev
 ```
 
 완료 검사는 다음 명령으로 실행합니다.
+
+CI 또는 Linux 환경에서 Playwright의 시스템 의존성까지 설치해야 하면 `npx playwright install --with-deps chromium`을 사용합니다.
 
 ```bash
 npm run lint

@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint src --no-config-lookup --ext .ts,.tsx --parser @typescript-eslint/parser --rule 'no-undef:error'",
+    "lint": "eslint src tests '*.config.ts' '*.config.mjs' --no-error-on-unmatched-pattern --no-config-lookup --ext .ts,.tsx,.mjs --parser @typescript-eslint/parser --global process --rule 'no-undef:error'",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "test:e2e": "env -u NO_COLOR playwright test --pass-with-no-tests"
@@ -29,6 +29,10 @@
     "eslint": "9.39.5",
     "typescript": "5.9.3",
     "vitest": "4.1.10"
+  },
+  "overrides": {
+    "postcss": "$postcss",
+    "sharp": "0.35.0"
   },
   "engines": {
     "node": ">=20.19.0"
