@@ -35,7 +35,7 @@
 | P00-T03 | MVP 의존성과 추적성 | done | - |
 | P00-T04 | 31개 작업 카드와 대시보드 | done | - |
 | P00-T05 | 하네스 자동 검사 | done | - |
-| P01-T01 | Next.js·TypeScript·Tailwind·Vitest·Playwright 기반 | in_progress | - |
+| P01-T01 | Next.js·TypeScript·Tailwind·Vitest·Playwright 기반 | review | - |
 | P01-T02 | Sera 기반 토큰·폰트·필수 UI | blocked | F-A |
 | P01-T03 | 공개 헤더·모바일 메뉴·홈·오류 틀 | blocked | F-A |
 | P02-T01 | 테이블·제약·인덱스 migration | blocked | D-A |
@@ -64,8 +64,8 @@
 
 ## 현재 흐름
 
-- 진행 중: P01-T01 Next.js·TypeScript·Tailwind·Vitest·Playwright 기반 (Codex)
-- 리뷰 대기: 없음
+- 진행 중: 없음
+- 리뷰 대기: P01-T01 Next.js·TypeScript·Tailwind·Vitest·Playwright 기반
 - 다음 실행 가능: 없음 (P01-T01 진행 중)
 - 향후 외부 차단: OAuth, YouTube, Resend, Supabase, GitHub와 Vercel 체크포인트는 각 카드의 선행 작업 완료 후 외부 준비를 확인해 해제
 

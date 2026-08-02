@@ -1,7 +1,7 @@
 ---
 id: P01-T01
 title: Next.js·TypeScript·Tailwind·Vitest·Playwright 기반
-status: in_progress
+status: review
 type: config
 depends_on: ["P00-T05"]
 parallel_group: ""
@@ -10,7 +10,7 @@ started_at: "2026-08-02T14:06:38+09:00"
 blocked_reason: ""
 owned_files: ["package.json", "next.config.ts", "tsconfig.json", "vitest.config.ts", "playwright.config.ts", "src/app/layout.tsx", "src/app/page.tsx", "README.md"]
 shared_files: ["package-lock.json"]
-implementation_commit: ""
+implementation_commit: "792cfac"
 reviewer: ""
 review_commit: ""
 ---
@@ -84,6 +84,11 @@ P00-T05가 모두 done이면 ready로 전환한다.
 # 리뷰 증거
 
 작업 전 실패, 완료 명령 결과, 구현 커밋, 구현자와 다른 리뷰어, 승인 커밋을 이 절에 기록한다.
+
+- 작업 전 RED (2026-08-02T14:07:08+09:00): `npm run typecheck` → 종료 코드 254. `package.json`을 찾을 수 없다는 `ENOENT`로 예상대로 실패했다.
+- 완료 GREEN (2026-08-02T14:17:00+09:00): `npm run lint && npm run typecheck && npm run test && npm run test:e2e && npm run build` → 종료 코드 0. Vitest와 Playwright는 빈 suite를 정상 경계로 처리했고 Next.js production build는 `/`와 `/_not-found`를 정적 생성했다.
+- 하네스 (2026-08-02T14:17:00+09:00): `./scripts/check-harness.sh` → `하네스 검사 통과: 31개 작업 카드`.
+- 구현 커밋: `792cfac` (`설정: Next.js·TypeScript·Tailwind·Vitest·Playwright 기반`).
 
 # 커밋
 
