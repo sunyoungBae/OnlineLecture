@@ -38,6 +38,8 @@ OnlineLecture는 넓은 여백과 절제된 에디토리얼 분위기의 비상�
 
 shadcn/ui `Sera` 스타일, Base UI와 Tailwind CSS v4를 기반으로 한다. 필요한 공식 컴포넌트만 설치한다: Button, Input, Textarea, Label, Dialog, Dropdown Menu, Select, Tabs, Badge, Table, Pagination, Alert, Progress, Skeleton, Sonner.
 
+프로젝트 기반 단계에서 Tailwind CSS v4의 PostCSS 플러그인과 전역 CSS 진입점을 연결하고, Next.js 타입 선언과 생성물 제외 규칙을 함께 둔다.
+
 Noto Serif KR는 제목, Noto Sans KR는 본문과 컨트롤에 `next/font` 자체 호스팅으로 적용한다. 토큰은 다음과 같다.
 
 - 배경 `#F7F7F2`

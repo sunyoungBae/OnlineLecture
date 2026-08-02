@@ -8,7 +8,7 @@ parallel_group: ""
 owner: "Codex"
 started_at: "2026-08-02T14:06:38+09:00"
 blocked_reason: ""
-owned_files: ["package.json", "next.config.ts", "tsconfig.json", "vitest.config.ts", "playwright.config.ts", "src/app/layout.tsx", "src/app/page.tsx", "README.md"]
+owned_files: ["package.json", "next.config.ts", "tsconfig.json", "vitest.config.ts", "playwright.config.ts", "postcss.config.mjs", ".gitignore", "next-env.d.ts", "src/app/globals.css", "src/app/layout.tsx", "src/app/page.tsx", "README.md"]
 shared_files: ["package-lock.json"]
 implementation_commit: "792cfac"
 reviewer: ""
@@ -26,6 +26,10 @@ Next.js·TypeScript·Tailwind·Vitest·Playwright 기반을 완료해 다음 의
 - 생성 또는 수정: tsconfig.json
 - 생성 또는 수정: vitest.config.ts
 - 생성 또는 수정: playwright.config.ts
+- 생성 또는 수정: postcss.config.mjs
+- 생성 또는 수정: .gitignore
+- 생성 또는 수정: next-env.d.ts
+- 생성 또는 수정: src/app/globals.css
 - 생성 또는 수정: src/app/layout.tsx
 - 생성 또는 수정: src/app/page.tsx
 - 생성 또는 수정: README.md
@@ -46,6 +50,10 @@ P00-T05가 모두 done이면 ready로 전환한다.
 - tsconfig.json
 - vitest.config.ts
 - playwright.config.ts
+- postcss.config.mjs
+- .gitignore
+- next-env.d.ts
+- src/app/globals.css
 - src/app/layout.tsx
 - src/app/page.tsx
 - README.md
