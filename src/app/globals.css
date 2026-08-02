@@ -1,1 +1,86 @@
 @import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --font-sans: var(--font-noto-sans-kr), "Noto Sans KR", sans-serif;
+  --font-serif: var(--font-noto-serif-kr), "Noto Serif KR", serif;
+  --radius-sm: var(--radius);
+}
+
+:root {
+  --background: #f7f7f2;
+  --surface: #ffffff;
+  --foreground: #171717;
+  --muted-foreground: #6b6b65;
+  --border: #d9d9d2;
+  --accent: #c8ff3d;
+  --destructive: #c93c37;
+  --success: #18794e;
+  --content-max-width: 1200px;
+  --reading-max-width: 760px;
+  --page-padding-mobile: 20px;
+  --page-padding-desktop: 32px;
+  --page-padding: var(--page-padding-mobile);
+  --space-unit: 4px;
+  --radius: 2px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--background);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-noto-sans-kr), "Noto Sans KR", sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-noto-serif-kr), "Noto Serif KR", serif;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button,
+input,
+select {
+  min-height: 44px;
+}
+
+textarea {
+  min-height: 88px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--foreground);
+  outline-offset: 2px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --page-padding: var(--page-padding-desktop);
+  }
+}
