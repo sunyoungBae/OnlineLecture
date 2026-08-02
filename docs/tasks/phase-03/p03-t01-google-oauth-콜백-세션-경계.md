@@ -8,7 +8,7 @@ parallel_group: ""
 owner: "Codex/p03_t01"
 started_at: "2026-08-02T23:54:07+09:00"
 blocked_reason: ""
-owned_files: ["src/app/auth/callback/route.ts", "src/app/(public)/login/page.tsx", "src/lib/supabase/client.ts", "src/lib/supabase/server.ts", "tests/e2e/auth.spec.ts", "src/middleware.ts"]
+owned_files: ["src/app/auth/callback/route.ts", "src/app/(public)/login/page.tsx", "src/lib/supabase/client.ts", "src/lib/supabase/server.ts", "tests/e2e/auth.spec.ts", "src/proxy.ts", "package.json", "package-lock.json"]
 shared_files: []
 implementation_commit: ""
 reviewer: ""
@@ -26,7 +26,9 @@ Google OAuth·콜백·세션 경계을 완료해 다음 의존 작업이 사용�
 - 생성 또는 수정: src/lib/supabase/client.ts
 - 생성 또는 수정: src/lib/supabase/server.ts
 - 생성 또는 수정: tests/e2e/auth.spec.ts
-- 생성 또는 수정: src/middleware.ts
+- 생성 또는 수정: src/proxy.ts
+- 생성 또는 수정: package.json
+- 생성 또는 수정: package-lock.json
 
 # 제외
 
@@ -43,7 +45,9 @@ P01-T03, P02-T03가 모두 done이면 `blocked_reason: external`로 바꾸고 Go
 - src/lib/supabase/client.ts
 - src/lib/supabase/server.ts
 - tests/e2e/auth.spec.ts
-- src/middleware.ts
+- src/proxy.ts
+- package.json
+- package-lock.json
 
 # 인터페이스
 
