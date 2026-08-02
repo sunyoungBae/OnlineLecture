@@ -8,7 +8,7 @@ parallel_group: "D-A"
 owner: "Codex/p02_t01"
 started_at: "2026-08-02T22:18:00+09:00"
 blocked_reason: ""
-owned_files: ["supabase/migrations/202608020001_core_schema.sql", "supabase/tests/core_schema.sql"]
+owned_files: ["supabase/config.toml", "supabase/migrations/202608020001_core_schema.sql", "supabase/tests/core_schema.sql"]
 shared_files: []
 implementation_commit: ""
 reviewer: ""
@@ -21,6 +21,7 @@ review_commit: ""
 
 # 범위
 
+- 생성 또는 수정: supabase/config.toml
 - 생성 또는 수정: supabase/migrations/202608020001_core_schema.sql
 - 생성 또는 수정: supabase/tests/core_schema.sql
 - 공유 파일 수정 없음
@@ -35,6 +36,7 @@ P01-T01가 done이면 Supabase 로컬 CLI 설정을 확인한다. 원격 개발 
 
 # 파일
 
+- supabase/config.toml
 - supabase/migrations/202608020001_core_schema.sql
 - supabase/tests/core_schema.sql
 

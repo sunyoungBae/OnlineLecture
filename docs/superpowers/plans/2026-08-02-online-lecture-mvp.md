@@ -54,7 +54,7 @@ flowchart TD
 | P01-T01 | Next.js·TypeScript·Tailwind·Vitest·Playwright 기반 | blocked | P00-T05 | - | 프로젝트 설정, `src` 기본 구조, Tailwind PostCSS·전역 CSS 진입점, 생성물 제외 | `package.json`, lockfile, 테스트 설정, README |
 | P01-T02 | Sera 기반 토큰·폰트·필수 UI | blocked | P01-T01 | F-A | `src/components/ui`, 전역 스타일, 필요한 UI 패키지와 라이선스 기록 | `package.json`과 lockfile은 P01-T02가 통합 소유 |
 | P01-T03 | 공개 헤더·모바일 메뉴·홈·오류 틀 | blocked | P01-T01 | F-A | P01-T01 임시 루트 페이지를 교체하는 공개 라우트와 레이아웃 | 루트 레이아웃 통합 소유 |
-| P02-T01 | 테이블·제약·인덱스 migration | blocked | P01-T01 | D-A | 첫 schema migration | migration 번호 |
+| P02-T01 | 테이블·제약·인덱스 migration | blocked | P01-T01 | D-A | Supabase 로컬 설정과 첫 schema migration | migration 번호 |
 | P02-T02 | 역할별 RLS와 SQL 권한 테스트 | blocked | P02-T01 | - | RLS migration·테스트 | migration 번호 |
 | P02-T03 | 비공개 Storage 정책과 DB 생성 타입 | blocked | P02-T02 | - | Storage migration, 생성 타입 | 타입 export |
 | P03-T01 | Google OAuth·콜백·세션 경계 | blocked | P01-T03,P02-T03 | - | 인증 라우트와 Supabase 클라이언트 | middleware |

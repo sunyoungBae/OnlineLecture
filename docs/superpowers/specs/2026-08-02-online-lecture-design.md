@@ -30,6 +30,7 @@ OnlineLecture는 넓은 여백과 절제된 에디토리얼 분위기의 비상�
 - Resend는 저장공간 80% 도달 경고 이메일 한 종류에만 사용한다.
 - Zod 스키마로 서버 입력, URL, 검색 파라미터와 파일 메타데이터를 검증한다.
 - Vitest는 순수 로직, Playwright는 실제 브라우저 사용자 흐름을 검증한다.
+- Supabase CLI 로컬 설정과 Docker 기반 PostgreSQL 스택으로 migration 및 pgTAP 검사를 재현한다.
 - ORM, 전역 상태관리, React Hook Form, 별도 검색 엔진과 CMS는 추가하지 않는다.
 
 서비스 역할 키와 Resend 키는 서버에서만 사용한다. 실제 비밀 값은 로컬과 Vercel 환경 변수에 저장하고 `.env.example`에는 변수명과 설명만 둔다.
