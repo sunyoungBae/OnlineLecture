@@ -1,6 +1,12 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server.js";
 
 import { createClient } from "@/lib/supabase/server";
+
+type CallbackClientFactory = () => Promise<{
+  auth: {
+    exchangeCodeForSession: (code: string) => Promise<{ error: unknown }>;
+  };
+}>;
 
 function safeNextPath(value: string | null, origin: string) {
   if (!value?.startsWith("/") || value.startsWith("//")) {
@@ -27,7 +33,10 @@ function siteOrigin(request: NextRequest) {
   ).origin;
 }
 
-export async function GET(request: NextRequest) {
+export async function handleOAuthCallback(
+  request: NextRequest,
+  createCallbackClient: CallbackClientFactory = createClient,
+) {
   const code = request.nextUrl.searchParams.get("code");
   if (!code) {
     return NextResponse.redirect(callbackErrorUrl(request));
@@ -39,7 +48,7 @@ export async function GET(request: NextRequest) {
   );
 
   try {
-    const supabase = await createClient();
+    const supabase = await createCallbackClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (error) {
       return NextResponse.redirect(callbackErrorUrl(request));
@@ -49,4 +58,8 @@ export async function GET(request: NextRequest) {
   }
 
   return NextResponse.redirect(new globalThis.URL(next, siteOrigin(request)));
+}
+
+export async function GET(request: NextRequest) {
+  return handleOAuthCallback(request);
 }

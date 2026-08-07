@@ -1,9 +1,31 @@
-import { createServerClient } from "@supabase/ssr";
-import { NextResponse, type NextRequest } from "next/server";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { NextResponse, type NextRequest } from "next/server.js";
 
 import type { Database } from "@/types/database";
 
-export async function proxy(request: NextRequest) {
+type SessionClientFactory = (
+  url: string,
+  anonKey: string,
+  options: {
+    auth: { flowType: "pkce" };
+    cookies: {
+      getAll: () => { name: string; value: string }[];
+      setAll: (
+        cookies: { name: string; value: string; options?: CookieOptions }[],
+      ) => void;
+    };
+  },
+) => {
+  auth: { getClaims: () => Promise<unknown> };
+};
+
+const createSessionClient: SessionClientFactory = (url, anonKey, options) =>
+  createServerClient<Database>(url, anonKey, options);
+
+export async function refreshSession(
+  request: NextRequest,
+  clientFactory: SessionClientFactory = createSessionClient,
+) {
   let response = NextResponse.next({ request });
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -12,7 +34,7 @@ export async function proxy(request: NextRequest) {
     return response;
   }
 
-  const supabase = createServerClient<Database>(url, anonKey, {
+  const supabase = clientFactory(url, anonKey, {
     auth: { flowType: "pkce" },
     cookies: {
       getAll: () => request.cookies.getAll(),
@@ -32,6 +54,10 @@ export async function proxy(request: NextRequest) {
 
   await supabase.auth.getClaims();
   return response;
+}
+
+export async function proxy(request: NextRequest) {
+  return refreshSession(request);
 }
 
 export const config = {

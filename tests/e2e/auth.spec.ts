@@ -1,4 +1,8 @@
 import { expect, test } from "@playwright/test";
+import { NextRequest } from "next/server.js";
+
+import { handleOAuthCallback } from "@/app/auth/callback/route";
+import { refreshSession } from "@/proxy";
 
 test("Google 로그인은 PKCE 콜백과 안전한 next 경로를 전달한다", async ({ page }) => {
   let authorizeUrl: globalThis.URL | undefined;
@@ -58,4 +62,46 @@ test("로그인 응답에 서버 전용 키가 노출되지 않는다", async ({
   const html = await response!.text();
   expect(html).not.toContain("SUPABASE_SERVICE_ROLE_KEY");
   expect(html).not.toContain("never-expose-e2e-service-role");
+});
+
+test("콜백은 code를 교환한 뒤 안전한 경로로 이동한다", async () => {
+  let exchangedCode = "";
+  const request = new NextRequest(
+    "http://127.0.0.1:3000/auth/callback?code=oauth-code&next=%2Fcourses",
+  );
+
+  const response = await handleOAuthCallback(request, async () => ({
+    auth: {
+      exchangeCodeForSession: async (code: string) => {
+        exchangedCode = code;
+        return { error: null };
+      },
+    },
+  }));
+
+  expect(exchangedCode).toBe("oauth-code");
+  expect(response.headers.get("location")).toBe("http://127.0.0.1:3000/courses");
+});
+
+test("proxy는 갱신된 인증 쿠키를 응답으로 전달한다", async () => {
+  const request = new NextRequest("http://127.0.0.1:3000/courses");
+
+  const response = await refreshSession(request, (_url, _anonKey, options) => ({
+    auth: {
+      getClaims: async () => {
+        options.cookies.setAll([
+          {
+            name: "sb-session",
+            value: "refreshed-session",
+            options: { httpOnly: true, sameSite: "lax" },
+          },
+        ]);
+        return { data: { claims: null }, error: null };
+      },
+    },
+  }));
+
+  expect(response.cookies.get("sb-session")?.value).toBe("refreshed-session");
+  expect(response.headers.get("set-cookie")).toContain("HttpOnly");
+  expect(response.headers.get("set-cookie")).not.toContain("never-expose-e2e-service-role");
 });
