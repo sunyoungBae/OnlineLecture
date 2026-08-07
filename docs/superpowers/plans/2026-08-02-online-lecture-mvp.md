@@ -58,8 +58,8 @@ flowchart TD
 | P02-T02 | 역할별 RLS와 SQL 권한 테스트 | blocked | P02-T01 | - | RLS migration·테스트 | migration 번호 |
 | P02-T03 | 비공개 Storage 정책과 DB 생성 타입 | blocked | P02-T02 | - | Storage migration, 생성 타입 | 타입 export |
 | P03-T01 | Google OAuth·콜백·세션 경계 | blocked | P01-T03,P02-T03 | - | 인증 라우트, Supabase 클라이언트와 인증 패키지 통합 | `package.json`, lockfile, Next.js proxy |
-| P03-T02 | 별명 검증·중복 차단·온보딩 | blocked | P03-T01 | - | 온보딩 라우트, 검증 함수와 서버 액션 테스트 | profiles 타입 |
-| P03-T03 | 보호 경로·역할 가드·관리자 승격 절차 | blocked | P03-T02 | - | 권한 헬퍼·관리 문서/migration | Next.js proxy |
+| P03-T02 | 별명 검증·중복 차단·온보딩 | blocked | P03-T01 | - | 온보딩 라우트, 검증 함수, 서버 액션 테스트와 별명 CHECK migration·pgTAP | profiles 타입 |
+| P03-T03 | 보호 경로·역할 가드·관리자 승격 절차 | blocked | P03-T02 | - | 권한 헬퍼·관리 문서와 후속 admin bootstrap migration | Next.js proxy |
 | P04-T01 | 회원 강의 목록·상세·YouTube 플레이어 | blocked | P03-T03 | C-A | 회원 강의 라우트와 YouTube 검증 | 공개 레이아웃 없음 |
 | P04-T02 | 운영자 강의 CRUD | blocked | P03-T03 | C-A | 관리자 강의 라우트·서버 액션 | 관리자 내비게이션은 통합 소유 |
 | P04-T03 | 운영자 회차 CRUD·위아래 순서 이동 | blocked | P04-T02 | - | 회차 관리·순서 로직 | 강의 관리자 화면 |
@@ -86,6 +86,7 @@ flowchart TD
 - U-B는 공통 P06-T01 완료 후 게시글과 회차 첨부를 분리하며, 공통 경고 상태는 P06-T04만 수정한다.
 - R-A와 M-A는 각각 파일 소유권과 외부 계정이 분리된다.
 - migration 번호, `package.json`/lockfile, Next.js proxy, 공용 타입과 route export는 표에 지정된 통합 작업 외에는 수정하지 않는다.
+- P03 migration은 P03-T02의 `202608070004_profile_nickname_constraint.sql`, P03-T03의 `202608070005_admin_bootstrap.sql` 순서로 통합한다.
 
 ## 외부 체크포인트
 
