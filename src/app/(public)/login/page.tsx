@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { createClient } from "@/lib/supabase/client";
 
@@ -19,6 +19,15 @@ function safeNextPath(value: string | null) {
 
 export default function LoginPage() {
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const callbackError = new globalThis.URLSearchParams(globalThis.location.search).get(
+      "error",
+    );
+    if (callbackError === "oauth_callback") {
+      setError("Google 로그인을 완료하지 못했습니다. 다시 시도해 주세요.");
+    }
+  }, []);
 
   async function signInWithGoogle() {
     setError("");

@@ -64,6 +64,16 @@ test("로그인 응답에 서버 전용 키가 노출되지 않는다", async ({
   expect(html).not.toContain("never-expose-e2e-service-role");
 });
 
+test("콜백 오류를 접근 가능한 한국어 경고로 안내한다", async ({ page }) => {
+  await page.goto("/login?error=oauth_callback");
+
+  const alert = page.getByText(
+    "Google 로그인을 완료하지 못했습니다. 다시 시도해 주세요.",
+    { exact: true },
+  );
+  await expect(alert).toHaveAttribute("role", "alert");
+});
+
 test("콜백은 code를 교환한 뒤 안전한 경로로 이동한다", async () => {
   let exchangedCode = "";
   const request = new NextRequest(
