@@ -1,7 +1,7 @@
 ---
 id: P03-T01
 title: Google OAuth·콜백·세션 경계
-status: in_progress
+status: review
 type: feature
 depends_on: ["P01-T03", "P02-T03"]
 parallel_group: ""
@@ -10,7 +10,7 @@ started_at: "2026-08-02T23:54:07+09:00"
 blocked_reason: ""
 owned_files: ["src/app/auth/callback/route.ts", "src/app/(public)/login/page.tsx", "src/lib/supabase/client.ts", "src/lib/supabase/server.ts", "tests/e2e/auth.spec.ts", "src/proxy.ts", "package.json", "package-lock.json"]
 shared_files: []
-implementation_commit: ""
+implementation_commit: "8ec555a"
 reviewer: ""
 review_commit: ""
 ---
@@ -83,7 +83,13 @@ P01-T03, P02-T03가 모두 done이면 ready로 전환한다. 실제 Google 계�
 
 # 리뷰 증거
 
-작업 전 실패, 완료 명령 결과, 구현 커밋, 구현자와 다른 리뷰어, 승인 커밋을 이 절에 기록한다.
+- RED: `npm run test:e2e -- tests/e2e/auth.spec.ts`에서 4개 중 OAuth authorize 요청, callback route와 외부 `next` 방어 3개가 기능 부재로 실패했다. 기존 서버 키 문자열 비노출 1개만 통과했다.
+- 리뷰 보강 RED: 콜백 오류 alert 부재를 확인했고, 위험 URL 행렬에서 encoded 역슬래시가 루트로 제한되지 않는 실패를 재현했다.
+- GREEN: 인증 E2E 14개가 PKCE S256, 정확한 `openid email profile` 범위, code 교환, Proxy 갱신 쿠키, 콜백 오류 안내, 외부 URL·슬래시·역슬래시 변형 차단과 code/내부 오류 비노출을 검증했다.
+- 공통 검사: `./scripts/check-harness.sh`, `npm run lint`, `npm run typecheck`, `npm run test`(49), `npm run test:e2e`(16), `npm run build`, `git diff --check`와 비밀 패턴 검사가 모두 통과했다.
+- 구현 커밋: `8ec555a` (RED `3cdcef5`, 최소 구현 `cec68c5`, lint 경계 `e8c290c`, 교환·쿠키 테스트 `a3bc0b0`, 오류 alert `e3ef005` 포함)
+- 독립 리뷰: `Codex/p03_t01_reviewprep`가 OAuth 보안·오류·리디렉션 경계를, `Codex/p03_t01_dep_review`가 Supabase 패키지·Node 20·Next.js 16·lockfile·환경변수 경계를 검토해 Critical/Important 없음으로 승인했다.
+- 실제 Google Cloud 앱·Provider·배포 리디렉션 URL과 실로그인은 사용자 결정에 따라 P09-T01 수동 인수로 연기했다.
 
 # 커밋
 
