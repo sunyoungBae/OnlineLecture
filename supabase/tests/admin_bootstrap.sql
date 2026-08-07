@@ -1,6 +1,6 @@
 begin;
 
-select plan(15);
+select plan(19);
 
 insert into auth.users (
   id,
@@ -13,7 +13,7 @@ insert into auth.users (
   raw_user_meta_data
 )
 values
-  ('80000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'bootstrap-member@example.invalid', 'not-used', '{}', '{}'),
+  ('80000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'bootstrap-member@example.invalid', 'not-used', '{"role":"admin"}', '{}'),
   ('80000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'bootstrap-existing-admin@example.invalid', 'not-used', '{}', '{}'),
   ('80000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'bootstrap-second-member@example.invalid', 'not-used', '{}', '{}');
 
@@ -48,6 +48,29 @@ select ok(
   not coalesce((select has_function_privilege('service_role', oid, 'execute') from pg_proc where oid = to_regprocedure('private.bootstrap_first_admin(uuid)')), false),
   'service_role은 1회 관리자 승격 함수를 실행할 수 없다'
 );
+select ok(
+  not coalesce((select has_table_privilege('anon', oid, 'select') or has_table_privilege('anon', oid, 'insert') or has_table_privilege('anon', oid, 'update') or has_table_privilege('anon', oid, 'delete') from pg_class where oid = to_regclass('private.admin_bootstrap')), false),
+  'anon은 관리자 bootstrap 이력 테이블 권한이 없다'
+);
+select ok(
+  not coalesce((select has_table_privilege('authenticated', oid, 'select') or has_table_privilege('authenticated', oid, 'insert') or has_table_privilege('authenticated', oid, 'update') or has_table_privilege('authenticated', oid, 'delete') from pg_class where oid = to_regclass('private.admin_bootstrap')), false),
+  'authenticated는 관리자 bootstrap 이력 테이블 권한이 없다'
+);
+select ok(
+  not coalesce((select has_table_privilege('service_role', oid, 'select') or has_table_privilege('service_role', oid, 'insert') or has_table_privilege('service_role', oid, 'update') or has_table_privilege('service_role', oid, 'delete') from pg_class where oid = to_regclass('private.admin_bootstrap')), false),
+  'service_role은 관리자 bootstrap 이력 테이블 권한이 없다'
+);
+
+set local role authenticated;
+select set_config('request.jwt.claim.role', 'authenticated', true);
+select set_config('request.jwt.claim.sub', '80000000-0000-0000-0000-000000000001', true);
+select set_config('request.jwt.claims', '{"sub":"80000000-0000-0000-0000-000000000001","role":"authenticated","app_metadata":{"role":"admin"}}', true);
+select throws_ok(
+  $$ update public.profiles set role = 'admin' where id = '80000000-0000-0000-0000-000000000001' $$,
+  '42501', null,
+  '위조된 JWT app_metadata 역할은 DB member 프로필을 admin으로 바꾸지 못한다'
+);
+set local role postgres;
 
 select throws_ok(
   $$ select private.bootstrap_first_admin('80000000-0000-0000-0000-000000000099') $$,

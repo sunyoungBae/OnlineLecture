@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import { createClient } from "../supabase/server";
 
@@ -73,19 +73,12 @@ export async function requireRole(
   requiredRole: Role,
   { clientFactory, nextPath }: RequireRoleOptions = {},
 ): Promise<AuthenticatedProfile> {
-  let supabase: RequireRoleClient;
-  let user: { id: string } | null;
-
-  try {
-    supabase = await (clientFactory ?? defaultClientFactory)();
-    const { data, error } = await supabase.auth.getUser();
-    if (error || !data.user) {
-      return redirect(loginPath(nextPath));
-    }
-    user = data.user;
-  } catch {
+  const supabase = await (clientFactory ?? defaultClientFactory)();
+  const { data, error: authError } = await supabase.auth.getUser();
+  if (authError || !data.user) {
     return redirect(loginPath(nextPath));
   }
+  const user = data.user;
 
   let profileResult: ProfileQueryResult;
   try {
@@ -113,6 +106,21 @@ export async function requireRole(
   }
 
   return { id: profile.id, role };
+}
+
+export async function requirePageRole(
+  requiredRole: Role,
+  options: RequireRoleOptions = {},
+): Promise<AuthenticatedProfile> {
+  try {
+    return await requireRole(requiredRole, options);
+  } catch (error) {
+    if (error instanceof AuthorizationError) {
+      return notFound();
+    }
+
+    throw error;
+  }
 }
 
 function defaultClientFactory() {
