@@ -58,7 +58,7 @@ flowchart TD
 | P02-T02 | 역할별 RLS와 SQL 권한 테스트 | blocked | P02-T01 | - | RLS migration·테스트 | migration 번호 |
 | P02-T03 | 비공개 Storage 정책과 DB 생성 타입 | blocked | P02-T02 | - | Storage migration, 생성 타입 | 타입 export |
 | P03-T01 | Google OAuth·콜백·세션 경계 | blocked | P01-T03,P02-T03 | - | 인증 라우트, Supabase 클라이언트와 인증 패키지 통합 | `package.json`, lockfile, Next.js proxy |
-| P03-T02 | 별명 검증·중복 차단·온보딩 | blocked | P03-T01 | - | 온보딩 라우트와 검증 함수 | profiles 타입 |
+| P03-T02 | 별명 검증·중복 차단·온보딩 | blocked | P03-T01 | - | 온보딩 라우트, 검증 함수와 서버 액션 테스트 | profiles 타입 |
 | P03-T03 | 보호 경로·역할 가드·관리자 승격 절차 | blocked | P03-T02 | - | 권한 헬퍼·관리 문서/migration | Next.js proxy |
 | P04-T01 | 회원 강의 목록·상세·YouTube 플레이어 | blocked | P03-T03 | C-A | 회원 강의 라우트와 YouTube 검증 | 공개 레이아웃 없음 |
 | P04-T02 | 운영자 강의 CRUD | blocked | P03-T03 | C-A | 관리자 강의 라우트·서버 액션 | 관리자 내비게이션은 통합 소유 |
