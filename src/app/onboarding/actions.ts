@@ -28,6 +28,7 @@ export type OnboardingClient = {
 };
 
 type OnboardingClientFactory = () => Promise<OnboardingClient>;
+type OnboardingFormData = { get: (name: string) => unknown };
 
 const ONBOARDING_COMPLETE_PATH = "/";
 const SAVE_ERROR_MESSAGE = "별명을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.";
@@ -49,7 +50,7 @@ function isNicknameDuplicate(error: Exclude<OnboardingInsertError, null>) {
 
 export async function completeOnboarding(
   _previousState: OnboardingActionState,
-  formData: FormData,
+  formData: OnboardingFormData,
   clientFactory: OnboardingClientFactory = createClient,
 ): Promise<OnboardingActionState> {
   const nicknameValue = formData.get("nickname");

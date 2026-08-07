@@ -10,7 +10,7 @@ import {
 vi.mock("next/navigation", () => ({ redirect: vi.fn() }));
 
 function onboardingForm(nickname: string) {
-  const formData = new FormData();
+  const formData = new globalThis.FormData();
   formData.set("nickname", nickname);
   return formData;
 }
