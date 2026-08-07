@@ -1,7 +1,7 @@
 ---
 id: P03-T01
 title: Google OAuth·콜백·세션 경계
-status: review
+status: done
 type: feature
 depends_on: ["P01-T03", "P02-T03"]
 parallel_group: ""
@@ -11,8 +11,8 @@ blocked_reason: ""
 owned_files: ["src/app/auth/callback/route.ts", "src/app/(public)/login/page.tsx", "src/lib/supabase/client.ts", "src/lib/supabase/server.ts", "tests/e2e/auth.spec.ts", "src/proxy.ts", "package.json", "package-lock.json"]
 shared_files: []
 implementation_commit: "8ec555a"
-reviewer: ""
-review_commit: ""
+reviewer: "Codex/p03_t01_reviewprep"
+review_commit: "5569aa1"
 ---
 
 # 목표
@@ -90,6 +90,7 @@ P01-T03, P02-T03가 모두 done이면 ready로 전환한다. 실제 Google 계�
 - 구현 커밋: `8ec555a` (RED `3cdcef5`, 최소 구현 `cec68c5`, lint 경계 `e8c290c`, 교환·쿠키 테스트 `a3bc0b0`, 오류 alert `e3ef005` 포함)
 - 독립 리뷰: `Codex/p03_t01_reviewprep`가 OAuth 보안·오류·리디렉션 경계를, `Codex/p03_t01_dep_review`가 Supabase 패키지·Node 20·Next.js 16·lockfile·환경변수 경계를 검토해 Critical/Important 없음으로 승인했다.
 - 실제 Google Cloud 앱·Provider·배포 리디렉션 URL과 실로그인은 사용자 결정에 따라 P09-T01 수동 인수로 연기했다.
+- 승인 커밋: `5569aa1` (`리뷰: P03-T01 독립 승인`)
 
 # 커밋
 
