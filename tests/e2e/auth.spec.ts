@@ -16,6 +16,7 @@ test("Google 로그인은 PKCE 콜백과 안전한 next 경로를 전달한다",
   await page.getByRole("button", { name: "Google로 계속하기" }).click();
 
   await expect.poll(() => authorizeUrl?.searchParams.get("provider")).toBe("google");
+  expect(authorizeUrl?.searchParams.get("scopes")).toBe("openid email profile");
   expect(authorizeUrl?.searchParams.get("code_challenge")).toBeTruthy();
   expect(authorizeUrl?.searchParams.get("code_challenge_method")).toBe("s256");
 
@@ -91,6 +92,64 @@ test("콜백은 code를 교환한 뒤 안전한 경로로 이동한다", async (
 
   expect(exchangedCode).toBe("oauth-code");
   expect(response.headers.get("location")).toBe("http://127.0.0.1:3000/courses");
+});
+
+for (const unsafeNext of [
+  "https://evil.example/steal",
+  "//evil.example/steal",
+  "/\\evil.example/steal",
+  "/%5C%5Cevil.example/steal",
+  "%2F%2Fevil.example/steal",
+]) {
+  test(`콜백은 위험한 next를 루트로 제한한다: ${unsafeNext}`, async () => {
+    const request = new NextRequest(
+      `http://127.0.0.1:3000/auth/callback?code=oauth-code&next=${globalThis.encodeURIComponent(unsafeNext)}`,
+    );
+
+    const response = await handleOAuthCallback(request, async () => ({
+      auth: {
+        exchangeCodeForSession: async () => ({ error: null }),
+      },
+    }));
+
+    expect(response.headers.get("location")).toBe("http://127.0.0.1:3000/");
+  });
+}
+
+test("code 교환 오류는 code와 오류 내용을 노출하지 않는다", async () => {
+  const request = new NextRequest(
+    "http://127.0.0.1:3000/auth/callback?code=oauth-secret-code&next=%2Fcourses",
+  );
+  const response = await handleOAuthCallback(request, async () => ({
+    auth: {
+      exchangeCodeForSession: async () => ({ error: new Error("server-secret") }),
+    },
+  }));
+
+  expect(response.headers.get("location")).toBe(
+    "http://127.0.0.1:3000/login?error=oauth_callback",
+  );
+  expect(response.headers.get("location")).not.toContain("oauth-secret-code");
+  expect(response.headers.get("location")).not.toContain("server-secret");
+});
+
+test("code 교환 예외는 같은 출처의 일반 오류로 제한한다", async () => {
+  const request = new NextRequest(
+    "http://127.0.0.1:3000/auth/callback?code=oauth-secret-code&next=%2Fcourses",
+  );
+  const response = await handleOAuthCallback(request, async () => ({
+    auth: {
+      exchangeCodeForSession: async () => {
+        throw new Error("server-secret");
+      },
+    },
+  }));
+
+  expect(response.headers.get("location")).toBe(
+    "http://127.0.0.1:3000/login?error=oauth_callback",
+  );
+  expect(response.headers.get("location")).not.toContain("oauth-secret-code");
+  expect(response.headers.get("location")).not.toContain("server-secret");
 });
 
 test("proxy는 갱신된 인증 쿠키를 응답으로 전달한다", async () => {

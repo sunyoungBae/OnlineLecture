@@ -9,7 +9,12 @@ type CallbackClientFactory = () => Promise<{
 }>;
 
 function safeNextPath(value: string | null, origin: string) {
-  if (!value?.startsWith("/") || value.startsWith("//")) {
+  if (
+    !value?.startsWith("/") ||
+    value.startsWith("//") ||
+    value.includes("\\") ||
+    /%(?:2f|5c)/i.test(value)
+  ) {
     return "/";
   }
 

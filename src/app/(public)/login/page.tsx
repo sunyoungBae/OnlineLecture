@@ -5,7 +5,12 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 function safeNextPath(value: string | null) {
-  if (!value?.startsWith("/") || value.startsWith("//")) {
+  if (
+    !value?.startsWith("/") ||
+    value.startsWith("//") ||
+    value.includes("\\") ||
+    /%(?:2f|5c)/i.test(value)
+  ) {
     return "/";
   }
 
