@@ -11,11 +11,12 @@ OnlineLecture는 넓은 여백과 절제된 에디토리얼 분위기의 비상�
 구현 중 다음 순서로 외부 계정을 준비한다.
 
 1. Supabase 개발 프로젝트 하나를 생성한다.
-2. Google Cloud OAuth 앱을 만들고 기본 신원 범위만 허용한다.
-3. YouTube 채널과 공개 테스트 영상을 준비한다.
-4. Resend 계정을 만들고 계정 소유자 이메일만 용량 경고 수신자로 둔다.
-5. GitHub 저장소와 Vercel 프로젝트를 연결한다.
-6. 로컬, Supabase, Vercel의 OAuth 리디렉션 URL을 등록한다.
+2. YouTube 채널과 공개 테스트 영상을 준비한다.
+3. Resend 계정을 만들고 계정 소유자 이메일만 용량 경고 수신자로 둔다.
+4. GitHub 저장소와 Vercel 프로젝트를 연결한다.
+5. P09 배포 인수 직전에 Google Cloud OAuth 앱을 만들고 기본 신원 범위와 Supabase·Vercel 리디렉션 URL을 등록한다.
+
+P03 인증 구현과 자동 검증은 로컬·모의 OAuth 경계로 진행하며 실제 Google 계정 설정은 요구하지 않는다. 실제 Google 로그인은 배포 URL이 확정된 P09에서 한 번만 설정하고 수동 검증한다.
 
 첫 Google 로그인 후 해당 사용자를 한 번의 버전 관리 SQL migration 또는 관리 쿼리로 `admin`으로 승격한다. 관리자 역할 편집 UI는 만들지 않는다.
 
