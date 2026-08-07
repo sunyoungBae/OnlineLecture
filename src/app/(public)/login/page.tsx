@@ -1,4 +1,53 @@
+"use client";
+
+import { useState } from "react";
+
+import { createClient } from "@/lib/supabase/client";
+
+function safeNextPath(value: string | null) {
+  if (!value?.startsWith("/") || value.startsWith("//")) {
+    return "/";
+  }
+
+  const target = new URL(value, window.location.origin);
+  if (target.origin !== window.location.origin) {
+    return "/";
+  }
+
+  return `${target.pathname}${target.search}${target.hash}`;
+}
+
 export default function LoginPage() {
+  const [error, setError] = useState("");
+
+  async function signInWithGoogle() {
+    setError("");
+
+    try {
+      const next = safeNextPath(new URLSearchParams(window.location.search).get("next"));
+      const callback = new URL("/auth/callback", window.location.origin);
+      callback.searchParams.set("next", next);
+
+      const supabase = createClient();
+      const { data, error: signInError } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: callback.toString(),
+          scopes: "openid email profile",
+          skipBrowserRedirect: true,
+        },
+      });
+
+      if (signInError || !data.url) {
+        throw signInError ?? new Error("OAuth URL이 없습니다.");
+      }
+
+      window.location.assign(data.url);
+    } catch {
+      setError("로그인을 시작하지 못했습니다. 잠시 후 다시 시도해 주세요.");
+    }
+  }
+
   return (
     <main className="mx-auto max-w-[var(--reading-max-width)] px-[var(--page-padding)] py-16">
       <h1 className="text-4xl font-semibold tracking-tight">로그인</h1>
@@ -8,9 +57,15 @@ export default function LoginPage() {
       <button
         className="mt-8 min-h-11 border border-[var(--foreground)] bg-[var(--surface)] px-5 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2"
         type="button"
+        onClick={signInWithGoogle}
       >
         Google로 계속하기
       </button>
+      {error ? (
+        <p className="mt-4 text-sm text-[var(--destructive)]" role="alert">
+          {error}
+        </p>
+      ) : null}
     </main>
   );
 }

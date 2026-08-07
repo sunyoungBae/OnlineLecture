@@ -1,0 +1,50 @@
+import { NextResponse, type NextRequest } from "next/server";
+
+import { createClient } from "@/lib/supabase/server";
+
+function safeNextPath(value: string | null, origin: string) {
+  if (!value?.startsWith("/") || value.startsWith("//")) {
+    return "/";
+  }
+
+  const target = new URL(value, origin);
+  if (target.origin !== origin) {
+    return "/";
+  }
+
+  return `${target.pathname}${target.search}${target.hash}`;
+}
+
+function callbackErrorUrl(request: NextRequest) {
+  const url = new URL("/login", siteOrigin(request));
+  url.searchParams.set("error", "oauth_callback");
+  return url;
+}
+
+function siteOrigin(request: NextRequest) {
+  return new URL(process.env.NEXT_PUBLIC_SITE_URL ?? request.nextUrl.origin).origin;
+}
+
+export async function GET(request: NextRequest) {
+  const code = request.nextUrl.searchParams.get("code");
+  if (!code) {
+    return NextResponse.redirect(callbackErrorUrl(request));
+  }
+
+  const next = safeNextPath(
+    request.nextUrl.searchParams.get("next"),
+    siteOrigin(request),
+  );
+
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    if (error) {
+      return NextResponse.redirect(callbackErrorUrl(request));
+    }
+  } catch {
+    return NextResponse.redirect(callbackErrorUrl(request));
+  }
+
+  return NextResponse.redirect(new URL(next, siteOrigin(request)));
+}

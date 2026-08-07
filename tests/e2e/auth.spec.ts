@@ -55,5 +55,7 @@ test("로그인 응답에 서버 전용 키가 노출되지 않는다", async ({
   const response = await page.goto("/login");
 
   expect(response).not.toBeNull();
-  expect(await response!.text()).not.toContain("SUPABASE_SERVICE_ROLE_KEY");
+  const html = await response!.text();
+  expect(html).not.toContain("SUPABASE_SERVICE_ROLE_KEY");
+  expect(html).not.toContain("never-expose-e2e-service-role");
 });

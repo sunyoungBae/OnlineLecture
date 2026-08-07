@@ -4,16 +4,18 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -H 127.0.0.1",
     "build": "next build",
     "start": "next start",
     "lint": "eslint src tests '*.config.ts' '*.config.mjs' --no-error-on-unmatched-pattern --no-config-lookup --ext .ts,.tsx,.mjs --parser @typescript-eslint/parser --global process --rule 'no-undef:error'",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
-    "test:e2e": "env -u NO_COLOR playwright test --pass-with-no-tests"
+    "test:e2e": "env -u NO_COLOR NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321 NEXT_PUBLIC_SUPABASE_ANON_KEY=e2e-public-anon-key NEXT_PUBLIC_SITE_URL=http://127.0.0.1:3000 SUPABASE_SERVICE_ROLE_KEY=never-expose-e2e-service-role playwright test --pass-with-no-tests"
   },
   "dependencies": {
     "@base-ui/react": "1.6.0",
+    "@supabase/ssr": "0.8.0",
+    "@supabase/supabase-js": "2.95.3",
     "@tailwindcss/postcss": "4.1.18",
     "next": "16.2.12",
     "postcss": "8.5.25",
