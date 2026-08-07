@@ -92,11 +92,10 @@ flowchart TD
 | 시점 | 필요한 사용자 작업 | 해제되는 작업 |
 | --- | --- | --- |
 | P02 시작 전 | Supabase 개발 프로젝트 생성 | P02 실제 적용 검증 |
-| P03 시작 전 | Google Cloud OAuth 앱과 기본 신원 범위 승인 | P03-T01 |
 | P04 완료 전 | 공개 YouTube 테스트 영상 준비 | P04-T01 브라우저 검증 |
 | P06-T04 전 | Resend 계정·계정 소유자 수신 주소 준비 | P06-T04 실제 발송 검증 |
 | P08-T03 전 | GitHub 저장소·Vercel 프로젝트 연결 | P08-T03 |
-| P09 전 | 로컬·Supabase·Vercel 리디렉션 URL 등록 | P09-T01 |
+| P09 전 | Google Cloud OAuth 앱·기본 신원 범위·Supabase Provider·Vercel 리디렉션 URL 등록 | P09-T01 |
 
 첫 로그인 사용자의 `admin` 승격은 P03-T03의 버전 관리 migration 또는 관리 쿼리로 한 번만 수행하며 역할 편집 UI는 만들지 않는다.
 
