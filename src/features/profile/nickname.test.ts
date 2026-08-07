@@ -3,14 +3,14 @@ import { describe, expect, it } from "vitest";
 import { areNicknamesEqual, validateNickname } from "./nickname";
 
 describe("validateNickname", () => {
-  it.each(["가a", "홍길동", "Online_2026", "한글_English99"])(
+  it.each(["가a", "홍길동", "Online_2026", "한글_English99", "12345678901234567890"])(
     "2~20자의 한글·영문·숫자·밑줄 별명 %s를 허용한다",
     (nickname) => {
       expect(validateNickname(nickname)).toEqual({ valid: true, nickname });
     },
   );
 
-  it.each(["가", "a", "가나다라마바사라마바사라마바사라마바사라마바사라마바사라마바사라마바사라마바사라마바사"])(
+  it.each(["가", "a", "123456789012345678901"])(
     "2~20자 범위 밖 별명 %s를 거부한다",
     (nickname) => {
       expect(validateNickname(nickname)).toEqual({
