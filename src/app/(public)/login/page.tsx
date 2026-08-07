@@ -9,8 +9,8 @@ function safeNextPath(value: string | null) {
     return "/";
   }
 
-  const target = new URL(value, window.location.origin);
-  if (target.origin !== window.location.origin) {
+  const target = new globalThis.URL(value, globalThis.location.origin);
+  if (target.origin !== globalThis.location.origin) {
     return "/";
   }
 
@@ -24,8 +24,10 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const next = safeNextPath(new URLSearchParams(window.location.search).get("next"));
-      const callback = new URL("/auth/callback", window.location.origin);
+      const next = safeNextPath(
+        new globalThis.URLSearchParams(globalThis.location.search).get("next"),
+      );
+      const callback = new globalThis.URL("/auth/callback", globalThis.location.origin);
       callback.searchParams.set("next", next);
 
       const supabase = createClient();
@@ -42,7 +44,7 @@ export default function LoginPage() {
         throw signInError ?? new Error("OAuth URL이 없습니다.");
       }
 
-      window.location.assign(data.url);
+      globalThis.location.assign(data.url);
     } catch {
       setError("로그인을 시작하지 못했습니다. 잠시 후 다시 시도해 주세요.");
     }

@@ -7,7 +7,7 @@ function safeNextPath(value: string | null, origin: string) {
     return "/";
   }
 
-  const target = new URL(value, origin);
+  const target = new globalThis.URL(value, origin);
   if (target.origin !== origin) {
     return "/";
   }
@@ -16,13 +16,15 @@ function safeNextPath(value: string | null, origin: string) {
 }
 
 function callbackErrorUrl(request: NextRequest) {
-  const url = new URL("/login", siteOrigin(request));
+  const url = new globalThis.URL("/login", siteOrigin(request));
   url.searchParams.set("error", "oauth_callback");
   return url;
 }
 
 function siteOrigin(request: NextRequest) {
-  return new URL(process.env.NEXT_PUBLIC_SITE_URL ?? request.nextUrl.origin).origin;
+  return new globalThis.URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? request.nextUrl.origin,
+  ).origin;
 }
 
 export async function GET(request: NextRequest) {
@@ -46,5 +48,5 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(callbackErrorUrl(request));
   }
 
-  return NextResponse.redirect(new URL(next, siteOrigin(request)));
+  return NextResponse.redirect(new globalThis.URL(next, siteOrigin(request)));
 }
