@@ -30,7 +30,7 @@ review_commit: ""
 
 # 선행조건과 차단 해제
 
-P08-T03가 done이면 `blocked_reason: external`로 바꾸고 Google OAuth 승인·배포 리디렉션 URL·공개 테스트 영상 준비를 확인한 뒤 ready로 전환한다.
+P08-T03가 done이면 `blocked_reason: external`로 바꾸고 Google Cloud OAuth 웹 앱·기본 신원 범위·Supabase Google Provider·배포 리디렉션 URL·공개 테스트 영상 준비를 확인한 뒤 ready로 전환한다.
 
 # 파일
 

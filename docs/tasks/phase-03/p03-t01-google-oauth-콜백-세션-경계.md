@@ -36,7 +36,7 @@ Google OAuth·콜백·세션 경계을 완료해 다음 의존 작업이 사용�
 
 # 선행조건과 차단 해제
 
-P01-T03, P02-T03가 모두 done이면 `blocked_reason: external`로 바꾸고 Google Cloud OAuth 앱·기본 신원 범위·로컬 리디렉션 URL 준비를 확인한 뒤 ready로 전환한다.
+P01-T03, P02-T03가 모두 done이면 ready로 전환한다. 실제 Google 계정·Provider·리디렉션 URL 설정은 P09-T01에서 수행하며, 이 카드는 로컬·모의 OAuth 경계로 자동 검증한다.
 
 # 파일
 
