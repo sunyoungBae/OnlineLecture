@@ -39,9 +39,9 @@ delete from public.storage_reservations;
 select is((select public.storage_usage_release(reservation_id) from public.storage_usage_claim(10)), true, 'claim token은 한 번만 해제된다');
 select is((select reserved_bytes from public.storage_settings where id = true), 0::bigint, 'token 해제 뒤 예약 바이트는 0이다');
 
-select ok((select count(*) from pg_proc where proname = 'storage_usage_claim' and prosrc like '%for update%'), 'claim locks settings row for concurrency');
-select ok((select count(*) from pg_proc where proname = 'storage_usage_claim' and prosrc like '%reserved_bytes%'), 'claim includes reservations');
-select ok((select count(*) from pg_proc where proname = 'storage_usage_release' and prosrc like '%storage_reservations%'), 'release is token-scoped');
+select ok((select count(*) from pg_proc where proname = 'storage_usage_claim' and prosrc like '%for update%') > 0, 'claim locks settings row for concurrency');
+select ok((select count(*) from pg_proc where proname = 'storage_usage_claim' and prosrc like '%reserved_bytes%') > 0, 'claim includes reservations');
+select ok((select count(*) from pg_proc where proname = 'storage_usage_release' and prosrc like '%storage_reservations%') > 0, 'release is token-scoped');
 
 select set_config('request.jwt.claim.role', 'authenticated', true);
 select throws_ok($$ select * from public.storage_usage_claim(0) $$, 'P0001', 'service role required', '회원 역할의 직접 claim은 거부된다');
