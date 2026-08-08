@@ -1,10 +1,25 @@
 begin;
-select plan(6);
--- RED before 202608080002: RPC and row-lock claim do not exist; Docker execution is intentionally deferred.
-select has_function('public','storage_usage_claim', array['bigint']);
-select function_privs_are('public','storage_usage_claim',array['bigint'],'authenticated',array['EXECUTE']);
-select isnt((select proacl is null from pg_proc where proname='storage_usage_claim'), true, 'explicit execute grant');
-select has_function('public','storage_usage_release', array['bigint']);
-select has_function('public','storage_warning_send_failed', array[]::text[]);
-select pass('80/95 transition and reservation release are covered by TypeScript boundary tests');
+select plan(17);
+select has_function('public', 'storage_usage_claim', array['bigint']);
+select has_function('public', 'storage_usage_release', array['uuid']);
+select has_function('public', 'storage_warning_send_failed', array[]::text[]);
+select function_privs_are('public', 'storage_usage_claim', array['bigint'], 'anon', array[]::text[]);
+select function_privs_are('public', 'storage_usage_claim', array['bigint'], 'authenticated', array[]::text[]);
+select function_privs_are('public', 'storage_usage_claim', array['bigint'], 'service_role', array['EXECUTE']);
+select function_privs_are('public', 'storage_usage_release', array['uuid'], 'authenticated', array[]::text[]);
+select function_privs_are('public', 'storage_warning_send_failed', array[]::text[], 'authenticated', array[]::text[]);
+
+select set_config('request.jwt.claim.role', 'service_role', true);
+update public.storage_settings set quota_bytes = 100, reserved_bytes = 0, warning_state = 'armed', last_warning_email_sent_at = null where id = true;
+delete from public.storage_reservations;
+select is((select warning_claimed from public.storage_usage_claim(80)), true, '80% 최초 claim');
+select is((select warning_claimed from public.storage_usage_claim(0)), false, 'sent 상태는 중복 claim하지 않음');
+update public.storage_settings set reserved_bytes = 0, warning_state = 'armed' where id = true;
+delete from public.storage_reservations;
+select is((select upload_allowed from public.storage_usage_claim(95)), false, '95%는 차단');
+update public.storage_settings set warning_state = 'sent', reserved_bytes = 0 where id = true;
+select is((select warning_claimed from public.storage_usage_claim(0)), false, '75% 아래 재무장 sync');
+select ok((select count(*) from pg_proc where proname = 'storage_usage_claim' and prosrc like '%for update%'), 'claim locks settings row for concurrency');
+select ok((select count(*) from pg_proc where proname = 'storage_usage_claim' and prosrc like '%reserved_bytes%'), 'claim includes reservations');
+select ok((select count(*) from pg_proc where proname = 'storage_usage_release' and prosrc like '%storage_reservations%'), 'release is token-scoped');
 select * from finish(); rollback;

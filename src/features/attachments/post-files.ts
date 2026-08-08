@@ -45,11 +45,11 @@ type AttachmentStorage = {
   upload: (path: string, file: UploadFile) => Promise<Result<null>>;
 };
 
-type QuotaClaim = { upload_allowed: boolean; warning_claimed: boolean };
+type QuotaClaim = { reservation_id: string | null; upload_allowed: boolean; warning_claimed: boolean };
 type StorageQuotaGateway = {
-  claim: (bytes: number) => Promise<Result<QuotaClaim | null>>;
-  release: (bytes: number) => Promise<Result<null>>;
-  sendFailed: () => Promise<Result<null>>;
+  claim: (bytes: number) => Promise<Result<QuotaClaim[] | null>>;
+  release: (reservationId: string) => Promise<Result<boolean | null>>;
+  sendFailed: () => Promise<Result<boolean | null>>;
 };
 
 export type PostFileDependencies = {
@@ -81,7 +81,7 @@ const defaultDependencies: PostFileDependencies = {
   requireRole: defaultRequireRole,
   storageFactory: createAttachmentStorage,
   quotaFactory: createStorageQuotaGateway,
-  sendWarning: () => sendStorageWarning({ recipient: process.env.STORAGE_ALERT_RECIPIENT ?? "", apiKey: process.env.RESEND_API_KEY ?? "" }),
+  sendWarning: () => sendStorageWarning({ recipient: process.env.STORAGE_ALERT_RECIPIENT ?? "", apiKey: process.env.RESEND_API_KEY ?? "", from: process.env.RESEND_FROM ?? "" }),
 };
 
 export function validatePostUpload(
@@ -146,6 +146,17 @@ async function cleanupPaths(storage: AttachmentStorage, paths: string[]) {
   return false;
 }
 
+async function releaseReservation(quota: StorageQuotaGateway, reservationId: string | null) {
+  if (!reservationId) return true;
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const released = await quota.release(reservationId);
+      if (!released.error && released.data === true) return true;
+    } catch {}
+  }
+  return false;
+}
+
 function trashPathFor(attachment: PostAttachment) {
   return `trash/posts/${attachment.post_id}/${attachment.id}-${globalThis.crypto.randomUUID()}`;
 }
@@ -167,6 +178,8 @@ export async function savePostAttachments(
   let storage: AttachmentStorage | null = null;
   const paths: string[] = [];
   let quota: StorageQuotaGateway | null = null;
+  let reservationId: string | null = null;
+  let warningClaimed = false;
   const totalBytes = files.reduce((total, file) => total + file.size, 0);
   try {
     const repository = await dependencies.repositoryFactory();
@@ -182,20 +195,19 @@ export async function savePostAttachments(
 
     quota = await dependencies.quotaFactory();
     const claim = await quota.claim(totalBytes);
-    if (claim.error || !claim.data || !claim.data.upload_allowed) return { ok: false, reason: "save_failed" };
-    if (claim.data.warning_claimed) {
-      const warning = await dependencies.sendWarning();
-      if (!warning.sent) await quota.sendFailed();
-    }
+    const claimed = claim.data?.[0];
+    if (claim.error || !claimed || !claimed.upload_allowed || !claimed.reservation_id) return { ok: false, reason: "save_failed" };
+    reservationId = claimed.reservation_id;
+    warningClaimed = claimed.warning_claimed;
     storage = await dependencies.storageFactory();
     for (const file of files) {
       const path = dependencies.createPath(postId);
       const uploaded = await storage.upload(path, file);
       if (uploaded.error) {
-        if (paths.length) {
-          if (!(await cleanupPaths(storage, paths))) return { ok: false, reason: "cleanup_failed" };
-        }
-        await quota.release(totalBytes);
+        const cleaned = !paths.length || await cleanupPaths(storage, paths);
+        if (warningClaimed) await quota.sendFailed();
+        const released = await releaseReservation(quota, reservationId);
+        if (!cleaned || !released) return { ok: false, reason: "cleanup_failed" };
         return { ok: false, reason: "save_failed" };
       }
       paths.push(path);
@@ -211,17 +223,21 @@ export async function savePostAttachments(
       })),
     );
     if (inserted.error) {
-      await quota.release(totalBytes);
-      return {
-        ok: false,
-        reason: (await cleanupPaths(storage, paths)) ? "save_failed" : "cleanup_failed",
-      };
+      if (warningClaimed) await quota.sendFailed();
+      const released = await releaseReservation(quota, reservationId);
+      const cleaned = await cleanupPaths(storage, paths);
+      return { ok: false, reason: released && cleaned ? "save_failed" : "cleanup_failed" };
     }
 
-    await quota.release(totalBytes);
+    if (warningClaimed) {
+      const warning = await dependencies.sendWarning();
+      if (!warning.sent) await quota.sendFailed();
+    }
+    if (!(await releaseReservation(quota, reservationId))) return { ok: false, reason: "cleanup_failed" };
     return { ok: true };
   } catch {
-    if (quota) await quota.release(totalBytes).catch(() => undefined);
+    if (quota && !(await releaseReservation(quota, reservationId))) return { ok: false, reason: "cleanup_failed" };
+    if (quota && warningClaimed) await quota.sendFailed().catch(() => undefined);
     return {
       ok: false,
       reason: storage && paths.length && !(await cleanupPaths(storage, paths))
@@ -412,10 +428,16 @@ async function createAttachmentStorage(): Promise<AttachmentStorage> {
 }
 
 async function createStorageQuotaGateway(): Promise<StorageQuotaGateway> {
-  const supabase = await createClient();
   return {
-    claim: async (bytes) => (await supabase.rpc("storage_usage_claim", { p_incoming_bytes: bytes })) as unknown as Result<QuotaClaim | null>,
-    release: async (bytes) => { const result = await supabase.rpc("storage_usage_release", { p_reserved_bytes: bytes }); return { data: null, error: result.error }; },
-    sendFailed: async () => { const result = await supabase.rpc("storage_warning_send_failed"); return { data: null, error: result.error }; },
+    claim: async (bytes) => (await createServiceQuotaClient().rpc("storage_usage_claim", { p_incoming_bytes: bytes })) as unknown as Result<QuotaClaim[] | null>,
+    release: async (reservationId) => (await createServiceQuotaClient().rpc("storage_usage_release", { p_reservation_id: reservationId })) as unknown as Result<boolean | null>,
+    sendFailed: async () => (await createServiceQuotaClient().rpc("storage_warning_send_failed")) as unknown as Result<boolean | null>,
   };
+}
+
+function createServiceQuotaClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !serviceRoleKey) throw new Error("저장량 서비스 환경 변수가 설정되지 않았습니다.");
+  return createServiceClient<Database>(url, serviceRoleKey);
 }

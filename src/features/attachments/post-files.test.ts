@@ -71,9 +71,9 @@ function dependencies({
     error: null,
   });
   const requireRole = vi.fn().mockResolvedValue({ id: authorId, role: "member" as const });
-  const claim = vi.fn().mockResolvedValue({ data: { upload_allowed: true, warning_claimed: false }, error: null });
-  const release = vi.fn().mockResolvedValue({ data: null, error: null });
-  const sendFailed = vi.fn().mockResolvedValue({ data: null, error: null });
+  const claim = vi.fn().mockResolvedValue({ data: [{ reservation_id: "00000000-0000-4000-8000-000000000005", upload_allowed: true, warning_claimed: false }], error: null });
+  const release = vi.fn().mockResolvedValue({ data: true, error: null });
+  const sendFailed = vi.fn().mockResolvedValue({ data: true, error: null });
   const sendWarning = vi.fn().mockResolvedValue({ sent: true });
   const deps: PostFileDependencies = {
     createPath: () => storagePath,
@@ -124,13 +124,25 @@ describe("게시글 첨부 검증", () => {
 describe("게시글 첨부 저장", () => {
   it("95% claim이 거부되면 객체 업로드 전에 일반 저장 오류로 중단한다", async () => {
     const { claim, deps, upload } = dependencies();
-    claim.mockResolvedValue({ data: { upload_allowed: false, warning_claimed: false }, error: null });
+    claim.mockResolvedValue({ data: [{ reservation_id: null, upload_allowed: false, warning_claimed: false }], error: null });
     await expect(savePostAttachments(postId, authorId, [file()], deps)).resolves.toEqual({ ok: false, reason: "save_failed" });
     expect(upload).not.toHaveBeenCalled();
   });
+  it("RPC 배열이 비어 있거나 오류면 첫 행을 추정하지 않고 업로드를 거부한다", async () => {
+    const { claim, deps, upload } = dependencies();
+    claim.mockResolvedValue({ data: [], error: null });
+    await expect(savePostAttachments(postId, authorId, [file()], deps)).resolves.toEqual({ ok: false, reason: "save_failed" });
+    expect(upload).not.toHaveBeenCalled();
+  });
+  it("성공한 metadata 뒤 reservation release가 0행이면 재시도하고 성공으로 처리하지 않는다", async () => {
+    const { deps, release } = dependencies();
+    release.mockResolvedValue({ data: false, error: null });
+    await expect(savePostAttachments(postId, authorId, [file()], deps)).resolves.toEqual({ ok: false, reason: "cleanup_failed" });
+    expect(release).toHaveBeenCalledTimes(2);
+  });
   it("80% 최초 claim만 경고를 보내고 발송 실패면 재시도 가능 상태로 되돌린다", async () => {
     const { claim, deps, sendFailed, sendWarning } = dependencies();
-    claim.mockResolvedValue({ data: { upload_allowed: true, warning_claimed: true }, error: null });
+    claim.mockResolvedValue({ data: [{ reservation_id: "00000000-0000-4000-8000-000000000005", upload_allowed: true, warning_claimed: true }], error: null });
     sendWarning.mockResolvedValue({ sent: false });
     await savePostAttachments(postId, authorId, [file()], deps);
     expect(sendWarning).toHaveBeenCalledOnce();
@@ -173,11 +185,12 @@ describe("게시글 첨부 저장", () => {
   });
 
   it("업로드 실패면 앞서 저장한 객체를 정리한다", async () => {
-    const { deps, remove, upload } = dependencies();
+    const { deps, release, remove, upload } = dependencies();
     upload.mockResolvedValueOnce({ data: null, error: null }).mockResolvedValueOnce({ data: null, error: new Error("storage") });
 
     await expect(savePostAttachments(postId, authorId, [file(), file("other.pdf")], deps)).resolves.toEqual({ ok: false, reason: "save_failed" });
     expect(remove).toHaveBeenCalledWith([storagePath]);
+    expect(release).toHaveBeenCalledOnce();
   });
 
   it("업로드 예외면 이미 저장한 모든 객체를 정리한다", async () => {

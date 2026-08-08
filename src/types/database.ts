@@ -314,10 +314,10 @@ export type Database = {
       }
       storage_usage_claim: {
         Args: { p_incoming_bytes?: number }
-        Returns: { usage_bytes: number; quota_bytes: number; upload_allowed: boolean; warning_claimed: boolean }[]
+        Returns: { reservation_id: string | null; usage_bytes: number; quota_bytes: number; upload_allowed: boolean; warning_claimed: boolean }[]
       }
-      storage_usage_release: { Args: { p_reserved_bytes: number }; Returns: undefined }
-      storage_warning_send_failed: { Args: Record<PropertyKey, never>; Returns: undefined }
+      storage_usage_release: { Args: { p_reservation_id: string }; Returns: boolean }
+      storage_warning_send_failed: { Args: Record<PropertyKey, never>; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

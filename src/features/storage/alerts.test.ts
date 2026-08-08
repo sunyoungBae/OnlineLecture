@@ -14,7 +14,12 @@ describe("저장량 경고", () => {
   });
   it("Resend 실패는 키와 원문을 노출하지 않아 재시도할 수 있다", async () => {
     const fetcher = vi.fn().mockResolvedValue({ ok: false });
-    await expect(sendStorageWarning({ fetcher, recipient: "owner@example.com", apiKey: "secret" })).resolves.toEqual({ sent: false });
+    await expect(sendStorageWarning({ fetcher, recipient: "owner@example.com", apiKey: "secret", from: "alerts@example.com" })).resolves.toEqual({ sent: false });
     expect(fetcher).toHaveBeenCalledOnce();
+  });
+  it("발신자 환경 값이 없으면 Resend 요청과 비밀 노출 없이 실패한다", async () => {
+    const fetcher = vi.fn();
+    await expect(sendStorageWarning({ fetcher, recipient: "owner@example.com", apiKey: "secret", from: "" })).resolves.toEqual({ sent: false });
+    expect(fetcher).not.toHaveBeenCalled();
   });
 });

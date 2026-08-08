@@ -74,9 +74,9 @@ function dependencies({
   const remove = vi.fn().mockResolvedValue({ error: removeError });
   const createSignedUrl = vi.fn().mockResolvedValue({ data: { signedUrl: "https://signed.example/download" }, error: null });
   const requireRole = vi.fn().mockResolvedValue({ id: "admin-id", role: "admin" as const });
-  const claim = vi.fn().mockResolvedValue({ data: { upload_allowed: true, warning_claimed: false }, error: null });
-  const release = vi.fn().mockResolvedValue({ data: null, error: null });
-  const sendFailed = vi.fn().mockResolvedValue({ data: null, error: null });
+  const claim = vi.fn().mockResolvedValue({ data: [{ reservation_id: "00000000-0000-4000-8000-000000000004", upload_allowed: true, warning_claimed: false }], error: null });
+  const release = vi.fn().mockResolvedValue({ data: true, error: null });
+  const sendFailed = vi.fn().mockResolvedValue({ data: true, error: null });
   const sendWarning = vi.fn().mockResolvedValue({ sent: true });
   const deps: LessonFileDependencies = {
     createPath: () => `${lessonId}/attachment-1`,
@@ -118,7 +118,7 @@ describe("회차 자료 서버 동작", () => {
   });
   it("95% claim 거부면 Storage 업로드 전에 중단한다", async () => {
     const { claim, deps, upload } = dependencies();
-    claim.mockResolvedValue({ data: { upload_allowed: false, warning_claimed: false }, error: null });
+    claim.mockResolvedValue({ data: [{ reservation_id: null, upload_allowed: false, warning_claimed: false }], error: null });
     await uploadLessonAttachments(formData({ course_id: courseId, files: [file()], lesson_id: lessonId }), deps);
     expect(upload).not.toHaveBeenCalled();
     expect(redirect).toHaveBeenCalledWith(`/admin/courses/${courseId}/lessons?error=attachment-save`);
