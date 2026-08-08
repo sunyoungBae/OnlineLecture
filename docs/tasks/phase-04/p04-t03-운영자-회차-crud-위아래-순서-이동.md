@@ -1,7 +1,7 @@
 ---
 id: P04-T03
 title: 운영자 회차 CRUD·위아래 순서 이동
-status: in_progress
+status: review
 type: feature
 depends_on: ["P04-T02"]
 parallel_group: ""
@@ -10,7 +10,7 @@ started_at: "2026-08-08T09:18:07+09:00"
 blocked_reason: ""
 owned_files: ["src/app/admin/courses/[courseId]/lessons/page.tsx", "src/app/admin/courses/[courseId]/lessons/page.test.tsx", "src/app/admin/courses/[courseId]/lessons/actions.ts", "src/features/admin/lesson-order.ts", "src/features/admin/lesson-order.test.ts", "supabase/migrations/202608080001_move_lesson.sql", "supabase/tests/move_lesson.sql"]
 shared_files: ["src/app/admin/courses/page.tsx", "src/types/database.ts"]
-implementation_commit: ""
+implementation_commit: "9c9dd78"
 reviewer: ""
 review_commit: ""
 ---
@@ -86,7 +86,12 @@ P04-T02가 모두 done이면 ready로 전환한다.
 
 # 리뷰 증거
 
-작업 전 실패, 완료 명령 결과, 구현 커밋, 구현자와 다른 리뷰어, 승인 커밋을 이 절에 기록한다.
+- RED: 회차 순서·액션 모듈과 페이지 피드백 계약 부재로 좁은 테스트가 실패했고, 리뷰 보강에서 stale 0행·설명 길이·DB 원문 비노출 경계가 실패했다.
+- GREEN: 순서·CRUD 액션·페이지 19개 테스트가 인증 우선, 입력·YouTube 검증, 영향 행, 고정 성공·오류 안내와 원문 비노출을 검증하며 통과했다.
+- DB GREEN: 사용자가 로컬에서 reset과 전체 pgTAP을 실행해 6개 파일, 172개 테스트 모두 `Result: PASS`를 확인했다. 관리자 전용 RPC, 첫·중간·마지막 이동, 타 강의 불변과 position 유일성을 포함한다.
+- 공통 검사: 구현 최종 보강 시 전체 unit 163개, lint, typecheck, build, E2E 16개와 `./scripts/check-harness.sh`가 통과했다. 이후 독립 검증의 좁은 19개도 통과했다.
+- 구현 커밋: `9c9dd78` (원자 RPC `dbbb8ee`, CRUD UI `5fc78d0`, pgTAP `ae544be`, 리뷰 보강 `055f3e5`, `2240f37`, `1f0855d` 포함)
+- 독립 리뷰: `Codex/p04_t02`가 RPC 권한·잠금·유일성, CRUD 권한·입력·영향 행·오류 및 페이지 피드백을 검토해 Critical/Important 없음으로 승인했다.
 
 # 커밋
 
