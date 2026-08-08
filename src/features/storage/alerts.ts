@@ -12,7 +12,7 @@ export function evaluateStorageAlert({ usageBytes, quotaBytes, warningState }: {
   };
 }
 
-export async function sendStorageWarning({ fetcher = fetch, recipient, apiKey }: { fetcher?: typeof fetch; recipient: string; apiKey: string }) {
+export async function sendStorageWarning({ fetcher = globalThis.fetch, recipient, apiKey }: { fetcher?: typeof globalThis.fetch; recipient: string; apiKey: string }) {
   if (!recipient || !apiKey) return { sent: false };
   try {
     const response = await fetcher("https://api.resend.com/emails", { method: "POST", headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" }, body: JSON.stringify({ from: "OnlineLecture <alerts@onlinelecture.local>", to: [recipient], subject: "저장공간 사용량 경고", text: "저장공간 사용량이 80% 이상입니다." }) });
