@@ -1,8 +1,6 @@
-import { createPostAction } from "../../../features/posts/actions";
+import { createPost } from "../../../features/posts/actions";
 import { PostEditor } from "../../../features/posts/editor";
 import { requirePageRole } from "../../../lib/auth/require-role";
-
-const createPost = createPostAction();
 
 export default async function NewPostPage() {
   await requirePageRole("member", { nextPath: "/board/new" });

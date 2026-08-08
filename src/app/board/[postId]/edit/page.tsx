@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { createUpdatePostAction } from "../../../../features/posts/actions";
+import { updatePost } from "../../../../features/posts/actions";
 import { validatePostInput } from "../../../../features/posts/content";
 import { PostEditor } from "../../../../features/posts/editor";
 import { requirePageRole } from "../../../../lib/auth/require-role";
@@ -43,7 +43,7 @@ export default async function EditPostPage({
         게시글 수정
       </h1>
       <PostEditor
-        action={createUpdatePostAction(post.id)}
+        action={updatePost.bind(null, post.id)}
         initialContent={validation.value.content}
         initialTitle={validation.value.title}
         submitLabel="수정 저장"

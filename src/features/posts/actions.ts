@@ -105,6 +105,15 @@ export function createPostAction(dependencies: PostActionDependencies = defaultD
   };
 }
 
+export async function createPost(
+  previousState: PostEditorState,
+  formData: PostFormData,
+): Promise<PostEditorState> {
+  "use server";
+
+  return createPostAction(defaultDependencies)(previousState, formData);
+}
+
 export function createUpdatePostAction(
   postId: string,
   dependencies: PostActionDependencies = defaultDependencies,
@@ -145,4 +154,14 @@ export function createUpdatePostAction(
 
     return dependencies.redirect(`/board/${encodeURIComponent(postId)}`);
   };
+}
+
+export async function updatePost(
+  postId: string,
+  previousState: PostEditorState,
+  formData: PostFormData,
+): Promise<PostEditorState> {
+  "use server";
+
+  return createUpdatePostAction(postId, defaultDependencies)(previousState, formData);
 }
