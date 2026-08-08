@@ -1,13 +1,13 @@
 ---
 id: P07-T02
 title: 키보드·포커스·라벨·44px·WCAG AA·모바일 점검
-status: blocked
+status: ready
 type: feature
 depends_on: ["P07-T01"]
 parallel_group: ""
 owner: ""
 started_at: ""
-blocked_reason: dependency
+blocked_reason: ""
 owned_files: ["tests/e2e/accessibility.spec.ts", "tests/e2e/responsive.spec.ts", "src/components/site-header.tsx", "src/components/mobile-menu.tsx", "src/app/(public)/page.tsx", "src/app/(public)/login/page.tsx", "src/app/courses/page.tsx", "src/app/courses/[slug]/page.tsx", "src/app/board/page.tsx", "src/app/board/[postId]/page.tsx", "src/app/admin/courses/page.tsx", "src/app/admin/storage/page.tsx"]
 shared_files: []
 implementation_commit: ""
