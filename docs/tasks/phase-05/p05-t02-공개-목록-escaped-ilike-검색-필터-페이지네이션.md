@@ -1,7 +1,7 @@
 ---
 id: P05-T02
 title: 공개 목록·escaped ILIKE 검색·필터·페이지네이션
-status: in_progress
+status: review
 type: feature
 depends_on: ["P05-T01"]
 parallel_group: ""
@@ -10,7 +10,7 @@ started_at: "2026-08-08T09:23:26+09:00"
 blocked_reason: ""
 owned_files: ["src/features/posts/search.ts", "src/features/posts/search.test.ts", "src/app/board/page.tsx", "src/app/board/page.test.tsx"]
 shared_files: ["src/components/site-header.tsx"]
-implementation_commit: ""
+implementation_commit: "f682de3"
 reviewer: ""
 review_commit: ""
 ---
@@ -77,7 +77,11 @@ P05-T01가 모두 done이면 ready로 전환한다.
 
 # 리뷰 증거
 
-작업 전 실패, 완료 명령 결과, 구현 커밋, 구현자와 다른 리뷰어, 승인 커밋을 이 절에 기록한다.
+- RED: 검색 파서와 공개 게시판 서버 페이지 부재로 좁은 테스트가 실패했고, 리뷰 보강에서 unsafe integer와 Infinity 페이지가 그대로 통과했다.
+- GREEN: 검색·페이지 11개 테스트가 Zod URL 파라미터, escaped ILIKE, 공개 query·강의 필터·공지 우선 최신순·20개 범위, 빈·오류 상태와 최대 page 10,000을 검증하며 통과했다.
+- 검증: `npm run lint`, `npm run typecheck`, 전체 unit 150개, E2E 16개와 `./scripts/check-harness.sh`가 통과했다. 구현 완료 시 build와 audit 0건도 확인했다.
+- 구현 커밋: `f682de3` (검색 파서 `9f0ea6b`, 공개 페이지 `aed5d08` 포함)
+- 독립 리뷰: `Codex/p04_t02`가 공개 접근, 검색 escape, 필터·정렬·범위, 오류 비노출과 페이지 상한을 검토해 Critical/Important 없음으로 승인했다.
 
 # 커밋
 
