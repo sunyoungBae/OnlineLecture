@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { EmptyState } from "../../components/states/empty-state";
 import {
   buildPostSearchFilter,
   parsePostSearchParams,
@@ -154,13 +155,24 @@ export async function renderBoardPage(
       </form>
 
       {hasLoadError ? (
-        <p className="mt-8 text-sm text-[var(--destructive)]" role="alert">
-          게시글 목록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.
-        </p>
+        <div className="mt-8">
+          <EmptyState
+            action={{ href: "/board", label: "목록 새로고침" }}
+            description="잠시 후 다시 시도해 주세요."
+            role="alert"
+            title="게시글 목록을 불러오지 못했습니다"
+          />
+        </div>
       ) : null}
 
       {!hasLoadError && posts.length === 0 ? (
-        <p className="mt-8 text-sm text-[var(--muted-foreground)]">아직 게시글이 없습니다.</p>
+        <div className="mt-8">
+          <EmptyState
+            action={{ href: "/board/new", label: "첫 게시글 작성하기" }}
+            description="다른 수강생과 나누고 싶은 이야기를 첫 글로 남겨 보세요."
+            title="아직 게시글이 없습니다."
+          />
+        </div>
       ) : null}
 
       {posts.length > 0 ? (

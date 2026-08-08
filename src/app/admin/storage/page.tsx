@@ -1,5 +1,6 @@
 import { requirePageRole } from "../../../lib/auth/require-role";
 import { createClient } from "../../../lib/supabase/server";
+import { EmptyState } from "../../../components/states/empty-state";
 
 export type AdminStorageClient = {
   from: (table: "storage_settings" | "attachments") => {
@@ -20,7 +21,7 @@ export async function loadAdminStorage(factory: () => Promise<AdminStorageClient
 }
 
 export function renderAdminStoragePage(data: { hasLoadError: boolean; quota: number; usage: number; warningState: string }) {
-  if (data.hasLoadError) return <main className="py-10"><h2 className="text-3xl font-semibold">저장공간 관리</h2><p role="alert">저장량 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.</p></main>;
+  if (data.hasLoadError) return <main className="py-10"><h2 className="text-3xl font-semibold">저장공간 관리</h2><div className="mt-6 max-w-[var(--reading-max-width)]"><EmptyState action={{ href: "/admin/storage", label: "저장량 새로고침" }} description="잠시 후 다시 시도해 주세요." role="alert" title="저장량 정보를 불러오지 못했습니다" /></div></main>;
   const percent = data.quota ? (data.usage / data.quota) * 100 : 0;
   const blocked = percent >= 95;
   return <main className="py-10"><h2 className="text-3xl font-semibold">저장공간 관리</h2><p className="mt-4">사용량: {percent.toFixed(1)}%</p><p className="mt-2">경고 기준: 80%</p><p className="mt-2" role={blocked ? "alert" : "status"}>{blocked ? "업로드 차단: 95% 이상입니다." : data.warningState === "sent" ? "80% 경고를 발송했습니다." : "업로드 가능"}</p></main>;

@@ -96,6 +96,7 @@ describe("renderCourseDetailPage", () => {
     const page = await renderCourseDetailPage({ slug: "western-art" }, async () => client);
 
     expect(textContent(page)).toContain("강의를 불러오지 못했습니다");
+    expect(textContent(page)).toContain("강의 목록으로 돌아가기");
   });
 
   it("등록된 회차가 없으면 빈 회차 상태를 표시한다", async () => {
@@ -104,6 +105,7 @@ describe("renderCourseDetailPage", () => {
     const page = await renderCourseDetailPage({ slug: "western-art" }, async () => client);
 
     expect(textContent(page)).toContain("등록된 회차가 없습니다");
+    expect(textContent(page)).toContain("강의 목록으로 돌아가기");
   });
 
   it("회차 조회 DB 오류를 재시도 가능한 메시지로 표시한다", async () => {

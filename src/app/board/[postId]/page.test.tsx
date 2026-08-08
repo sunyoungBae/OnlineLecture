@@ -24,7 +24,7 @@ const text = (node: any): string =>
     : Array.isArray(node)
       ? node.map(text).join("")
       : node?.props
-        ? text(node.props.children)
+        ? text(node.props.children) || (typeof node.type === "function" ? text(node.type(node.props)) : "")
         : "";
 
 describe("공개 게시글 상세", () => {
@@ -76,5 +76,8 @@ describe("공개 게시글 상세", () => {
     expect(
       text(await renderPostPage(Promise.resolve({ postId: "p" }), async () => client(null, [], new Error("db")))),
     ).toContain("게시글을 불러오지 못했습니다");
+    expect(
+      text(await renderPostPage(Promise.resolve({ postId: "p" }), async () => client(null, [], new Error("db")))),
+    ).toContain("게시글 목록으로");
   });
 });

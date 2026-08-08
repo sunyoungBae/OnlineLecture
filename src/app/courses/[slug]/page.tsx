@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { EmptyState } from "../../../components/states/empty-state";
 import { parseYouTubeUrl } from "@/features/courses/youtube";
 import { downloadLessonAttachment } from "../../../features/attachments/lesson-files";
 import { requirePageRole } from "@/lib/auth/require-role";
@@ -100,10 +101,13 @@ export async function renderCourseDetailPage(
       </header>
 
       {!lessons?.length ? (
-        <section className="mt-8 max-w-[var(--reading-max-width)] border border-[var(--border)] bg-[var(--surface)] p-6" aria-labelledby="empty-lessons-title">
-          <h2 className="text-2xl font-semibold" id="empty-lessons-title">등록된 회차가 없습니다</h2>
-          <p className="mt-3 text-[var(--muted-foreground)]">회차가 등록되면 이 강의에서 영상을 시청할 수 있습니다.</p>
-        </section>
+        <div className="mt-8 max-w-[var(--reading-max-width)]">
+          <EmptyState
+            action={{ href: "/courses", label: "강의 목록으로 돌아가기" }}
+            description="회차가 등록되면 이 강의에서 영상을 시청할 수 있습니다."
+            title="등록된 회차가 없습니다"
+          />
+        </div>
       ) : (
         <ol className="mt-8 grid gap-8">
           {lessons.map((lesson) => {
@@ -170,8 +174,12 @@ async function downloadLessonAttachmentAction(formData: Parameters<typeof downlo
 function CourseError() {
   return (
     <main className="mx-auto max-w-[var(--reading-max-width)] px-[var(--page-padding)] py-16">
-      <h1 className="text-4xl font-semibold tracking-tight">강의를 불러오지 못했습니다</h1>
-      <p className="mt-6 text-[var(--muted-foreground)]">잠시 후 다시 시도해 주세요.</p>
+      <EmptyState
+        action={{ href: "/courses", label: "강의 목록으로 돌아가기" }}
+        description="잠시 후 다시 시도해 주세요."
+        role="alert"
+        title="강의를 불러오지 못했습니다"
+      />
     </main>
   );
 }

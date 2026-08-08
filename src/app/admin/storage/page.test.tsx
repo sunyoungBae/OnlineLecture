@@ -6,7 +6,7 @@ vi.mock("../../../lib/auth/require-role", () => ({ requirePageRole: vi.fn().mock
 import { requirePageRole } from "../../../lib/auth/require-role";
 import { loadAdminStorage, renderAdminStoragePage, type AdminStorageClient } from "./page";
 
-const text = (node: any): string => typeof node === "string" ? node : Array.isArray(node) ? node.map(text).join("") : node?.props ? text(node.props.children) : "";
+const text = (node: any): string => typeof node === "string" ? node : Array.isArray(node) ? node.map(text).join("") : node?.type && typeof node.type === "function" ? text(node.type(node.props ?? {})) : node?.props ? text(node.props.children) : "";
 function client({ usage = 800, quota = 1000, error = null }: { usage?: number; quota?: number; error?: unknown } = {}) {
   const maybeSingle = vi.fn().mockResolvedValue({ data: error ? null : { quota_bytes: quota, reserved_bytes: 0, warning_state: "sent", last_warning_email_sent_at: null }, error });
   const selectSettings = vi.fn().mockReturnValue({ maybeSingle });
@@ -26,5 +26,6 @@ describe("관리자 저장량 페이지", () => {
     const failed = await loadAdminStorage(async () => client({ error: new Error("secret") }));
     expect(text(renderAdminStoragePage(blocked))).toContain("업로드 차단");
     expect(text(renderAdminStoragePage(failed))).toContain("저장량 정보를 불러오지 못했습니다");
+    expect(text(renderAdminStoragePage(failed))).toContain("저장량 새로고침");
   });
 });

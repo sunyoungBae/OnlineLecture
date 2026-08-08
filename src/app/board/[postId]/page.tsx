@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { EmptyState } from "../../../components/states/empty-state";
 import {
   deletePostAttachment,
   downloadPostAttachment,
@@ -92,7 +93,12 @@ export async function renderPostPage(
   if (result.hasLoadError) {
     return (
       <main className="mx-auto max-w-[var(--reading-max-width)] px-[var(--page-padding)] py-16">
-        <p role="alert">게시글을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.</p>
+        <EmptyState
+          action={{ href: "/board", label: "게시글 목록으로" }}
+          description="잠시 후 다시 시도해 주세요."
+          role="alert"
+          title="게시글을 불러오지 못했습니다"
+        />
       </main>
     );
   }

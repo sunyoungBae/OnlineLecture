@@ -110,6 +110,7 @@ describe("renderCoursesPage", () => {
     const page = await renderCoursesPage(async () => client);
 
     expect(textContent(page)).toContain("강의를 불러오지 못했습니다");
+    expect(textContent(page)).toContain("강의 목록 새로고침");
   });
 
   it("공개 강의가 없으면 빈 상태를 표시하고 회차를 조회하지 않는다", async () => {
@@ -118,6 +119,7 @@ describe("renderCoursesPage", () => {
     const page = await renderCoursesPage(async () => client);
 
     expect(textContent(page)).toContain("현재 공개된 강의가 없습니다");
+    expect(textContent(page)).toContain("강의 둘러보기");
     expect(client.from).toHaveBeenCalledTimes(1);
   });
 

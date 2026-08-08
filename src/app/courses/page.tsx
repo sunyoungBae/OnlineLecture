@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { EmptyState } from "../../components/states/empty-state";
 import { parseYouTubeUrl } from "@/features/courses/youtube";
 import { requirePageRole } from "@/lib/auth/require-role";
 import { createClient } from "@/lib/supabase/server";
@@ -153,8 +154,12 @@ export default async function CoursesPage() {
 function CoursesEmpty() {
   return (
     <main className="mx-auto max-w-[var(--reading-max-width)] px-[var(--page-padding)] py-16">
-      <h1 className="text-4xl font-semibold tracking-tight">강의</h1>
-      <p className="mt-6 text-[var(--muted-foreground)]">현재 공개된 강의가 없습니다. 새 강의가 등록되면 이곳에서 확인할 수 있습니다.</p>
+      <EmptyState
+        action={{ href: "/courses", label: "강의 둘러보기" }}
+        description="새 강의가 등록되면 이곳에서 확인할 수 있습니다."
+        headingLevel="h1"
+        title="현재 공개된 강의가 없습니다"
+      />
     </main>
   );
 }
@@ -162,8 +167,13 @@ function CoursesEmpty() {
 function CoursesError() {
   return (
     <main className="mx-auto max-w-[var(--reading-max-width)] px-[var(--page-padding)] py-16">
-      <h1 className="text-4xl font-semibold tracking-tight">강의를 불러오지 못했습니다</h1>
-      <p className="mt-6 text-[var(--muted-foreground)]">잠시 후 다시 시도해 주세요.</p>
+      <EmptyState
+        action={{ href: "/courses", label: "강의 목록 새로고침" }}
+        description="잠시 후 다시 시도해 주세요."
+        headingLevel="h1"
+        role="alert"
+        title="강의를 불러오지 못했습니다"
+      />
     </main>
   );
 }

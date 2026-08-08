@@ -1,5 +1,7 @@
 import { deleteCourse, createCourse, updateCourse } from "./actions";
 import Link from "next/link";
+import { EmptyState } from "../../../components/states/empty-state";
+import { Forbidden } from "../../../components/states/forbidden";
 import { requirePageRole } from "../../../lib/auth/require-role";
 import { createClient } from "../../../lib/supabase/server";
 
@@ -65,7 +67,16 @@ export default async function AdminCoursesPage({
 }) {
   const [{ courses, hasLoadError }, params] = await Promise.all([loadAdminCourses(), searchParams]);
   const notice = params.notice && params.notice in noticeMessages ? noticeMessages[params.notice as keyof typeof noticeMessages] : null;
-  const error = params.error && params.error in errorMessages ? errorMessages[params.error as keyof typeof errorMessages] : null;
+  const isForbidden = params.error === "forbidden";
+  const error = !isForbidden && params.error && params.error in errorMessages ? errorMessages[params.error as keyof typeof errorMessages] : null;
+
+  if (isForbidden) {
+    return (
+      <main className="py-10">
+        <Forbidden action={{ href: "/", label: "처음으로" }} />
+      </main>
+    );
+  }
 
   return (
     <main className="py-10">
@@ -76,9 +87,14 @@ export default async function AdminCoursesPage({
         {notice ? <p className="mt-6 text-sm text-success" role="status">{notice}</p> : null}
         {error ? <p className="mt-6 text-sm text-destructive" role="alert">{error}</p> : null}
         {hasLoadError ? (
-          <p className="mt-6 text-sm text-destructive" role="alert">
-            강의 목록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.
-          </p>
+          <div className="mt-6">
+            <EmptyState
+              action={{ href: "/admin/courses", label: "강의 목록 새로고침" }}
+              description="잠시 후 다시 시도해 주세요."
+              role="alert"
+              title="강의 목록을 불러오지 못했습니다"
+            />
+          </div>
         ) : null}
 
         <section aria-labelledby="create-course-heading" className="mt-10 border-t border-border pt-8">
@@ -89,7 +105,7 @@ export default async function AdminCoursesPage({
         <section aria-labelledby="course-list-heading" className="mt-12 border-t border-border pt-8">
           <h3 className="text-2xl font-semibold" id="course-list-heading">등록된 강의</h3>
           {courses.length === 0 ? (
-            <p className="mt-4 text-muted-foreground">아직 등록된 강의가 없습니다.</p>
+            <EmptyState description="새 강의를 만들면 이 목록에서 공개 상태와 회차를 관리할 수 있습니다." headingLevel="h4" title="아직 등록된 강의가 없습니다." />
           ) : (
             <ul className="mt-6 space-y-10">
               {courses.map((course) => (

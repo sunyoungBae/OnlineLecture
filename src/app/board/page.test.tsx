@@ -63,7 +63,10 @@ function textContent(node: unknown): string {
   }
 
   if (node && typeof node === "object" && "props" in node) {
-    return textContent((node as { props: { children?: unknown } }).props.children);
+    const element = node as { props: { children?: unknown }; type?: unknown };
+    const children = textContent(element.props.children);
+    if (children || typeof element.type !== "function") return children;
+    return textContent(element.type(element.props));
   }
 
   return "";
@@ -105,9 +108,12 @@ describe("공개 게시글 목록", () => {
     const empty = createClient({ count: 0, data: [] });
     const emptyPage = await renderBoardPage(Promise.resolve({}), async () => empty.client);
     expect(textContent(emptyPage)).toContain("아직 게시글이 없습니다.");
+    expect(textContent(emptyPage)).toContain("첫 게시글 작성하기");
 
     const failed = createClient({ error: new Error("database detail") });
     const failedPage = await renderBoardPage(Promise.resolve({}), async () => failed.client);
-    expect(textContent(failedPage)).toContain("게시글 목록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.");
+    expect(textContent(failedPage)).toContain("게시글 목록을 불러오지 못했습니다");
+    expect(textContent(failedPage)).toContain("잠시 후 다시 시도해 주세요.");
+    expect(textContent(failedPage)).toContain("목록 새로고침");
   });
 });
