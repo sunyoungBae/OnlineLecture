@@ -56,7 +56,7 @@
 | P06-T04 | 80% Resend 1회·재무장·95% 차단/복구 | done | - |
 | P07-T01 | 오류·404·권한·빈 상태·로딩 공통 마감 | done | Q-A |
 | P07-T02 | 키보드·포커스·라벨·44px·WCAG AA·모바일 점검 | done | - |
-| P08-T01 | lint·typecheck·unit·E2E·build 전체 통과 | ready | - |
+| P08-T01 | lint·typecheck·unit·E2E·build 전체 통과 | in_progress | - |
 | P08-T02 | 공개 읽기 30개 동시 요청 부하 스모크 | blocked | R-A |
 | P08-T03 | GitHub·Vercel 연결과 배포 문서 | blocked | R-A |
 | P09-T01 | 배포 Google OAuth·별명·강의·YouTube 수동 인수 | blocked | M-A |
@@ -64,9 +64,9 @@
 
 ## 현재 흐름
 
-- 진행 중: 없음
+- 진행 중: P08-T01 lint·typecheck·unit·E2E·build 전체 통과 (Codex/p08_t01)
 - 리뷰 대기: 없음
-- 다음 실행 가능: P08-T01 lint·typecheck·unit·E2E·build 전체 통과
+- 다음 실행 가능: 없음 (P08-T01 진행 중)
 - 향후 외부 차단: OAuth, YouTube, Resend, Supabase, GitHub와 Vercel 체크포인트는 각 카드의 선행 작업 완료 후 외부 준비를 확인해 해제
 
 ## 상태 변경 체크

@@ -1,12 +1,12 @@
 ---
 id: P08-T01
 title: lint·typecheck·unit·E2E·build 전체 통과
-status: ready
+status: in_progress
 type: config
 depends_on: ["P07-T02"]
 parallel_group: ""
-owner: ""
-started_at: ""
+owner: "Codex/p08_t01"
+started_at: "2026-08-08T17:52:29+09:00"
 blocked_reason: ""
 owned_files: ["docs/verification/release-check.md"]
 shared_files: []
