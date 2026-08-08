@@ -1,7 +1,7 @@
 ---
 id: P04-T02
 title: 운영자 강의 CRUD
-status: in_progress
+status: review
 type: feature
 depends_on: ["P03-T03"]
 parallel_group: "C-A"
@@ -10,7 +10,7 @@ started_at: "2026-08-08T09:00:13+09:00"
 blocked_reason: ""
 owned_files: ["src/app/admin/courses/page.tsx", "src/app/admin/courses/actions.ts", "src/features/admin/courses.test.ts", "src/app/admin/layout.tsx"]
 shared_files: []
-implementation_commit: ""
+implementation_commit: "88551c8"
 reviewer: ""
 review_commit: ""
 ---
@@ -75,7 +75,11 @@ P03-T03가 모두 done이면 ready로 전환한다.
 
 # 리뷰 증거
 
-작업 전 실패, 완료 명령 결과, 구현 커밋, 구현자와 다른 리뷰어, 승인 커밋을 이 절에 기록한다.
+- RED: 관리자 강의 액션 모듈이 없어 좁은 테스트가 실패했다.
+- GREEN: 강의 생성·수정·삭제, 관리자 가드, 입력 검증과 일반화 오류를 다루는 7개 테스트가 통과했다.
+- 검증: `npm run typecheck`, `npm run lint`, `./scripts/check-harness.sh`, 전체 unit, E2E 16개와 build가 구현 완료 시점에 통과했다.
+- 구현 커밋: `88551c8`
+- 독립 리뷰: `Codex/p04_t01`이 관리자 가드, 입력 검증, DB 오류 비노출과 UI 경계를 검토해 Critical/Important 없음으로 승인했다.
 
 # 커밋
 

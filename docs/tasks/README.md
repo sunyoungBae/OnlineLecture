@@ -45,7 +45,7 @@
 | P03-T02 | 별명 검증·중복 차단·온보딩 | done | - |
 | P03-T03 | 보호 경로·역할 가드·관리자 승격 절차 | done | - |
 | P04-T01 | 회원 강의 목록·상세·YouTube 플레이어 | review | C-A |
-| P04-T02 | 운영자 강의 CRUD | in_progress | C-A |
+| P04-T02 | 운영자 강의 CRUD | review | C-A |
 | P04-T03 | 운영자 회차 CRUD·위아래 순서 이동 | blocked | - |
 | P05-T01 | Tiptap 제한 편집기와 게시글 CRUD | in_progress | B-A |
 | P05-T02 | 공개 목록·escaped ILIKE 검색·필터·페이지네이션 | blocked | - |
@@ -64,9 +64,9 @@
 
 ## 현재 흐름
 
-- 진행 중: P04-T02 운영자 강의 CRUD (Codex/p04_t02), P05-T01 Tiptap 제한 편집기와 게시글 CRUD (Codex/p05_t01)
-- 리뷰 대기: P04-T01 회원 강의 목록·상세·YouTube 플레이어 (Codex/p04_t02 승인)
-- 다음 실행 가능: 없음 (P04-T01 리뷰 중, P04-T02와 P05-T01 진행 중)
+- 진행 중: P05-T01 Tiptap 제한 편집기와 게시글 CRUD (Codex/p05_t01)
+- 리뷰 대기: P04-T01 회원 강의 목록·상세·YouTube 플레이어 (Codex/p04_t02 승인), P04-T02 운영자 강의 CRUD (Codex/p04_t01 승인)
+- 다음 실행 가능: 없음 (P04-T01과 P04-T02 리뷰 중, P05-T01 진행 중)
 - 향후 외부 차단: OAuth, YouTube, Resend, Supabase, GitHub와 Vercel 체크포인트는 각 카드의 선행 작업 완료 후 외부 준비를 확인해 해제
 
 ## 상태 변경 체크
