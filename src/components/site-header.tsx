@@ -20,7 +20,7 @@ export function SiteHeader() {
         <nav aria-label="주요 메뉴" className="hidden items-center gap-2 md:flex">
           {navigationItems.map((item) => (
             <Link
-              className="flex min-h-11 items-center px-3 text-sm font-medium hover:underline focus-visible:outline-2 focus-visible:outline-offset-2"
+              className="flex min-h-11 min-w-11 items-center justify-center px-3 text-sm font-medium hover:underline focus-visible:outline-2 focus-visible:outline-offset-2"
               href={item.href}
               key={item.href}
             >

@@ -121,7 +121,7 @@ export async function renderCoursesPage(
               <div className="p-5">
                 <h2 className="text-2xl font-semibold">
                   <Link
-                    className="focus-visible:outline-2 focus-visible:outline-offset-4 hover:underline"
+                    className="inline-flex min-h-11 items-center focus-visible:outline-2 focus-visible:outline-offset-4 hover:underline"
                     href={`/courses/${course.slug}`}
                   >
                     {course.title}
