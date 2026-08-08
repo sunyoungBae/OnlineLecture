@@ -1,7 +1,7 @@
 ---
 id: P08-T01
 title: lint·typecheck·unit·E2E·build 전체 통과
-status: in_progress
+status: review
 type: config
 depends_on: ["P07-T02"]
 parallel_group: ""
@@ -10,7 +10,7 @@ started_at: "2026-08-08T17:52:29+09:00"
 blocked_reason: ""
 owned_files: ["docs/verification/release-check.md"]
 shared_files: []
-implementation_commit: ""
+implementation_commit: "315aa7d"
 reviewer: ""
 review_commit: ""
 ---
@@ -68,7 +68,10 @@ P07-T02가 모두 done이면 ready로 전환한다.
 
 # 리뷰 증거
 
-작업 전 실패, 완료 명령 결과, 구현 커밋, 구현자와 다른 리뷰어, 승인 커밋을 이 절에 기록한다.
+- 구조/명령: `docs/verification/release-check.md`에 기준 SHA와 시간대 포함 실행 시각, 필수 5개 명령의 종료 코드 0을 기록했다.
+- 결과: harness 31개 카드, unit 27파일·218개, E2E 30개, lint·typecheck·build, audit 0건, diff/status clean과 비밀 실값 미검출을 확인했다.
+- 구현 커밋: `315aa7d` (초기 기록 `26271c7` 포함)
+- 독립 리뷰: `Codex/p04_t02`가 기록을 실제 재실행 결과와 대조하고 SHA·ISO 시각·수치·비밀 비노출·파일 범위를 검토해 Critical/Important 없음으로 승인했다.
 
 # 커밋
 
