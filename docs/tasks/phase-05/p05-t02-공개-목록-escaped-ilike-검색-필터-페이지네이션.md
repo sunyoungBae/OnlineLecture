@@ -8,7 +8,7 @@ parallel_group: ""
 owner: "Codex/p05_t02"
 started_at: "2026-08-08T09:23:26+09:00"
 blocked_reason: ""
-owned_files: ["src/features/posts/search.ts", "src/features/posts/search.test.ts", "src/app/board/page.tsx"]
+owned_files: ["src/features/posts/search.ts", "src/features/posts/search.test.ts", "src/app/board/page.tsx", "src/app/board/page.test.tsx"]
 shared_files: ["src/components/site-header.tsx"]
 implementation_commit: ""
 reviewer: ""
@@ -24,6 +24,7 @@ review_commit: ""
 - 생성 또는 수정: src/features/posts/search.ts
 - 생성 또는 수정: src/features/posts/search.test.ts
 - 생성 또는 수정: src/app/board/page.tsx
+- 생성 또는 수정: src/app/board/page.test.tsx
 - 통합 소유 시에만 수정: src/components/site-header.tsx
 
 # 제외
@@ -39,6 +40,7 @@ P05-T01가 모두 done이면 ready로 전환한다.
 - src/features/posts/search.ts
 - src/features/posts/search.test.ts
 - src/app/board/page.tsx
+- src/app/board/page.test.tsx
 - src/components/site-header.tsx
 
 # 인터페이스
