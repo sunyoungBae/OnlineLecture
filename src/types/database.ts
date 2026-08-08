@@ -265,6 +265,7 @@ export type Database = {
           id: boolean
           last_warning_email_sent_at: string | null
           quota_bytes: number
+          reserved_bytes: number
           updated_at: string
           warning_state: string
         }
@@ -273,6 +274,7 @@ export type Database = {
           id?: boolean
           last_warning_email_sent_at?: string | null
           quota_bytes?: number
+          reserved_bytes?: number
           updated_at?: string
           warning_state?: string
         }
@@ -281,6 +283,7 @@ export type Database = {
           id?: boolean
           last_warning_email_sent_at?: string | null
           quota_bytes?: number
+          reserved_bytes?: number
           updated_at?: string
           warning_state?: string
         }
@@ -309,6 +312,12 @@ export type Database = {
         Args: { p_direction: string; p_lesson_id: string }
         Returns: boolean
       }
+      storage_usage_claim: {
+        Args: { p_incoming_bytes?: number }
+        Returns: { usage_bytes: number; quota_bytes: number; upload_allowed: boolean; warning_claimed: boolean }[]
+      }
+      storage_usage_release: { Args: { p_reserved_bytes: number }; Returns: undefined }
+      storage_warning_send_failed: { Args: Record<PropertyKey, never>; Returns: undefined }
     }
     Enums: {
       [_ in never]: never

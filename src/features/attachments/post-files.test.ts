@@ -71,6 +71,10 @@ function dependencies({
     error: null,
   });
   const requireRole = vi.fn().mockResolvedValue({ id: authorId, role: "member" as const });
+  const claim = vi.fn().mockResolvedValue({ data: { upload_allowed: true, warning_claimed: false }, error: null });
+  const release = vi.fn().mockResolvedValue({ data: null, error: null });
+  const sendFailed = vi.fn().mockResolvedValue({ data: null, error: null });
+  const sendWarning = vi.fn().mockResolvedValue({ sent: true });
   const deps: PostFileDependencies = {
     createPath: () => storagePath,
     redirect,
@@ -84,6 +88,8 @@ function dependencies({
     }),
     requireRole,
     storageFactory: async () => ({ createSignedUrl, move, remove, upload }),
+    quotaFactory: async () => ({ claim, release, sendFailed }),
+    sendWarning,
   };
 
   return {
@@ -98,6 +104,7 @@ function dependencies({
     move,
     remove,
     requireRole,
+    claim, release, sendFailed, sendWarning,
     restore,
     upload,
   };
@@ -115,6 +122,20 @@ describe("게시글 첨부 검증", () => {
 });
 
 describe("게시글 첨부 저장", () => {
+  it("95% claim이 거부되면 객체 업로드 전에 일반 저장 오류로 중단한다", async () => {
+    const { claim, deps, upload } = dependencies();
+    claim.mockResolvedValue({ data: { upload_allowed: false, warning_claimed: false }, error: null });
+    await expect(savePostAttachments(postId, authorId, [file()], deps)).resolves.toEqual({ ok: false, reason: "save_failed" });
+    expect(upload).not.toHaveBeenCalled();
+  });
+  it("80% 최초 claim만 경고를 보내고 발송 실패면 재시도 가능 상태로 되돌린다", async () => {
+    const { claim, deps, sendFailed, sendWarning } = dependencies();
+    claim.mockResolvedValue({ data: { upload_allowed: true, warning_claimed: true }, error: null });
+    sendWarning.mockResolvedValue({ sent: false });
+    await savePostAttachments(postId, authorId, [file()], deps);
+    expect(sendWarning).toHaveBeenCalledOnce();
+    expect(sendFailed).toHaveBeenCalledOnce();
+  });
   it("작성자 확인 뒤 private posts 경로에 저장하고 메타데이터를 기록한다", async () => {
     const { deps, findOwnedPost, insert, upload } = dependencies();
 

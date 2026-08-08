@@ -9,6 +9,7 @@ import {
   validateAttachmentFile,
   type AttachmentFileInput,
 } from "./validation";
+import { sendStorageWarning } from "../storage/alerts";
 
 type FormDataLike = {
   get: (name: string) => unknown;
@@ -44,12 +45,21 @@ type AttachmentStorage = {
   upload: (path: string, file: UploadFile) => Promise<Result<null>>;
 };
 
+type QuotaClaim = { upload_allowed: boolean; warning_claimed: boolean };
+type StorageQuotaGateway = {
+  claim: (bytes: number) => Promise<Result<QuotaClaim | null>>;
+  release: (bytes: number) => Promise<Result<null>>;
+  sendFailed: () => Promise<Result<null>>;
+};
+
 export type PostFileDependencies = {
   createPath: (postId: string) => string;
   redirect: (path: string) => never;
   repositoryFactory: () => Promise<PostAttachmentRepository>;
   requireRole: (role: Role) => Promise<{ id: string; role: Role }>;
   storageFactory: () => Promise<AttachmentStorage>;
+  quotaFactory: () => Promise<StorageQuotaGateway>;
+  sendWarning: () => Promise<{ sent: boolean }>;
 };
 
 export type PostUploadValidation =
@@ -70,6 +80,8 @@ const defaultDependencies: PostFileDependencies = {
   repositoryFactory: createPostAttachmentRepository,
   requireRole: defaultRequireRole,
   storageFactory: createAttachmentStorage,
+  quotaFactory: createStorageQuotaGateway,
+  sendWarning: () => sendStorageWarning({ recipient: process.env.STORAGE_ALERT_RECIPIENT ?? "", apiKey: process.env.RESEND_API_KEY ?? "" }),
 };
 
 export function validatePostUpload(
@@ -154,6 +166,8 @@ export async function savePostAttachments(
 
   let storage: AttachmentStorage | null = null;
   const paths: string[] = [];
+  let quota: StorageQuotaGateway | null = null;
+  const totalBytes = files.reduce((total, file) => total + file.size, 0);
   try {
     const repository = await dependencies.repositoryFactory();
     const ownedPost = await repository.findOwnedPost(postId, authorId);
@@ -166,6 +180,13 @@ export async function savePostAttachments(
       return { ok: false, reason: "save_failed" };
     }
 
+    quota = await dependencies.quotaFactory();
+    const claim = await quota.claim(totalBytes);
+    if (claim.error || !claim.data || !claim.data.upload_allowed) return { ok: false, reason: "save_failed" };
+    if (claim.data.warning_claimed) {
+      const warning = await dependencies.sendWarning();
+      if (!warning.sent) await quota.sendFailed();
+    }
     storage = await dependencies.storageFactory();
     for (const file of files) {
       const path = dependencies.createPath(postId);
@@ -174,6 +195,7 @@ export async function savePostAttachments(
         if (paths.length) {
           if (!(await cleanupPaths(storage, paths))) return { ok: false, reason: "cleanup_failed" };
         }
+        await quota.release(totalBytes);
         return { ok: false, reason: "save_failed" };
       }
       paths.push(path);
@@ -189,14 +211,17 @@ export async function savePostAttachments(
       })),
     );
     if (inserted.error) {
+      await quota.release(totalBytes);
       return {
         ok: false,
         reason: (await cleanupPaths(storage, paths)) ? "save_failed" : "cleanup_failed",
       };
     }
 
+    await quota.release(totalBytes);
     return { ok: true };
   } catch {
+    if (quota) await quota.release(totalBytes).catch(() => undefined);
     return {
       ok: false,
       reason: storage && paths.length && !(await cleanupPaths(storage, paths))
@@ -302,6 +327,8 @@ export async function deletePostAttachment(
     if (!(await cleanupPaths(storage, [trashPath]))) {
       return dependencies.redirect(`${boardPath(postId)}?error=attachment-delete`);
     }
+    const quota = await dependencies.quotaFactory();
+    await quota.claim(0);
   } catch {
     return dependencies.redirect(`${boardPath(postId)}?error=attachment-delete`);
   }
@@ -381,5 +408,14 @@ async function createAttachmentStorage(): Promise<AttachmentStorage> {
       );
       return { data: null, error: result.error };
     },
+  };
+}
+
+async function createStorageQuotaGateway(): Promise<StorageQuotaGateway> {
+  const supabase = await createClient();
+  return {
+    claim: async (bytes) => (await supabase.rpc("storage_usage_claim", { p_incoming_bytes: bytes })) as unknown as Result<QuotaClaim | null>,
+    release: async (bytes) => { const result = await supabase.rpc("storage_usage_release", { p_reserved_bytes: bytes }); return { data: null, error: result.error }; },
+    sendFailed: async () => { const result = await supabase.rpc("storage_warning_send_failed"); return { data: null, error: result.error }; },
   };
 }

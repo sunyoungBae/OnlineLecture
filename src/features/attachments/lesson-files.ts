@@ -5,6 +5,7 @@ import * as navigation from "next/navigation";
 import { requireRole as defaultRequireRole, type Role } from "../../lib/auth/require-role";
 import { createClient } from "../../lib/supabase/server";
 import type { Database } from "../../types/database";
+import { sendStorageWarning } from "../storage/alerts";
 
 export type LessonUploadValidation = { valid: true } | { valid: false; reason: string };
 
@@ -51,6 +52,8 @@ type AttachmentStorage = {
   remove: (paths: string[]) => Promise<Result<null>>;
   upload: (path: string, file: UploadFile) => Promise<Result<null>>;
 };
+type QuotaClaim = { upload_allowed: boolean; warning_claimed: boolean };
+type StorageQuotaGateway = { claim: (bytes: number) => Promise<Result<QuotaClaim | null>>; release: (bytes: number) => Promise<Result<null>>; sendFailed: () => Promise<Result<null>> };
 
 export type LessonFileDependencies = {
   createPath: (lessonId: string) => string;
@@ -58,6 +61,8 @@ export type LessonFileDependencies = {
   repositoryFactory: () => Promise<LessonAttachmentRepository>;
   requireRole: (role: Role) => Promise<{ id: string; role: Role }>;
   storageFactory: () => Promise<AttachmentStorage>;
+  quotaFactory: () => Promise<StorageQuotaGateway>;
+  sendWarning: () => Promise<{ sent: boolean }>;
 };
 
 const ATTACHMENT_BUCKET = "attachments";
@@ -70,6 +75,8 @@ const defaultDependencies: LessonFileDependencies = {
   repositoryFactory: createLessonAttachmentRepository,
   requireRole: defaultRequireRole,
   storageFactory: createAttachmentStorage,
+  quotaFactory: createStorageQuotaGateway,
+  sendWarning: () => sendStorageWarning({ recipient: process.env.STORAGE_ALERT_RECIPIENT ?? "", apiKey: process.env.RESEND_API_KEY ?? "" }),
 };
 
 function formValue(formData: FormDataLike, name: string) {
@@ -139,7 +146,13 @@ export async function uploadLessonAttachments(
   }
 
   const storagePaths: string[] = [];
+  const totalBytes = files.reduce((total, file) => total + file.size, 0);
+  let quota: StorageQuotaGateway | null = null;
   try {
+    quota = await dependencies.quotaFactory();
+    const claim = await quota.claim(totalBytes);
+    if (claim.error || !claim.data?.upload_allowed) return dependencyRedirect(dependencies, formData, "error=attachment-save");
+    if (claim.data.warning_claimed) { const warning = await dependencies.sendWarning(); if (!warning.sent) await quota.sendFailed(); }
     const storage = await dependencies.storageFactory();
     for (const file of files) {
       const storagePath = dependencies.createPath(lessonId);
@@ -148,6 +161,7 @@ export async function uploadLessonAttachments(
         if (storagePaths.length) {
           await storage.remove(storagePaths);
         }
+        await quota.release(totalBytes);
         return dependencyRedirect(dependencies, formData, "error=attachment-save");
       }
       storagePaths.push(storagePath);
@@ -164,9 +178,12 @@ export async function uploadLessonAttachments(
     );
     if (error) {
       await storage.remove(storagePaths);
+      await quota.release(totalBytes);
       return dependencyRedirect(dependencies, formData, "error=attachment-save");
     }
+    await quota.release(totalBytes);
   } catch {
+    if (quota) await quota.release(totalBytes).catch(() => undefined);
     return dependencyRedirect(dependencies, formData, "error=attachment-save");
   }
 
@@ -237,6 +254,8 @@ export async function deleteLessonAttachment(
       // DB 메타데이터는 이미 삭제됐으므로 경로를 노출하지 않고 잔여 trash 객체는 운영 정리 대상으로 둔다.
       return dependencyRedirect(dependencies, formData, "error=attachment-delete");
     }
+    const quota = await dependencies.quotaFactory();
+    await quota.claim(0);
   } catch {
     return dependencyRedirect(dependencies, formData, "error=attachment-delete");
   }
@@ -306,5 +325,14 @@ async function createAttachmentStorage(): Promise<AttachmentStorage> {
       });
       return { data: null, error: result.error };
     },
+  };
+}
+
+async function createStorageQuotaGateway(): Promise<StorageQuotaGateway> {
+  const supabase = await createClient();
+  return {
+    claim: async (bytes) => (await supabase.rpc("storage_usage_claim", { p_incoming_bytes: bytes })) as unknown as Result<QuotaClaim | null>,
+    release: async (bytes) => { const result = await supabase.rpc("storage_usage_release", { p_reserved_bytes: bytes }); return { data: null, error: result.error }; },
+    sendFailed: async () => { const result = await supabase.rpc("storage_warning_send_failed"); return { data: null, error: result.error }; },
   };
 }
