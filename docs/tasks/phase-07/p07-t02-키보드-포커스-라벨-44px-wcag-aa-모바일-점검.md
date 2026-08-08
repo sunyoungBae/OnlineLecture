@@ -1,7 +1,7 @@
 ---
 id: P07-T02
 title: 키보드·포커스·라벨·44px·WCAG AA·모바일 점검
-status: in_progress
+status: review
 type: feature
 depends_on: ["P07-T01"]
 parallel_group: ""
@@ -10,7 +10,7 @@ started_at: "2026-08-08T14:17:55+09:00"
 blocked_reason: ""
 owned_files: ["tests/e2e/accessibility.spec.ts", "tests/e2e/responsive.spec.ts", "tests/e2e/support/supabase-mock.mjs", "src/app/globals.css", "src/components/ui/button.tsx", "src/components/ui/input.tsx", "src/components/ui/label.tsx", "src/components/ui/textarea.tsx", "src/components/site-header.tsx", "src/components/mobile-menu.tsx", "src/app/(public)/page.tsx", "src/app/(public)/login/page.tsx", "src/app/onboarding/form.tsx", "src/app/courses/page.tsx", "src/app/courses/[slug]/page.tsx", "src/app/board/page.tsx", "src/app/board/[postId]/page.tsx", "src/app/board/new/page.tsx", "src/app/board/[postId]/edit/page.tsx", "src/app/admin/courses/page.tsx", "src/app/admin/courses/[courseId]/lessons/page.tsx", "src/app/admin/storage/page.tsx"]
 shared_files: ["playwright.config.ts"]
-implementation_commit: ""
+implementation_commit: "7c7dd3c"
 reviewer: ""
 review_commit: ""
 ---
@@ -113,7 +113,11 @@ P07-T01가 모두 done이면 ready로 전환한다.
 
 # 리뷰 증거
 
-작업 전 실패, 완료 명령 결과, 구현 커밋, 구현자와 다른 리뷰어, 승인 커밋을 이 절에 기록한다.
+- RED: 데스크톱 헤더 링크가 36.9px로 44px 미만이었고, 실제 경로 E2E 14개 중 정상 상세·관리자·빈·오류·거부 5개가 실패했다. `tabIndex=-1` 변이에서도 실제 Tab 계약이 해당 컨트롤에서 실패했다.
+- GREEN: 접근성 E2E 14개가 실제 강의·게시판·온보딩·관리자 정상·빈·오류·거부 렌더에서 모든 활성 컨트롤의 Tab 순서·포커스 링·이름·44px, 유효 배경 대비와 320/375/768 overflow를 검증하며 통과했다.
+- 검증: localhost 전용 Supabase mock과 SSR 세션을 1 worker로 결정적으로 실행했고, 전체 E2E 30개, unit 218개, lint, typecheck, production build, `./scripts/check-harness.sh`와 audit 0건이 최신 HEAD에서 통과했다.
+- 구현 커밋: `7c7dd3c` (기본 접근성 `1a5f689`, mock 연결 `6c578bf`, 전체 경로 강화 `fa24033` 포함)
+- 독립 리뷰: `Codex/p04_t02`가 실제 Tab 도달성, 상태별 SSR 렌더, 이름·터치 영역·대비·반응형, mock 격리와 회차 hidden 입력 계약을 검토해 Critical/Important 없음으로 승인했다.
 
 # 커밋
 
