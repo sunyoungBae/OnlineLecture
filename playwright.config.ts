@@ -26,7 +26,7 @@ export default defineConfig({
   ],
   webServer: hasE2ETests
     ? {
-        command: "npm run dev",
+        command: "node tests/e2e/support/supabase-mock.mjs & npm run dev",
         url: "http://127.0.0.1:3000",
         reuseExistingServer: !process.env.CI,
       }

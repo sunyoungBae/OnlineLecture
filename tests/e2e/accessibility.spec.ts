@@ -88,3 +88,10 @@ test("공개 화면의 본문 보조 텍스트와 배경은 WCAG AA 대비를 �
 
   expect(contrastRatio(rgb(contrast.foreground), rgb(contrast.background))).toBeGreaterThanOrEqual(4.5);
 });
+
+test("mock된 강의와 게시판 경로는 실제 빈 상태를 키보드로 탐색한다", async ({ page }) => {
+  await page.goto("/board");
+  await page.keyboard.press("Tab");
+  await expect(page.locator(":focus")).toHaveCSS("outline-style", "solid");
+  await expect(page.getByText("아직 게시글이 없습니다.")).toBeVisible();
+});
