@@ -129,20 +129,33 @@ async function setMockMode(page: import("@playwright/test").Page, mode: string) 
 async function expectMainKeyboardContract(page: import("@playwright/test").Page) {
   const main = page.locator("main").last();
   const controls = main.locator('a, button, input:not([type="hidden"]), textarea, select');
-  await page.evaluate(() => (globalThis.document.activeElement as globalThis.HTMLElement | null)?.blur());
+  const expected = [];
+  for (const control of await controls.all()) {
+    if (await control.isVisible() && !(await control.isDisabled())) expected.push(control);
+  }
+  expect(expected.length, "main에 Tab으로 탐색할 제어가 있어야 합니다").toBeGreaterThan(0);
+
+  let reachedFirst = false;
   for (let index = 0; index < 30; index += 1) {
     await page.keyboard.press("Tab");
-    if (await page.evaluate(() => Boolean((globalThis.document.activeElement as globalThis.HTMLElement | null)?.closest("main")))) break;
+    if (await expected[0].evaluate((element) => globalThis.document.activeElement === element)) {
+      reachedFirst = true;
+      break;
+    }
+    const enteredMain = await page.evaluate(() => Boolean((globalThis.document.activeElement as globalThis.HTMLElement | null)?.closest("main")));
+    expect(enteredMain, "첫 번째 main 제어보다 앞선 예상 밖 main 포커스가 있습니다").toBe(false);
   }
-  await expect(main.locator(":focus").last()).toHaveCSS("outline-style", "solid");
-  for (const control of await controls.all()) {
-    if (!(await control.isVisible()) || await control.isDisabled()) continue;
+  expect(reachedFirst, "첫 번째 main 제어에 실제 Tab으로 도달해야 합니다").toBe(true);
+
+  for (let index = 0; index < expected.length; index += 1) {
+    const control = expected[index];
+    if (index > 0) await page.keyboard.press("Tab");
+    await expect(control).toBeFocused();
     await expect(control).toHaveAccessibleName(/.+/);
     const box = await control.boundingBox();
     const description = await control.evaluate((element) => `${element.tagName.toLowerCase()} ${element.getAttribute("name") ?? ""} ${element.textContent?.trim() ?? ""}`);
     expect(box?.width, description).toBeGreaterThanOrEqual(44);
     expect(box?.height, description).toBeGreaterThanOrEqual(44);
-    await control.focus();
     await expect(control).toHaveCSS("outline-style", "solid");
   }
 }
@@ -170,13 +183,15 @@ async function expectEffectiveBackgroundContrast(page: import("@playwright/test"
 
 test("courses/detail/board/onboarding/admin 정상 렌더는 실제 키보드 계약을 충족한다", async ({ page }) => {
   await setMockMode(page, "normal");
-  for (const path of ["/courses", "/courses/accessible-course", "/board", "/board/40000000-0000-4000-8000-000000000001", "/onboarding", "/admin/courses"] as const) {
+  for (const path of ["/courses", "/courses/accessible-course", "/board", "/board/40000000-0000-4000-8000-000000000001", "/onboarding", "/admin/courses", "/admin/courses/20000000-0000-4000-8000-000000000001/lessons"] as const) {
     await page.goto(path);
     await expect(page.locator("main").last()).toBeVisible();
     await expectMainKeyboardContract(page);
     await expectEffectiveBackgroundContrast(page);
   }
   await expect(page.locator('form:has(button:text-is("삭제")) input[name="direction"]')).toHaveCount(0);
+  await expect(page.locator('form:has(button:text-is("위로")) input[name="direction"][value="up"]')).toHaveCount(1);
+  await expect(page.locator('form:has(button:text-is("아래로")) input[name="direction"][value="down"]')).toHaveCount(1);
 });
 
 test("실제 빈·오류·forbidden 렌더는 이름 있는 복구 제어와 상태 역할을 제공한다", async ({ page }) => {
