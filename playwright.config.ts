@@ -10,7 +10,8 @@ const hasE2ETests =
 
 export default defineConfig({
   testDir: e2eDirectory,
-  fullyParallel: true,
+  fullyParallel: false,
+  workers: 1,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
   reporter: "list",

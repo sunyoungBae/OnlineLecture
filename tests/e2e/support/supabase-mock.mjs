@@ -1,11 +1,6 @@
 import { createServer } from "node:http";
-
-const server = createServer((request, response) => {
-  response.setHeader("content-type", "application/json");
-  if (request.url?.startsWith("/auth/v1/user")) return response.end(JSON.stringify({ id: "member" }));
-  if (request.url?.startsWith("/rest/v1/profiles")) return response.end(JSON.stringify([{ id: "member", role: "member" }]));
-  if (request.url?.startsWith("/rest/v1/courses")) return response.end(JSON.stringify([]));
-  response.end(JSON.stringify([]));
-});
-server.listen(54321, "127.0.0.1");
-for (const signal of ["SIGINT", "SIGTERM"]) process.on(signal, () => server.close(() => process.exit()));
+const memberId="10000000-0000-4000-8000-000000000001",courseId="20000000-0000-4000-8000-000000000001",lessonId="30000000-0000-4000-8000-000000000001",postId="40000000-0000-4000-8000-000000000001";let mode="normal";
+const rows={courses:[{id:courseId,title:"접근성 강의",slug:"accessible-course",description:"키보드로 학습하는 강의",is_published:true,created_at:"2026-08-08T00:00:00Z"}],lessons:[{id:lessonId,course_id:courseId,title:"첫 회차",description:"접근 가능한 영상",position:1,youtube_video_id:"dQw4w9WgXcQ",attachments:[]}],posts:[{id:postId,author_id:memberId,title:"접근성 게시글",search_text:"키보드 탐색 본문",content:{type:"doc",content:[]},created_at:"2026-08-08T00:00:00Z",is_notice:false,course_id:courseId,attachments:[]}],comments:[{id:"50000000-0000-4000-8000-000000000001",body:"접근 가능한 댓글",author_id:memberId,created_at:"2026-08-08T00:00:00Z"}]};
+function send(response,data,status=200){response.statusCode=status;response.setHeader("content-type","application/json");const length=Array.isArray(data)?data.length:1;response.setHeader("content-range",`0-${Math.max(0,length-1)}/${length}`);response.end(JSON.stringify(data));}
+const server=createServer((request,response)=>{const url=new globalThis.URL(request.url??"/","http://127.0.0.1");if(url.pathname==="/__mock"){mode=url.searchParams.get("mode")??"normal";return send(response,{mode});}if(url.pathname.startsWith("/auth/v1/user"))return send(response,{id:memberId});if(url.pathname.startsWith("/rest/v1/profiles"))return send(response,[{id:memberId,role:mode==="member"?"member":"admin"}]);const table=["courses","lessons","posts","comments"].find(name=>url.pathname.startsWith(`/rest/v1/${name}`));if(table){if(mode===`${table}-error`)return send(response,{message:"mock failure"},500);if(mode==="empty")return send(response,[]);return send(response,rows[table]);}if(url.pathname.startsWith("/rest/v1/storage_settings"))return send(response,[{quota_bytes:1073741824,reserved_bytes:0,warning_state:"armed",last_warning_email_sent_at:null}]);return send(response,[]);});
+server.listen(54321,"127.0.0.1");for(const signal of ["SIGINT","SIGTERM"])process.on(signal,()=>server.close(()=>process.exit()));

@@ -186,7 +186,7 @@ function CourseForm({
         />
       </div>
       <label className="flex min-h-11 items-center gap-3 text-sm font-medium" htmlFor={`${fieldPrefix}-published`}>
-        <input defaultChecked={course?.is_published} id={`${fieldPrefix}-published`} name="is_published" type="checkbox" />
+        <input className="size-11" defaultChecked={course?.is_published} id={`${fieldPrefix}-published`} name="is_published" type="checkbox" />
         공개
       </label>
       <button className="min-h-11 rounded-sm border border-transparent bg-accent px-4 py-2 text-sm font-medium hover:bg-accent/85" type="submit">
