@@ -88,7 +88,7 @@ function dependencies({
     sendWarning,
   };
 
-  return { claim, createSignedUrl, deleteById, deps, findById, insert, listForLesson, move, remove, requireRole, upload };
+  return { claim, createSignedUrl, deleteById, deps, findById, insert, listForLesson, move, release, remove, requireRole, sendFailed, sendWarning, upload };
 }
 
 describe("validateLessonUpload", () => {
@@ -121,6 +121,27 @@ describe("회차 자료 서버 동작", () => {
     claim.mockResolvedValue({ data: [{ reservation_id: null, upload_allowed: false, warning_claimed: false }], error: null });
     await uploadLessonAttachments(formData({ course_id: courseId, files: [file()], lesson_id: lessonId }), deps);
     expect(upload).not.toHaveBeenCalled();
+    expect(redirect).toHaveBeenCalledWith(`/admin/courses/${courseId}/lessons?error=attachment-save`);
+  });
+  it("경고 재무장이 false면 한 번 재시도하고 예약 해제는 계속한다", async () => {
+    const { claim, deps, release, sendFailed, sendWarning } = dependencies();
+    claim.mockResolvedValue({ data: [{ reservation_id: "00000000-0000-4000-8000-000000000004", upload_allowed: true, warning_claimed: true }], error: null });
+    sendWarning.mockResolvedValue({ sent: false });
+    sendFailed.mockResolvedValue({ data: false, error: null });
+
+    await uploadLessonAttachments(formData({ course_id: courseId, files: [file()], lesson_id: lessonId }), deps);
+    expect(sendFailed).toHaveBeenCalledTimes(2);
+    expect(release).toHaveBeenCalledOnce();
+    expect(redirect).toHaveBeenCalledWith(`/admin/courses/${courseId}/lessons?error=attachment-cleanup`);
+  });
+  it("메타데이터 저장 뒤 경고 예외는 파일을 지우지 않고 예약을 해제한다", async () => {
+    const { claim, deps, release, remove, sendWarning } = dependencies();
+    claim.mockResolvedValue({ data: [{ reservation_id: "00000000-0000-4000-8000-000000000004", upload_allowed: true, warning_claimed: true }], error: null });
+    sendWarning.mockRejectedValue(new Error("resend unavailable"));
+
+    await uploadLessonAttachments(formData({ course_id: courseId, files: [file()], lesson_id: lessonId }), deps);
+    expect(remove).not.toHaveBeenCalled();
+    expect(release).toHaveBeenCalledOnce();
     expect(redirect).toHaveBeenCalledWith(`/admin/courses/${courseId}/lessons?error=attachment-save`);
   });
 

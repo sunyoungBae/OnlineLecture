@@ -150,6 +150,8 @@ export async function uploadLessonAttachments(
   let quota: StorageQuotaGateway | null = null;
   let reservationId: string | null = null;
   let warningClaimed = false;
+  let storage: AttachmentStorage | null = null;
+  let metadataSaved = false;
   try {
     quota = await dependencies.quotaFactory();
     const claim = await quota.claim(totalBytes);
@@ -157,16 +159,12 @@ export async function uploadLessonAttachments(
     if (claim.error || !claimed || !claimed.upload_allowed || !claimed.reservation_id) return dependencyRedirect(dependencies, formData, "error=attachment-save");
     reservationId = claimed.reservation_id;
     warningClaimed = claimed.warning_claimed;
-    const storage = await dependencies.storageFactory();
+    storage = await dependencies.storageFactory();
     for (const file of files) {
       const storagePath = dependencies.createPath(lessonId);
       const { error } = await storage.upload(storagePath, file);
       if (error) {
-        if (storagePaths.length) {
-          await storage.remove(storagePaths);
-        }
-        if (warningClaimed) await quota.sendFailed();
-        if (!(await releaseReservation(quota, reservationId))) return dependencyRedirect(dependencies, formData, "error=attachment-cleanup");
+        if (!(await finalizeFailedUpload({ storage, paths: storagePaths, quota, reservationId, warningClaimed }))) return dependencyRedirect(dependencies, formData, "error=attachment-cleanup");
         return dependencyRedirect(dependencies, formData, "error=attachment-save");
       }
       storagePaths.push(storagePath);
@@ -182,17 +180,21 @@ export async function uploadLessonAttachments(
       })),
     );
     if (error) {
-      await storage.remove(storagePaths);
-      if (warningClaimed) await quota.sendFailed();
-      if (!(await releaseReservation(quota, reservationId))) return dependencyRedirect(dependencies, formData, "error=attachment-cleanup");
+      if (!(await finalizeFailedUpload({ storage, paths: storagePaths, quota, reservationId, warningClaimed }))) return dependencyRedirect(dependencies, formData, "error=attachment-cleanup");
       return dependencyRedirect(dependencies, formData, "error=attachment-save");
     }
-    if (warningClaimed) { const warning = await dependencies.sendWarning(); if (!warning.sent) await quota.sendFailed(); }
+    metadataSaved = true;
+    if (warningClaimed) {
+      const warning = await dependencies.sendWarning();
+      const rearmed = warning.sent || await rearmWarning(quota, true);
+      const released = await releaseReservation(quota, reservationId);
+      if (!rearmed || !released) return dependencyRedirect(dependencies, formData, "error=attachment-cleanup");
+      return dependencyRedirect(dependencies, formData, "notice=attachment-uploaded");
+    }
     if (!(await releaseReservation(quota, reservationId))) return dependencyRedirect(dependencies, formData, "error=attachment-cleanup");
   } catch {
-    if (quota && !(await releaseReservation(quota, reservationId))) return dependencyRedirect(dependencies, formData, "error=attachment-cleanup");
-    if (quota && warningClaimed) await quota.sendFailed().catch(() => undefined);
-    return dependencyRedirect(dependencies, formData, "error=attachment-save");
+    // DB 행이 이미 생긴 뒤에는 객체를 삭제하지 않고 알림 상태와 예약만 보상한다.
+    return dependencyRedirect(dependencies, formData, await finalizeFailedUpload({ storage, paths: metadataSaved ? [] : storagePaths, quota, reservationId, warningClaimed }) ? "error=attachment-save" : "error=attachment-cleanup");
   }
 
   return dependencyRedirect(dependencies, formData, "notice=attachment-uploaded");
@@ -350,6 +352,29 @@ async function releaseReservation(quota: StorageQuotaGateway, reservationId: str
     try { const result = await quota.release(reservationId); if (!result.error && result.data === true) return true; } catch {}
   }
   return false;
+}
+
+async function rearmWarning(quota: StorageQuotaGateway, warningClaimed: boolean) {
+  if (!warningClaimed) return true;
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try { const result = await quota.sendFailed(); if (!result.error && result.data === true) return true; } catch {}
+  }
+  return false;
+}
+
+async function cleanupPaths(storage: AttachmentStorage | null, paths: string[]) {
+  if (!storage || !paths.length) return true;
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try { const result = await storage.remove(paths); if (!result.error) return true; } catch {}
+  }
+  return false;
+}
+
+async function finalizeFailedUpload({ storage, paths, quota, reservationId, warningClaimed }: { storage: AttachmentStorage | null; paths: string[]; quota: StorageQuotaGateway | null; reservationId: string | null; warningClaimed: boolean }) {
+  const cleaned = await cleanupPaths(storage, paths);
+  const rearmed = !quota || await rearmWarning(quota, warningClaimed);
+  const released = !quota || await releaseReservation(quota, reservationId);
+  return cleaned && rearmed && released;
 }
 
 function createServiceQuotaClient() {

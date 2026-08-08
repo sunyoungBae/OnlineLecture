@@ -148,6 +148,25 @@ describe("게시글 첨부 저장", () => {
     expect(sendWarning).toHaveBeenCalledOnce();
     expect(sendFailed).toHaveBeenCalledOnce();
   });
+  it("경고 재무장 RPC가 false면 한 번 더 시도하고 예약 해제는 계속한다", async () => {
+    const { claim, deps, release, sendFailed, sendWarning } = dependencies();
+    claim.mockResolvedValue({ data: [{ reservation_id: "00000000-0000-4000-8000-000000000005", upload_allowed: true, warning_claimed: true }], error: null });
+    sendWarning.mockResolvedValue({ sent: false });
+    sendFailed.mockResolvedValue({ data: false, error: null });
+
+    await expect(savePostAttachments(postId, authorId, [file()], deps)).resolves.toEqual({ ok: false, reason: "cleanup_failed" });
+    expect(sendFailed).toHaveBeenCalledTimes(2);
+    expect(release).toHaveBeenCalledOnce();
+  });
+  it("메타데이터 저장 뒤 경고 예외는 파일을 지우지 않고 예약을 해제한다", async () => {
+    const { claim, deps, release, remove, sendWarning } = dependencies();
+    claim.mockResolvedValue({ data: [{ reservation_id: "00000000-0000-4000-8000-000000000005", upload_allowed: true, warning_claimed: true }], error: null });
+    sendWarning.mockRejectedValue(new Error("resend unavailable"));
+
+    await expect(savePostAttachments(postId, authorId, [file()], deps)).resolves.toEqual({ ok: false, reason: "save_failed" });
+    expect(remove).not.toHaveBeenCalled();
+    expect(release).toHaveBeenCalledOnce();
+  });
   it("작성자 확인 뒤 private posts 경로에 저장하고 메타데이터를 기록한다", async () => {
     const { deps, findOwnedPost, insert, upload } = dependencies();
 

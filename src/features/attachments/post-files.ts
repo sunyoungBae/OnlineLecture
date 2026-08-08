@@ -157,6 +157,24 @@ async function releaseReservation(quota: StorageQuotaGateway, reservationId: str
   return false;
 }
 
+async function rearmWarning(quota: StorageQuotaGateway, warningClaimed: boolean) {
+  if (!warningClaimed) return true;
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const rearmed = await quota.sendFailed();
+      if (!rearmed.error && rearmed.data === true) return true;
+    } catch {}
+  }
+  return false;
+}
+
+async function finalizeFailedUpload({ storage, paths, quota, reservationId, warningClaimed }: { storage: AttachmentStorage | null; paths: string[]; quota: StorageQuotaGateway | null; reservationId: string | null; warningClaimed: boolean }) {
+  const cleaned = !storage || !paths.length || await cleanupPaths(storage, paths);
+  const rearmed = !quota || await rearmWarning(quota, warningClaimed);
+  const released = !quota || await releaseReservation(quota, reservationId);
+  return cleaned && rearmed && released;
+}
+
 function trashPathFor(attachment: PostAttachment) {
   return `trash/posts/${attachment.post_id}/${attachment.id}-${globalThis.crypto.randomUUID()}`;
 }
@@ -180,6 +198,7 @@ export async function savePostAttachments(
   let quota: StorageQuotaGateway | null = null;
   let reservationId: string | null = null;
   let warningClaimed = false;
+  let metadataSaved = false;
   const totalBytes = files.reduce((total, file) => total + file.size, 0);
   try {
     const repository = await dependencies.repositoryFactory();
@@ -204,10 +223,7 @@ export async function savePostAttachments(
       const path = dependencies.createPath(postId);
       const uploaded = await storage.upload(path, file);
       if (uploaded.error) {
-        const cleaned = !paths.length || await cleanupPaths(storage, paths);
-        if (warningClaimed) await quota.sendFailed();
-        const released = await releaseReservation(quota, reservationId);
-        if (!cleaned || !released) return { ok: false, reason: "cleanup_failed" };
+        if (!(await finalizeFailedUpload({ storage, paths, quota, reservationId, warningClaimed }))) return { ok: false, reason: "cleanup_failed" };
         return { ok: false, reason: "save_failed" };
       }
       paths.push(path);
@@ -223,26 +239,26 @@ export async function savePostAttachments(
       })),
     );
     if (inserted.error) {
-      if (warningClaimed) await quota.sendFailed();
-      const released = await releaseReservation(quota, reservationId);
-      const cleaned = await cleanupPaths(storage, paths);
-      return { ok: false, reason: released && cleaned ? "save_failed" : "cleanup_failed" };
+      return { ok: false, reason: await finalizeFailedUpload({ storage, paths, quota, reservationId, warningClaimed }) ? "save_failed" : "cleanup_failed" };
     }
+    metadataSaved = true;
 
     if (warningClaimed) {
       const warning = await dependencies.sendWarning();
-      if (!warning.sent) await quota.sendFailed();
+      const rearmed = warning.sent || await rearmWarning(quota, true);
+      const released = await releaseReservation(quota, reservationId);
+      if (!rearmed || !released) return { ok: false, reason: "cleanup_failed" };
+      return { ok: true };
     }
     if (!(await releaseReservation(quota, reservationId))) return { ok: false, reason: "cleanup_failed" };
     return { ok: true };
   } catch {
-    if (quota && !(await releaseReservation(quota, reservationId))) return { ok: false, reason: "cleanup_failed" };
-    if (quota && warningClaimed) await quota.sendFailed().catch(() => undefined);
+    // 메타데이터가 이미 커밋된 뒤의 알림/예약 예외는 실제 파일을 지우면
+    // DB가 가리키는 경로만 남는다. 그 경우 재무장과 예약 해제만 보상한다.
+    const finalized = await finalizeFailedUpload({ storage, paths: metadataSaved ? [] : paths, quota, reservationId, warningClaimed });
     return {
       ok: false,
-      reason: storage && paths.length && !(await cleanupPaths(storage, paths))
-        ? "cleanup_failed"
-        : "save_failed",
+      reason: finalized ? "save_failed" : "cleanup_failed",
     };
   }
 }

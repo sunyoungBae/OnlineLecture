@@ -17,7 +17,7 @@ begin
   if p_incoming_bytes < 0 then raise exception 'invalid bytes'; end if;
   select * into v_setting from public.storage_settings where id = true for update;
   select coalesce(sum(size_bytes), 0) into v_usage from public.attachments;
-  if v_usage < v_setting.quota_bytes * 0.75 and v_setting.warning_state = 'sent' then
+  if v_usage + v_setting.reserved_bytes < v_setting.quota_bytes * 0.75 and v_setting.warning_state = 'sent' then
     update public.storage_settings set warning_state = 'armed', last_warning_email_sent_at = null where id = true;
     v_setting.warning_state := 'armed';
   end if;
