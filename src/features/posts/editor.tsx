@@ -11,7 +11,10 @@ export type PostEditorState =
   | { status: "idle" }
   | { status: "error"; message: string };
 
-export type PostFormData = { get: (name: string) => unknown };
+export type PostFormData = {
+  get: (name: string) => unknown;
+  getAll?: (name: string) => unknown[];
+};
 
 export type PostEditorAction = (
   previousState: PostEditorState,
@@ -20,6 +23,7 @@ export type PostEditorAction = (
 
 type PostEditorProps = {
   action: PostEditorAction;
+  enableAttachments?: boolean;
   initialContent?: TiptapDocument;
   initialTitle?: string;
   submitLabel: string;
@@ -65,6 +69,7 @@ function EditorButton({
 
 export function PostEditor({
   action,
+  enableAttachments = false,
   initialContent = EMPTY_DOCUMENT,
   initialTitle = "",
   submitLabel,
@@ -114,7 +119,7 @@ export function PostEditor({
   const error = state.status === "error" ? state.message : null;
 
   return (
-    <form action={formAction} className="mt-8 space-y-6">
+    <form action={formAction} className="mt-8 space-y-6" encType="multipart/form-data">
       <div>
         <label className="block text-sm font-medium" htmlFor="post-title">
           제목
@@ -174,6 +179,23 @@ export function PostEditor({
         </div>
         <input name="content" type="hidden" value={content} />
       </div>
+
+      {enableAttachments ? (
+        <div>
+          <label className="block text-sm font-medium" htmlFor="post-files">
+            첨부 파일
+          </label>
+          <input
+            accept=".jpg,.jpeg,.png,.webp,.gif,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip"
+            className="mt-2 block min-h-11 w-full text-sm focus-visible:outline-2 focus-visible:outline-offset-2"
+            id="post-files"
+            multiple
+            name="files"
+            type="file"
+          />
+          <p className="mt-1 text-sm text-muted-foreground">최대 3개, 파일당 10MB까지 첨부할 수 있습니다.</p>
+        </div>
+      ) : null}
 
       {error ? (
         <p className="text-sm text-[var(--destructive)]" id="post-error" role="alert">

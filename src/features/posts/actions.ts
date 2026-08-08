@@ -1,5 +1,9 @@
 import { redirect as nextRedirect } from "next/navigation";
 
+import {
+  savePostAttachments as defaultSavePostAttachments,
+  type PostAttachmentSaveResult,
+} from "../attachments/post-files";
 import { requirePageRole } from "../../lib/auth/require-role";
 import { createClient as createSupabaseClient } from "../../lib/supabase/server";
 import { validatePostInput } from "./content";
@@ -10,12 +14,18 @@ const UPDATE_ERROR_MESSAGE = "게시글을 수정하지 못했습니다. 잠시 
 
 type PostClient = {
   from: (table: "posts") => {
-    insert: (post: {
-      author_id: string;
-      content: unknown;
-      search_text: string;
-      title: string;
-    }) => Promise<{ error: unknown }>;
+    delete: () => {
+      eq: (column: "id", value: string) => {
+        eq: (column: "author_id", value: string) => {
+          select: (columns: "id") => Promise<{ data: { id: string }[] | null; error: unknown }>;
+        };
+      };
+    };
+    insert: (post: { author_id: string; content: unknown; search_text: string; title: string }) => {
+      select: (columns: "id") => {
+        single: () => Promise<{ data: { id: string } | null; error: unknown }>;
+      };
+    };
     update: (post: { content: unknown; search_text: string; title: string }) => {
       eq: (column: "id", value: string) => {
         eq: (column: "author_id", value: string) => {
@@ -33,12 +43,18 @@ export type PostActionDependencies = {
     role: "member",
     options: { nextPath: string },
   ) => Promise<{ id: string; role: "member" | "admin" }>;
+  savePostAttachments: (
+    postId: string,
+    authorId: string,
+    files: readonly { name: string; size: number; type: string }[],
+  ) => Promise<PostAttachmentSaveResult>;
 };
 
 const defaultDependencies: PostActionDependencies = {
   createClient: async () => (await createSupabaseClient()) as unknown as PostClient,
   redirect: nextRedirect,
   requirePageRole,
+  savePostAttachments: defaultSavePostAttachments,
 };
 
 function validationError(reason: string) {
@@ -72,6 +88,24 @@ function parsedInput(formData: PostFormData) {
   }
 }
 
+function attachmentFiles(formData: PostFormData) {
+  const files = formData.getAll?.("files") ?? [];
+  if (
+    files.some(
+      (file) =>
+        !file ||
+        typeof file !== "object" ||
+        typeof (file as { name?: unknown }).name !== "string" ||
+        typeof (file as { size?: unknown }).size !== "number" ||
+        typeof (file as { type?: unknown }).type !== "string",
+    )
+  ) {
+    return null;
+  }
+
+  return files as { name: string; size: number; type: string }[];
+}
+
 export function createPostAction(dependencies: PostActionDependencies = defaultDependencies) {
   return async function createPost(
     _previousState: PostEditorState,
@@ -84,18 +118,39 @@ export function createPostAction(dependencies: PostActionDependencies = defaultD
     if (!input.valid) {
       return { status: "error", message: input.message };
     }
+    const files = attachmentFiles(formData);
+    if (!files) {
+      return { status: "error", message: CREATE_ERROR_MESSAGE };
+    }
 
     try {
       const supabase = await dependencies.createClient();
-      const { error } = await supabase.from("posts").insert({
-        author_id: profile.id,
-        content: input.value.content,
-        search_text: input.value.plainText,
-        title: input.value.title,
-      });
+      const { data: post, error } = await supabase
+        .from("posts")
+        .insert({
+          author_id: profile.id,
+          content: input.value.content,
+          search_text: input.value.plainText,
+          title: input.value.title,
+        })
+        .select("id")
+        .single();
 
-      if (error) {
+      if (error || !post) {
         return { status: "error", message: CREATE_ERROR_MESSAGE };
+      }
+
+      if (files.length) {
+        const attachments = await dependencies.savePostAttachments(post.id, profile.id, files);
+        if (!attachments.ok) {
+          await supabase
+            .from("posts")
+            .delete()
+            .eq("id", post.id)
+            .eq("author_id", profile.id)
+            .select("id");
+          return { status: "error", message: CREATE_ERROR_MESSAGE };
+        }
       }
     } catch {
       return { status: "error", message: CREATE_ERROR_MESSAGE };

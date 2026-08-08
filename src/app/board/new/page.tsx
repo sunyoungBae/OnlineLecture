@@ -10,7 +10,7 @@ export default async function NewPostPage() {
       <h1 className="font-[family-name:var(--font-noto-serif-kr)] text-4xl font-semibold tracking-tight">
         새 게시글
       </h1>
-      <PostEditor action={createPost} submitLabel="게시글 등록" />
+      <PostEditor action={createPost} enableAttachments submitLabel="게시글 등록" />
     </main>
   );
 }

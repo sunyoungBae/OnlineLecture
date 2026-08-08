@@ -17,15 +17,17 @@ function formData(values: Record<string, unknown>): PostFormData {
 }
 
 function dependencies({
-  insertResult = { error: null },
+  insertResult = { data: { id: "post-1" }, error: null },
   updateResult = { data: [{ id: "post-1" }], error: null },
   userId = "user-1",
 }: {
-  insertResult?: { error: unknown };
+  insertResult?: { data: { id: string } | null; error: unknown };
   updateResult?: { data: { id: string }[] | null; error: unknown };
   userId?: string;
 } = {}) {
-  const insert = vi.fn().mockResolvedValue(insertResult);
+  const single = vi.fn().mockResolvedValue(insertResult);
+  const insertSelect = vi.fn().mockReturnValue({ single });
+  const insert = vi.fn().mockReturnValue({ select: insertSelect });
   const select = vi.fn().mockResolvedValue(updateResult);
   const authorId = vi.fn().mockReturnValue({ select });
   const postId = vi.fn().mockReturnValue({ eq: authorId });
@@ -44,6 +46,7 @@ function dependencies({
     createClient: async () => ({ from }),
     redirect,
     requirePageRole,
+    savePostAttachments: vi.fn().mockResolvedValue({ ok: true }),
   };
 
   return { authorId, deps, events, from, insert, postId, redirect, select, update };
@@ -87,6 +90,43 @@ describe("게시글 서버 액션", () => {
     expect(redirect).toHaveBeenCalledWith("/board");
   });
 
+  it("첨부가 있는 생성은 새 게시글 ID로 저장하고 첨부 실패면 게시글도 정리한다", async () => {
+    const createdPostId = "00000000-0000-4000-8000-000000000010";
+    const insert = vi.fn().mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        single: vi.fn().mockResolvedValue({ data: { id: createdPostId }, error: null }),
+      }),
+    });
+    const deleteByAuthor = vi.fn().mockReturnValue({ select: vi.fn().mockResolvedValue({ data: [{ id: createdPostId }], error: null }) });
+    const deleteByPostId = vi.fn().mockReturnValue({ eq: deleteByAuthor });
+    const remove = vi.fn().mockReturnValue({ eq: deleteByPostId });
+    const savePostAttachments = vi.fn().mockResolvedValue({ ok: false });
+    const redirect = vi.fn((path: string): never => {
+      throw new Error(`redirect:${path}`);
+    });
+    const deps = {
+      createClient: async () => ({ from: vi.fn().mockReturnValue({ delete: remove, insert, update: vi.fn() }) }),
+      redirect,
+      requirePageRole: vi.fn().mockResolvedValue({ id: "author-1", role: "member" }),
+      savePostAttachments,
+    } as unknown as PostActionDependencies;
+    const action = createPostAction(deps);
+    const attachment = { name: "guide.pdf", size: 1024, type: "application/pdf" };
+    const input = {
+      get: (name: string) => (name === "content" ? validContent : "제목"),
+      getAll: (name: string) => (name === "files" ? [attachment] : []),
+    } as PostFormData;
+
+    await expect(action(initialState, input)).resolves.toEqual({
+      status: "error",
+      message: "게시글을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.",
+    });
+
+    expect(savePostAttachments).toHaveBeenCalledWith(createdPostId, "author-1", [attachment]);
+    expect(deleteByPostId).toHaveBeenCalledWith("id", createdPostId);
+    expect(deleteByAuthor).toHaveBeenCalledWith("author_id", "author-1");
+  });
+
   it("수정은 인증 전에 입력을 읽지 않고 post ID와 작성자 ID를 함께 조건으로 사용한다", async () => {
     const { authorId, deps, events, postId, redirect } = dependencies({ userId: "author-1" });
     const action = createUpdatePostAction("post-1", deps);
@@ -116,7 +156,7 @@ describe("게시글 서버 액션", () => {
   });
 
   it("DB/RLS 오류 원문은 생성 응답에 노출하지 않는다", async () => {
-    const { deps } = dependencies({ insertResult: { error: new Error("permission denied by RLS") } });
+    const { deps } = dependencies({ insertResult: { data: null, error: new Error("permission denied by RLS") } });
     const action = createPostAction(deps);
 
     await expect(action(initialState, formData({ content: validContent, title: "제목" }))).resolves.toEqual({
