@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { parseYouTubeUrl } from "@/features/courses/youtube";
+import { downloadLessonAttachment } from "@/features/attachments/lesson-files";
 import { requirePageRole } from "@/lib/auth/require-role";
 import { createClient } from "@/lib/supabase/server";
 
@@ -16,6 +17,7 @@ type Course = {
 };
 
 type Lesson = {
+  attachments?: { id: string; original_filename: string; size_bytes: number }[];
   description: string;
   id: string;
   position: number;
@@ -38,7 +40,7 @@ export type CourseDetailPageClient = {
       };
     };
     (table: "lessons"): {
-      select: (columns: "id, title, description, position, youtube_video_id") => {
+        select: (columns: "id, title, description, position, youtube_video_id, attachments (id, original_filename, size_bytes)") => {
         eq: (column: "course_id", value: string) => {
           order: (column: "position", options: { ascending: boolean }) => PromiseLike<LessonsQueryResult>;
         };
@@ -73,7 +75,7 @@ export async function renderCourseDetailPage(
 
   const { data: lessons, error: lessonsError } = await supabase
     .from("lessons")
-    .select("id, title, description, position, youtube_video_id")
+    .select("id, title, description, position, youtube_video_id, attachments (id, original_filename, size_bytes)")
     .eq("course_id", course.id)
     .order("position", { ascending: true });
 
@@ -113,6 +115,23 @@ export async function renderCourseDetailPage(
                 <h2 className="mt-2 text-2xl font-semibold">{lesson.title}</h2>
                 {lesson.description ? (
                   <p className="mt-3 whitespace-pre-wrap leading-7 text-[var(--muted-foreground)]">{lesson.description}</p>
+                ) : null}
+                {lesson.attachments?.length ? (
+                  <section aria-labelledby={`lesson-attachments-${lesson.id}`} className="mt-4">
+                    <h3 className="text-lg font-semibold" id={`lesson-attachments-${lesson.id}`}>자료</h3>
+                    <ul className="mt-2 space-y-2">
+                      {lesson.attachments.map((attachment) => (
+                        <li key={attachment.id}>
+                          <form action={downloadLessonAttachment}>
+                            <input name="attachment_id" type="hidden" value={attachment.id} />
+                            <button className="min-h-11 border-b border-[var(--foreground)] text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2" type="submit">
+                              {attachment.original_filename} 다운로드
+                            </button>
+                          </form>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
                 ) : null}
                 {video ? (
                   <div className="mt-5 aspect-video overflow-hidden border border-[var(--border)] bg-[var(--foreground)]">

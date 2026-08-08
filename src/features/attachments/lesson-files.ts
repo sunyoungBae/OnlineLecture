@@ -85,14 +85,6 @@ function adminLessonsPath(formData: FormDataLike) {
   return validId(courseId) ? `/admin/courses/${courseId}/lessons` : "/admin/courses";
 }
 
-function uploadError(formData: FormDataLike, code: "attachment-invalid" | "attachment-save") {
-  return defaultRedirect(formData, `error=${code}`);
-}
-
-function defaultRedirect(formData: FormDataLike, query: string): never {
-  return defaultDependencies.redirect(`${adminLessonsPath(formData)}?${query}`);
-}
-
 function dependencyRedirect(
   dependencies: LessonFileDependencies,
   formData: FormDataLike,
@@ -291,7 +283,7 @@ async function createAttachmentStorage(): Promise<AttachmentStorage> {
       return { data: null, error: result.error };
     },
     upload: async (path, file) => {
-      const result = await storage.upload(path, file as unknown as Blob, {
+      const result = await storage.upload(path, file as unknown as Parameters<typeof storage.upload>[1], {
         contentType: file.type,
         upsert: false,
       });
