@@ -1,6 +1,6 @@
 import { validateAttachmentCount, validateAttachmentFile, type AttachmentFileInput } from "./validation";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
-import { redirect as nextRedirect } from "next/navigation";
+import * as navigation from "next/navigation";
 
 import { requireRole as defaultRequireRole, type Role } from "../../lib/auth/require-role";
 import { createClient } from "../../lib/supabase/server";
@@ -65,7 +65,7 @@ const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-
 
 const defaultDependencies: LessonFileDependencies = {
   createPath: (lessonId) => `${lessonId}/${globalThis.crypto.randomUUID()}`,
-  redirect: nextRedirect,
+  redirect: (path) => navigation.redirect(path),
   repositoryFactory: createLessonAttachmentRepository,
   requireRole: defaultRequireRole,
   storageFactory: createAttachmentStorage,

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createLesson, deleteLesson, moveLesson, updateLesson } from "./actions";
-import { deleteLessonAttachment, downloadLessonAttachment, uploadLessonAttachments } from "@/features/attachments/lesson-files";
+import { deleteLessonAttachment, downloadLessonAttachment, uploadLessonAttachments } from "../../../../../features/attachments/lesson-files";
 import { requirePageRole } from "@/lib/auth/require-role";
 import { createClient } from "@/lib/supabase/server";
 

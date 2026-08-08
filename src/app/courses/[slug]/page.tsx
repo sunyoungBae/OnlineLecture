@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { parseYouTubeUrl } from "@/features/courses/youtube";
-import { downloadLessonAttachment } from "@/features/attachments/lesson-files";
+import { downloadLessonAttachment } from "../../../features/attachments/lesson-files";
 import { requirePageRole } from "@/lib/auth/require-role";
 import { createClient } from "@/lib/supabase/server";
 
