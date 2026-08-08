@@ -1,4 +1,5 @@
 import { deleteCourse, createCourse, updateCourse } from "./actions";
+import Link from "next/link";
 import { requirePageRole } from "../../../lib/auth/require-role";
 import { createClient } from "../../../lib/supabase/server";
 
@@ -93,6 +94,9 @@ export default async function AdminCoursesPage({
             <ul className="mt-6 space-y-10">
               {courses.map((course) => (
                 <li className="border-t border-border pt-6" key={course.id}>
+                  <Link className="inline-flex min-h-11 items-center text-sm font-medium underline" href={`/admin/courses/${course.id}/lessons`}>
+                    회차 관리
+                  </Link>
                   <CourseForm action={updateCourse} course={course} submitLabel="강의 수정" />
                   <form action={deleteCourse} className="mt-4">
                     <input name="id" type="hidden" value={course.id} />
