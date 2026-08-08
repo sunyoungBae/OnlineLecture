@@ -1,7 +1,7 @@
 ---
 id: P05-T03
 title: 댓글 CRUD·공지·운영자 삭제
-status: in_progress
+status: review
 type: feature
 depends_on: ["P05-T02"]
 parallel_group: ""
@@ -10,7 +10,7 @@ started_at: "2026-08-08T09:41:13+09:00"
 blocked_reason: ""
 owned_files: ["src/features/comments/actions.ts", "src/features/comments/actions.test.ts", "src/features/moderation/actions.ts", "src/features/moderation/actions.test.ts", "src/app/board/[postId]/page.tsx", "src/app/board/[postId]/page.test.tsx"]
 shared_files: []
-implementation_commit: ""
+implementation_commit: "1ff2c6a"
 reviewer: ""
 review_commit: ""
 ---
@@ -80,7 +80,11 @@ P05-T02가 모두 done이면 ready로 전환한다.
 
 # 리뷰 증거
 
-작업 전 실패, 완료 명령 결과, 구현 커밋, 구현자와 다른 리뷰어, 승인 커밋을 이 절에 기록한다.
+- RED: 댓글·관리 액션과 공개 상세 페이지 모듈 부재로 좁은 테스트가 실패했고, 리뷰 보강에서 운영자 댓글 삭제 액션 부재가 실패했다.
+- GREEN: P05 좁은 10개 테스트가 댓글 길이·인증 작성자·소유권·0행/RLS, 관리자 공지·게시글/댓글 삭제, 오류 비노출과 공개 상세의 빈·오류·notFound를 검증하며 통과했다.
+- 검증: 각 구현 단위의 typecheck가 통과했고 독립 재검증에서도 P05 좁은 테스트 10개와 typecheck가 통과했다.
+- 구현 커밋: `1ff2c6a` (댓글 액션 `471010d`, 관리 액션 `4d2b1da`, 공개 상세 `b4d083c` 포함)
+- 독립 리뷰: `Codex/p04_t01`이 댓글 작성자·관리자 권한, 영향 행, DB 원문 비노출과 공개 상세 경계를 검토해 Critical/Important 없음으로 승인했다.
 
 # 커밋
 
