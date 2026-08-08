@@ -8,7 +8,7 @@ parallel_group: "C-A"
 owner: "Codex/p04_t01"
 started_at: "2026-08-08T09:00:13+09:00"
 blocked_reason: ""
-owned_files: ["src/app/courses/page.tsx", "src/app/courses/[slug]/page.tsx", "src/features/courses/youtube.ts", "src/features/courses/youtube.test.ts"]
+owned_files: ["src/app/courses/page.tsx", "src/app/courses/page.test.tsx", "src/app/courses/[slug]/page.tsx", "src/app/courses/[slug]/page.test.tsx", "src/features/courses/youtube.ts", "src/features/courses/youtube.test.ts"]
 shared_files: []
 implementation_commit: ""
 reviewer: ""
@@ -22,7 +22,9 @@ review_commit: ""
 # 범위
 
 - 생성 또는 수정: src/app/courses/page.tsx
+- 생성 또는 수정: src/app/courses/page.test.tsx
 - 생성 또는 수정: src/app/courses/[slug]/page.tsx
+- 생성 또는 수정: src/app/courses/[slug]/page.test.tsx
 - 생성 또는 수정: src/features/courses/youtube.ts
 - 생성 또는 수정: src/features/courses/youtube.test.ts
 - 공유 파일 수정 없음
@@ -38,7 +40,9 @@ P03-T03가 done이면 단위 구현은 ready로 전환할 수 있다. 브라우�
 # 파일
 
 - src/app/courses/page.tsx
+- src/app/courses/page.test.tsx
 - src/app/courses/[slug]/page.tsx
+- src/app/courses/[slug]/page.test.tsx
 - src/features/courses/youtube.ts
 - src/features/courses/youtube.test.ts
 
