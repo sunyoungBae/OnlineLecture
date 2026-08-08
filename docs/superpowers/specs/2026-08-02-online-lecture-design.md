@@ -34,7 +34,7 @@ P03 인증 구현과 자동 검증은 로컬·모의 OAuth 경계로 진행하�
 - Supabase CLI 로컬 설정과 CLI 생성물 제외 규칙을 두고 Docker 기반 PostgreSQL 스택으로 migration 및 pgTAP 검사를 재현한다.
 - ORM, 전역 상태관리, React Hook Form, 별도 검색 엔진과 CMS는 추가하지 않는다.
 
-서비스 역할 키와 Resend 키는 서버에서만 사용한다. 실제 비밀 값은 로컬과 Vercel 환경 변수에 저장하고 `.env.example`에는 변수명과 설명만 둔다.
+서비스 역할 키와 Resend 키는 서버에서만 사용한다. 실제 비밀 값은 로컬과 Vercel 환경 변수에 저장하고 `.env.example`에는 변수명과 설명만 둔다. 경고 이메일 발신자는 Resend에서 검증된 `RESEND_FROM` 환경 변수로만 설정하며 코드에 도메인을 고정하지 않는다.
 
 ## 디자인 시스템
 
