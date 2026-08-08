@@ -1,12 +1,12 @@
 ---
 id: P05-T03
 title: 댓글 CRUD·공지·운영자 삭제
-status: ready
+status: in_progress
 type: feature
 depends_on: ["P05-T02"]
 parallel_group: ""
-owner: ""
-started_at: ""
+owner: "Codex/p05_t03"
+started_at: "2026-08-08T09:41:13+09:00"
 blocked_reason: ""
 owned_files: ["src/features/comments/actions.ts", "src/features/comments/actions.test.ts", "src/features/moderation/actions.ts", "src/app/board/[postId]/page.tsx"]
 shared_files: []
