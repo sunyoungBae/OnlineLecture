@@ -34,7 +34,7 @@ select is(public.move_lesson('93000000-0000-0000-0000-000000000002', 'down'), tr
 select is(public.move_lesson('93000000-0000-0000-0000-000000000001', 'up'), false, '첫 회차 위 이동은 no-op이다');
 select is(public.move_lesson('93000000-0000-0000-0000-000000000003', 'down'), false, '마지막 회차 아래 이동은 no-op이다');
 select results_eq($$ select position from public.lessons where course_id = '92000000-0000-0000-0000-000000000002' $$, $$ values (1::integer) $$, '다른 강의 position은 변하지 않는다');
-select is((select count(*) from public.lessons where course_id = '92000000-0000-0000-0000-000000000001'), 3::bigint, '같은 강의의 회차 수와 유일성이 보존된다');
+select is((select count(distinct position) from public.lessons where course_id = '92000000-0000-0000-0000-000000000001'), 3::bigint, '같은 강의의 position 유일성이 보존된다');
 
 select * from finish();
 rollback;
