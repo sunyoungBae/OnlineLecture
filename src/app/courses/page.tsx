@@ -9,9 +9,48 @@ type CoursePreview = {
   thumbnailUrl: string | null;
 };
 
-export default async function CoursesPage() {
+type Course = {
+  description: string;
+  id: string;
+  slug: string;
+  title: string;
+};
+
+type CoursePreviewLesson = {
+  course_id: string;
+  position: number;
+  youtube_video_id: string;
+};
+
+type CoursesQueryResult = { data: Course[] | null; error: unknown };
+type LessonsQueryResult = { data: CoursePreviewLesson[] | null; error: unknown };
+
+export type CoursesPageClient = {
+  from: {
+    (table: "courses"): {
+      select: (columns: "id, title, slug, description") => {
+        eq: (column: "is_published", value: boolean) => {
+          order: (column: "created_at", options: { ascending: boolean }) => PromiseLike<CoursesQueryResult>;
+        };
+      };
+    };
+    (table: "lessons"): {
+      select: (columns: "course_id, position, youtube_video_id") => {
+        in: (column: "course_id", values: string[]) => {
+          order: (column: "position", options: { ascending: boolean }) => PromiseLike<LessonsQueryResult>;
+        };
+      };
+    };
+  };
+};
+
+type CoursesPageClientFactory = () => Promise<CoursesPageClient>;
+
+export async function renderCoursesPage(
+  clientFactory: CoursesPageClientFactory = defaultPageClientFactory,
+) {
   await requirePageRole("member", { nextPath: "/courses" });
-  const supabase = await createClient();
+  const supabase = await clientFactory();
   const { data: courses, error: coursesError } = await supabase
     .from("courses")
     .select("id, title, slug, description")
@@ -107,6 +146,10 @@ export default async function CoursesPage() {
   );
 }
 
+export default async function CoursesPage() {
+  return renderCoursesPage();
+}
+
 function CoursesEmpty() {
   return (
     <main className="mx-auto max-w-[var(--reading-max-width)] px-[var(--page-padding)] py-16">
@@ -123,4 +166,8 @@ function CoursesError() {
       <p className="mt-6 text-[var(--muted-foreground)]">잠시 후 다시 시도해 주세요.</p>
     </main>
   );
+}
+
+function defaultPageClientFactory() {
+  return createClient() as unknown as Promise<CoursesPageClient>;
 }

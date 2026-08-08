@@ -9,11 +9,53 @@ type CoursePageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export default async function CourseDetailPage({ params }: CoursePageProps) {
-  const { slug } = await params;
+type Course = {
+  description: string;
+  id: string;
+  title: string;
+};
+
+type Lesson = {
+  description: string;
+  id: string;
+  position: number;
+  title: string;
+  youtube_video_id: string;
+};
+
+type CourseQueryResult = { data: Course | null; error: unknown };
+type LessonsQueryResult = { data: Lesson[] | null; error: unknown };
+
+export type CourseDetailPageClient = {
+  from: {
+    (table: "courses"): {
+      select: (columns: "id, title, description") => {
+        eq: (column: "slug", value: string) => {
+          eq: (column: "is_published", value: boolean) => {
+            maybeSingle: () => PromiseLike<CourseQueryResult>;
+          };
+        };
+      };
+    };
+    (table: "lessons"): {
+      select: (columns: "id, title, description, position, youtube_video_id") => {
+        eq: (column: "course_id", value: string) => {
+          order: (column: "position", options: { ascending: boolean }) => PromiseLike<LessonsQueryResult>;
+        };
+      };
+    };
+  };
+};
+
+type CourseDetailPageClientFactory = () => Promise<CourseDetailPageClient>;
+
+export async function renderCourseDetailPage(
+  { slug }: { slug: string },
+  clientFactory: CourseDetailPageClientFactory = defaultPageClientFactory,
+) {
   await requirePageRole("member", { nextPath: `/courses/${slug}` });
 
-  const supabase = await createClient();
+  const supabase = await clientFactory();
   const { data: course, error: courseError } = await supabase
     .from("courses")
     .select("id, title, description")
@@ -97,6 +139,10 @@ export default async function CourseDetailPage({ params }: CoursePageProps) {
   );
 }
 
+export default async function CourseDetailPage({ params }: CoursePageProps) {
+  return renderCourseDetailPage(await params);
+}
+
 function CourseError() {
   return (
     <main className="mx-auto max-w-[var(--reading-max-width)] px-[var(--page-padding)] py-16">
@@ -104,4 +150,8 @@ function CourseError() {
       <p className="mt-6 text-[var(--muted-foreground)]">잠시 후 다시 시도해 주세요.</p>
     </main>
   );
+}
+
+function defaultPageClientFactory() {
+  return createClient() as unknown as Promise<CourseDetailPageClient>;
 }
