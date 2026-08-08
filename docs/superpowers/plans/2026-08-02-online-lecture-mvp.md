@@ -69,7 +69,7 @@ flowchart TD
 | P06-T01 | 파일 allowlist·10MB/3개·80/95% 용량 로직 | blocked | P02-T03 | U-A | 파일·용량 순수 검증 모듈 | 없음 |
 | P06-T02 | 게시글 첨부 업로드·서명 다운로드·정리 | blocked | P05-T03,P06-T01 | U-B | 게시글 생성 액션·편집기 통합, 첨부 서버 로직·작성/상세 페이지 테스트와 실패 보상 | 게시글 액션·편집·본문 및 해당 테스트 통합 소유자 P06-T02 |
 | P06-T03 | 회차 자료 업로드·다운로드·삭제 | blocked | P04-T01,P04-T03,P06-T01 | U-B | 회차 첨부 서버 로직 | 회차 관리자·플레이어 통합 소유자 P06-T03 |
-| P06-T04 | 80% Resend 1회·재무장·95% 차단/복구 | blocked | P06-T02,P06-T03 | - | 관리자 전용 원자 usage/claim RPC migration·pgTAP, 경고 발송, 게시글·회차 업로드/삭제 통합과 관리자 저장량 페이지 테스트 | storage_settings·첨부 서버 경로·생성 DB 타입 통합 소유 |
+| P06-T04 | 80% Resend 1회·재무장·95% 차단/복구 | blocked | P06-T02,P06-T03 | - | 서버 전용 원자 usage/claim RPC migration·pgTAP, 검증 발신자 경고 발송, 게시글·회차 업로드/삭제 통합과 관리자 저장량 페이지 테스트 | storage_settings·첨부 서버 경로·생성 DB 타입·`.env.example` 통합 소유 |
 | P07-T01 | 오류·404·권한·빈 상태·로딩 공통 마감 | blocked | P04-T03,P05-T03,P06-T04 | Q-A | 공통 상태 컴포넌트·라우트 파일 | 각 기능 연결은 이 작업 소유 |
 | P07-T02 | 키보드·포커스·라벨·44px·WCAG AA·모바일 점검 | blocked | P07-T01 | - | 접근성 수정과 Playwright 검사 | 전 기능 UI |
 | P08-T01 | lint·typecheck·unit·E2E·build 전체 통과 | blocked | P07-T02 | - | 결함 수정·검증 보고 | 전체 저장소 |
