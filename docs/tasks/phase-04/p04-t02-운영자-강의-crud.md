@@ -1,12 +1,12 @@
 ---
 id: P04-T02
 title: 운영자 강의 CRUD
-status: ready
+status: in_progress
 type: feature
 depends_on: ["P03-T03"]
 parallel_group: "C-A"
-owner: ""
-started_at: ""
+owner: "Codex/p04_t02"
+started_at: "2026-08-08T09:00:13+09:00"
 blocked_reason: ""
 owned_files: ["src/app/admin/courses/page.tsx", "src/app/admin/courses/actions.ts", "src/features/admin/courses.test.ts", "src/app/admin/layout.tsx"]
 shared_files: []

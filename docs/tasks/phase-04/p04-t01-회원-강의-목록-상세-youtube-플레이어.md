@@ -1,12 +1,12 @@
 ---
 id: P04-T01
 title: 회원 강의 목록·상세·YouTube 플레이어
-status: ready
+status: in_progress
 type: feature
 depends_on: ["P03-T03"]
 parallel_group: "C-A"
-owner: ""
-started_at: ""
+owner: "Codex/p04_t01"
+started_at: "2026-08-08T09:00:13+09:00"
 blocked_reason: ""
 owned_files: ["src/app/courses/page.tsx", "src/app/courses/[slug]/page.tsx", "src/features/courses/youtube.ts", "src/features/courses/youtube.test.ts"]
 shared_files: []
