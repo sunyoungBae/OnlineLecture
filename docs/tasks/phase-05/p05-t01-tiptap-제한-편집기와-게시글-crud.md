@@ -8,7 +8,7 @@ parallel_group: "B-A"
 owner: "Codex/p05_t01"
 started_at: "2026-08-08T09:00:13+09:00"
 blocked_reason: ""
-owned_files: ["src/features/posts/content.ts", "src/features/posts/content.test.ts", "src/features/posts/editor.tsx", "src/app/board/new/page.tsx", "src/app/board/[postId]/edit/page.tsx", "package.json", "package-lock.json"]
+owned_files: ["src/features/posts/content.ts", "src/features/posts/content.test.ts", "src/features/posts/editor.tsx", "src/app/board/new/page.tsx", "src/app/board/[postId]/edit/page.tsx", "package.json", "package-lock.json", "README.md"]
 shared_files: []
 implementation_commit: ""
 reviewer: ""
@@ -28,6 +28,7 @@ Tiptap 제한 편집기와 게시글 CRUD을 완료해 다음 의존 작업이 �
 - 생성 또는 수정: src/app/board/[postId]/edit/page.tsx
 - 생성 또는 수정: package.json
 - 생성 또는 수정: package-lock.json
+- 생성 또는 수정: README.md
 
 # 제외
 
@@ -46,6 +47,7 @@ P03-T03가 모두 done이면 ready로 전환한다.
 - src/app/board/[postId]/edit/page.tsx
 - package.json
 - package-lock.json
+- README.md
 
 # 인터페이스
 
