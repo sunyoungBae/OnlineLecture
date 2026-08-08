@@ -305,7 +305,10 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      move_lesson: {
+        Args: { p_direction: string; p_lesson_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
