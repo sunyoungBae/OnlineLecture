@@ -1,7 +1,7 @@
 ---
 id: P05-T01
 title: Tiptap 제한 편집기와 게시글 CRUD
-status: review
+status: done
 type: feature
 depends_on: ["P03-T03"]
 parallel_group: "B-A"
@@ -11,8 +11,8 @@ blocked_reason: ""
 owned_files: ["src/features/posts/content.ts", "src/features/posts/content.test.ts", "src/features/posts/actions.ts", "src/features/posts/actions.test.ts", "src/features/posts/editor.tsx", "src/app/board/new/page.tsx", "src/app/board/[postId]/edit/page.tsx", "package.json", "package-lock.json", "README.md"]
 shared_files: []
 implementation_commit: "c29590b"
-reviewer: ""
-review_commit: ""
+reviewer: "Codex/p04_t02"
+review_commit: "863586a"
 ---
 
 # 목표
@@ -94,6 +94,7 @@ P03-T03가 모두 done이면 ready로 전환한다.
 - 검증: `npm run lint`, `npm run typecheck`, 전체 unit 133개, E2E 16개, build와 `./scripts/check-harness.sh`가 통과했다. `npm audit --json`은 `nanoid` 3.3.18 잠금 후 취약점 0개였다.
 - 구현 커밋: `c29590b` (패키지 보안 `68f2f15`, 액션·Zod `c3a1443` 포함)
 - 독립 리뷰: `Codex/p04_t02`가 인증·작성자·소유권·오류·직렬화 경계, Zod 재귀 허용 목록과 패키지·라이선스를 검토해 Critical/Important 없음으로 승인했다.
+- 승인 커밋: `863586a` (`리뷰: P05-T01 독립 승인`)
 
 # 커밋
 

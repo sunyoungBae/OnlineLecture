@@ -1,13 +1,13 @@
 ---
 id: P05-T02
 title: 공개 목록·escaped ILIKE 검색·필터·페이지네이션
-status: blocked
+status: ready
 type: feature
 depends_on: ["P05-T01"]
 parallel_group: ""
 owner: ""
 started_at: ""
-blocked_reason: dependency
+blocked_reason: ""
 owned_files: ["src/features/posts/search.ts", "src/features/posts/search.test.ts", "src/app/board/page.tsx"]
 shared_files: ["src/components/site-header.tsx"]
 implementation_commit: ""
