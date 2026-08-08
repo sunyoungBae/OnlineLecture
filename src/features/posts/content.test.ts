@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { validatePostInput } from "./content";
+import { postInputSchema, validatePostInput } from "./content";
 
 const allowedContent = {
   type: "doc",
@@ -32,6 +32,11 @@ const allowedContent = {
 };
 
 describe("validatePostInput", () => {
+  it("서버 입력 Zod 스키마는 허용 JSON과 제목을 함께 파싱한다", () => {
+    expect(postInputSchema.safeParse({ title: "게시글 제목", content: allowedContent }).success).toBe(true);
+    expect(postInputSchema.safeParse({ title: "게시글 제목", content: "<p>임의 HTML</p>" }).success).toBe(false);
+  });
+
   it("허용된 Tiptap 노드와 mark만 저장 가능한 JSON과 검색용 본문으로 정규화한다", () => {
     expect(validatePostInput({ title: "게시글 제목", content: allowedContent })).toEqual({
       valid: true,

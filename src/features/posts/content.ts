@@ -35,6 +35,8 @@ export type PostInputValidation =
 const INLINE_NODES = new Set(["text", "hardBreak"]);
 const BLOCK_NODES = new Set(["paragraph", "heading", "bulletList", "orderedList", "blockquote"]);
 const ALLOWED_MARKS = new Set(["bold", "italic", "strike", "link"]);
+const INVALID_CONTENT_STRUCTURE = "invalid_content_structure";
+const INVALID_CONTENT_LENGTH = "invalid_content_length";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -210,23 +212,52 @@ function isValidNode(value: unknown, parentType?: TiptapNode["type"]): value is 
   return false;
 }
 
+export const postInputSchema = z
+  .object({
+    content: z.unknown(),
+    title: z.string().trim().min(1).max(120),
+  })
+  .superRefine(({ content }, context) => {
+    if (!isValidNode(content) || content.type !== "doc") {
+      context.addIssue({
+        code: "custom",
+        message: INVALID_CONTENT_STRUCTURE,
+        path: ["content"],
+      });
+      return;
+    }
+
+    const plainText = extractText(content).trim();
+    if (Array.from(plainText).length < 1 || Array.from(plainText).length > 20_000) {
+      context.addIssue({
+        code: "custom",
+        message: INVALID_CONTENT_LENGTH,
+        path: ["content"],
+      });
+    }
+  });
+
 export function validatePostInput(input: { content: unknown; title: unknown }): PostInputValidation {
-  if (typeof input.title !== "string" || Array.from(input.title.trim()).length < 1 || Array.from(input.title).length > 120) {
+  const parsed = postInputSchema.safeParse(input);
+  if (!parsed.success) {
+    const contentIssue = parsed.error.issues.find((issue) => issue.path[0] === "content");
+    if (contentIssue?.message === INVALID_CONTENT_LENGTH) {
+      return { valid: false, reason: "invalid_content_length" };
+    }
+
+    if (contentIssue) {
+      return { valid: false, reason: "invalid_content_structure" };
+    }
+
     return { valid: false, reason: "invalid_title_length" };
   }
 
-  if (!isValidNode(input.content) || input.content.type !== "doc") {
-    return { valid: false, reason: "invalid_content_structure" };
-  }
-
-  const content = input.content as TiptapDocument;
+  const content = parsed.data.content as TiptapDocument;
   const plainText = extractText(content).trim();
-  if (Array.from(plainText).length < 1 || Array.from(plainText).length > 20_000) {
-    return { valid: false, reason: "invalid_content_length" };
-  }
 
   return {
     valid: true,
-    value: { title: input.title, content, plainText },
+    value: { title: parsed.data.title, content, plainText },
   };
 }
+import { z } from "zod";
