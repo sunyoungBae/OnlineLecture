@@ -1,7 +1,7 @@
 ---
 id: P07-T02
 title: 키보드·포커스·라벨·44px·WCAG AA·모바일 점검
-status: review
+status: done
 type: feature
 depends_on: ["P07-T01"]
 parallel_group: ""
@@ -11,8 +11,8 @@ blocked_reason: ""
 owned_files: ["tests/e2e/accessibility.spec.ts", "tests/e2e/responsive.spec.ts", "tests/e2e/support/supabase-mock.mjs", "src/app/globals.css", "src/components/ui/button.tsx", "src/components/ui/input.tsx", "src/components/ui/label.tsx", "src/components/ui/textarea.tsx", "src/components/site-header.tsx", "src/components/mobile-menu.tsx", "src/app/(public)/page.tsx", "src/app/(public)/login/page.tsx", "src/app/onboarding/form.tsx", "src/app/courses/page.tsx", "src/app/courses/[slug]/page.tsx", "src/app/board/page.tsx", "src/app/board/[postId]/page.tsx", "src/app/board/new/page.tsx", "src/app/board/[postId]/edit/page.tsx", "src/app/admin/courses/page.tsx", "src/app/admin/courses/[courseId]/lessons/page.tsx", "src/app/admin/storage/page.tsx"]
 shared_files: ["playwright.config.ts"]
 implementation_commit: "7c7dd3c"
-reviewer: ""
-review_commit: ""
+reviewer: "Codex/p04_t02"
+review_commit: "90e7869"
 ---
 
 # 목표
@@ -118,6 +118,7 @@ P07-T01가 모두 done이면 ready로 전환한다.
 - 검증: localhost 전용 Supabase mock과 SSR 세션을 1 worker로 결정적으로 실행했고, 전체 E2E 30개, unit 218개, lint, typecheck, production build, `./scripts/check-harness.sh`와 audit 0건이 최신 HEAD에서 통과했다.
 - 구현 커밋: `7c7dd3c` (기본 접근성 `1a5f689`, mock 연결 `6c578bf`, 전체 경로 강화 `fa24033` 포함)
 - 독립 리뷰: `Codex/p04_t02`가 실제 Tab 도달성, 상태별 SSR 렌더, 이름·터치 영역·대비·반응형, mock 격리와 회차 hidden 입력 계약을 검토해 Critical/Important 없음으로 승인했다.
+- 승인 커밋: `90e7869` (`리뷰: P07-T02 독립 승인`)
 
 # 커밋
 
