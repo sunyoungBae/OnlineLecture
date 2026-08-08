@@ -1,7 +1,7 @@
 ---
 id: P04-T02
 title: 운영자 강의 CRUD
-status: review
+status: done
 type: feature
 depends_on: ["P03-T03"]
 parallel_group: "C-A"
@@ -11,8 +11,8 @@ blocked_reason: ""
 owned_files: ["src/app/admin/courses/page.tsx", "src/app/admin/courses/actions.ts", "src/features/admin/courses.test.ts", "src/app/admin/layout.tsx"]
 shared_files: []
 implementation_commit: "88551c8"
-reviewer: ""
-review_commit: ""
+reviewer: "Codex/p04_t01"
+review_commit: "2f76fb5"
 ---
 
 # 목표
@@ -80,6 +80,7 @@ P03-T03가 모두 done이면 ready로 전환한다.
 - 검증: `npm run typecheck`, `npm run lint`, `./scripts/check-harness.sh`, 전체 unit, E2E 16개와 build가 구현 완료 시점에 통과했다.
 - 구현 커밋: `88551c8`
 - 독립 리뷰: `Codex/p04_t01`이 관리자 가드, 입력 검증, DB 오류 비노출과 UI 경계를 검토해 Critical/Important 없음으로 승인했다.
+- 승인 커밋: `2f76fb5` (`리뷰: P04-T02 독립 승인`)
 
 # 커밋
 

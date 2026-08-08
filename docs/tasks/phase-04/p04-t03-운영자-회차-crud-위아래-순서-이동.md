@@ -1,13 +1,13 @@
 ---
 id: P04-T03
 title: 운영자 회차 CRUD·위아래 순서 이동
-status: blocked
+status: ready
 type: feature
 depends_on: ["P04-T02"]
 parallel_group: ""
 owner: ""
 started_at: ""
-blocked_reason: dependency
+blocked_reason: ""
 owned_files: ["src/app/admin/courses/[courseId]/lessons/page.tsx", "src/app/admin/courses/[courseId]/lessons/actions.ts", "src/features/admin/lesson-order.ts", "src/features/admin/lesson-order.test.ts"]
 shared_files: ["src/app/admin/courses/page.tsx"]
 implementation_commit: ""
