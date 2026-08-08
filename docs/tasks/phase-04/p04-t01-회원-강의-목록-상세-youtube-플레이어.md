@@ -1,7 +1,7 @@
 ---
 id: P04-T01
 title: 회원 강의 목록·상세·YouTube 플레이어
-status: in_progress
+status: review
 type: feature
 depends_on: ["P03-T03"]
 parallel_group: "C-A"
@@ -10,7 +10,7 @@ started_at: "2026-08-08T09:00:13+09:00"
 blocked_reason: ""
 owned_files: ["src/app/courses/page.tsx", "src/app/courses/page.test.tsx", "src/app/courses/[slug]/page.tsx", "src/app/courses/[slug]/page.test.tsx", "src/features/courses/youtube.ts", "src/features/courses/youtube.test.ts"]
 shared_files: []
-implementation_commit: ""
+implementation_commit: "194d09e"
 reviewer: ""
 review_commit: ""
 ---
@@ -80,7 +80,11 @@ P03-T03가 done이면 단위 구현은 ready로 전환할 수 있다. 브라우�
 
 # 리뷰 증거
 
-작업 전 실패, 완료 명령 결과, 구현 커밋, 구현자와 다른 리뷰어, 승인 커밋을 이 절에 기록한다.
+- RED: YouTube 파서 모듈 부재로 좁은 테스트가 실패했고, 리뷰 보강에서는 서버 페이지 렌더 계약 부재로 목록·상세 테스트 9개가 실패했다.
+- GREEN: YouTube 6개와 서버 페이지 9개, 총 15개 테스트가 통과했다.
+- 검증: 회원 역할 가드, 공개 강의 필터, 다중 강의 첫 회차 썸네일, 빈 상태·DB 오류, 없는·미공개 slug의 notFound와 회차 순서를 확인했다. `npm run typecheck`, `npm run lint`, `./scripts/check-harness.sh`, 전체 unit 127개, E2E 16개와 build가 통과했다.
+- 구현 커밋: `194d09e` (초기 구현 `ef4e966` 포함)
+- 독립 리뷰: `Codex/p04_t02`가 확장된 페이지 계약과 YouTube 경계를 검토해 Critical/Important 없음으로 승인했다.
 
 # 커밋
 
