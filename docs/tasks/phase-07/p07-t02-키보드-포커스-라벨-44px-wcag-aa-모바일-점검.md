@@ -8,8 +8,8 @@ parallel_group: ""
 owner: "Codex/p07_t02"
 started_at: "2026-08-08T14:17:55+09:00"
 blocked_reason: ""
-owned_files: ["tests/e2e/accessibility.spec.ts", "tests/e2e/responsive.spec.ts", "src/app/globals.css", "src/components/ui/button.tsx", "src/components/ui/input.tsx", "src/components/ui/label.tsx", "src/components/ui/textarea.tsx", "src/components/site-header.tsx", "src/components/mobile-menu.tsx", "src/app/(public)/page.tsx", "src/app/(public)/login/page.tsx", "src/app/onboarding/form.tsx", "src/app/courses/page.tsx", "src/app/courses/[slug]/page.tsx", "src/app/board/page.tsx", "src/app/board/[postId]/page.tsx", "src/app/board/new/page.tsx", "src/app/board/[postId]/edit/page.tsx", "src/app/admin/courses/page.tsx", "src/app/admin/courses/[courseId]/lessons/page.tsx", "src/app/admin/storage/page.tsx"]
-shared_files: []
+owned_files: ["tests/e2e/accessibility.spec.ts", "tests/e2e/responsive.spec.ts", "tests/e2e/support/supabase-mock.mjs", "src/app/globals.css", "src/components/ui/button.tsx", "src/components/ui/input.tsx", "src/components/ui/label.tsx", "src/components/ui/textarea.tsx", "src/components/site-header.tsx", "src/components/mobile-menu.tsx", "src/app/(public)/page.tsx", "src/app/(public)/login/page.tsx", "src/app/onboarding/form.tsx", "src/app/courses/page.tsx", "src/app/courses/[slug]/page.tsx", "src/app/board/page.tsx", "src/app/board/[postId]/page.tsx", "src/app/board/new/page.tsx", "src/app/board/[postId]/edit/page.tsx", "src/app/admin/courses/page.tsx", "src/app/admin/courses/[courseId]/lessons/page.tsx", "src/app/admin/storage/page.tsx"]
+shared_files: ["playwright.config.ts"]
 implementation_commit: ""
 reviewer: ""
 review_commit: ""
@@ -23,6 +23,8 @@ review_commit: ""
 
 - 생성 또는 수정: tests/e2e/accessibility.spec.ts
 - 생성 또는 수정: tests/e2e/responsive.spec.ts
+- 생성 또는 수정: tests/e2e/support/supabase-mock.mjs
+- 통합 소유 시에만 수정: playwright.config.ts
 - 이 접근성 통합 카드가 수정: src/app/globals.css
 - 이 접근성 통합 카드가 수정: src/components/ui/button.tsx
 - 이 접근성 통합 카드가 수정: src/components/ui/input.tsx
@@ -55,6 +57,8 @@ P07-T01가 모두 done이면 ready로 전환한다.
 
 - tests/e2e/accessibility.spec.ts
 - tests/e2e/responsive.spec.ts
+- tests/e2e/support/supabase-mock.mjs
+- playwright.config.ts
 - src/app/globals.css
 - src/components/ui/button.tsx
 - src/components/ui/input.tsx
