@@ -159,6 +159,24 @@ describe("게시글 첨부 저장", () => {
     expect(remove).toHaveBeenCalledWith([storagePath]);
   });
 
+  it("업로드 예외면 이미 저장한 모든 객체를 정리한다", async () => {
+    const { deps, remove, upload } = dependencies();
+    upload.mockResolvedValueOnce({ data: null, error: null }).mockRejectedValueOnce(new Error("storage"));
+
+    await expect(savePostAttachments(postId, authorId, [file(), file("other.pdf")], deps)).resolves.toEqual({ ok: false, reason: "save_failed" });
+    expect(remove).toHaveBeenCalledWith([storagePath]);
+    expect(upload.mock.invocationCallOrder[0]).toBeLessThan(remove.mock.invocationCallOrder[0]);
+  });
+
+  it("메타데이터 예외면 저장 객체를 정리하고 cleanup 실패는 일반 cleanup 오류로 제한한다", async () => {
+    const { deps, insert, remove } = dependencies();
+    insert.mockRejectedValue(new Error("database secret"));
+    remove.mockResolvedValue({ data: null, error: new Error("storage secret") });
+
+    await expect(savePostAttachments(postId, authorId, [file()], deps)).resolves.toEqual({ ok: false, reason: "cleanup_failed" });
+    expect(remove).toHaveBeenCalledTimes(2);
+  });
+
   it("폼 업로드는 회원 인증 뒤 작성자만 처리하고 일반 오류로 돌아간다", async () => {
     const { deps, requireRole } = dependencies();
     requireRole.mockRejectedValue(new Error("denied"));
@@ -209,6 +227,7 @@ describe("게시글 첨부 다운로드와 삭제", () => {
 
     await deletePostAttachment(formData({ attachment_id: attachmentId, post_id: postId }), deps);
 
+    expect(remove).toHaveBeenCalledTimes(2);
     expect(remove).toHaveBeenCalledWith([move.mock.calls[0]?.[1]]);
     expect(redirect).toHaveBeenCalledWith(`/board/${postId}?error=attachment-delete`);
   });

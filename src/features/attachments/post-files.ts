@@ -152,6 +152,8 @@ export async function savePostAttachments(
     return { ok: false, reason: "save_failed" };
   }
 
+  let storage: AttachmentStorage | null = null;
+  const paths: string[] = [];
   try {
     const repository = await dependencies.repositoryFactory();
     const ownedPost = await repository.findOwnedPost(postId, authorId);
@@ -164,8 +166,7 @@ export async function savePostAttachments(
       return { ok: false, reason: "save_failed" };
     }
 
-    const storage = await dependencies.storageFactory();
-    const paths: string[] = [];
+    storage = await dependencies.storageFactory();
     for (const file of files) {
       const path = dependencies.createPath(postId);
       const uploaded = await storage.upload(path, file);
@@ -196,7 +197,12 @@ export async function savePostAttachments(
 
     return { ok: true };
   } catch {
-    return { ok: false, reason: "save_failed" };
+    return {
+      ok: false,
+      reason: storage && paths.length && !(await cleanupPaths(storage, paths))
+        ? "cleanup_failed"
+        : "save_failed",
+    };
   }
 }
 
@@ -293,8 +299,7 @@ export async function deletePostAttachment(
       return dependencies.redirect(`${boardPath(postId)}?error=attachment-delete`);
     }
 
-    const removed = await storage.remove([trashPath]);
-    if (removed.error) {
+    if (!(await cleanupPaths(storage, [trashPath]))) {
       return dependencies.redirect(`${boardPath(postId)}?error=attachment-delete`);
     }
   } catch {
