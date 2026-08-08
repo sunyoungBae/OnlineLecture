@@ -78,6 +78,19 @@ export default async function AdminCoursesPage({
     );
   }
 
+  if (hasLoadError) {
+    return (
+      <main className="py-10">
+        <EmptyState
+          action={{ href: "/admin/courses", label: "강의 목록 새로고침" }}
+          description="잠시 후 다시 시도해 주세요."
+          role="alert"
+          title="강의 목록을 불러오지 못했습니다"
+        />
+      </main>
+    );
+  }
+
   return (
     <main className="py-10">
       <div className="max-w-[var(--reading-max-width)]">
@@ -86,17 +99,6 @@ export default async function AdminCoursesPage({
 
         {notice ? <p className="mt-6 text-sm text-success" role="status">{notice}</p> : null}
         {error ? <p className="mt-6 text-sm text-destructive" role="alert">{error}</p> : null}
-        {hasLoadError ? (
-          <div className="mt-6">
-            <EmptyState
-              action={{ href: "/admin/courses", label: "강의 목록 새로고침" }}
-              description="잠시 후 다시 시도해 주세요."
-              role="alert"
-              title="강의 목록을 불러오지 못했습니다"
-            />
-          </div>
-        ) : null}
-
         <section aria-labelledby="create-course-heading" className="mt-10 border-t border-border pt-8">
           <h3 className="text-2xl font-semibold" id="create-course-heading">새 강의</h3>
           <CourseForm action={createCourse} submitLabel="강의 만들기" />

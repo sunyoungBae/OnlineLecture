@@ -21,6 +21,9 @@ describe("관리자 강의 공통 상태", () => {
     const page = await AdminCoursesPage({ searchParams: Promise.resolve({}) });
     expect(text(page)).toContain("강의 목록을 불러오지 못했습니다");
     expect(text(page)).toContain("강의 목록 새로고침");
+    expect(text(page)).not.toContain("새 강의");
+    expect(text(page)).not.toContain("등록된 강의");
+    expect(text(page)).not.toContain("아직 등록된 강의가 없습니다.");
   });
 
   it("권한 거부 쿼리는 존재 정보를 숨긴 공통 alert로 표시한다", async () => {
