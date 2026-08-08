@@ -1,0 +1,8 @@
+import { describe, expect, it, vi } from "vitest";
+import { deletePostAction, toggleNoticeAction, type ModerationDependencies } from "./actions";
+const deps = (role: "member" | "admin", error: unknown = null) => { const eq = vi.fn().mockReturnValue({ select: vi.fn().mockResolvedValue({ data: [{ id: "post-1" }], error }) }); const update = vi.fn().mockReturnValue({ eq }); const remove = vi.fn().mockReturnValue({ eq }); const redirect = vi.fn((path: string): never => { throw new Error(`redirect:${path}`); }); const d: ModerationDependencies = { createClient: async () => ({ from: vi.fn().mockReturnValue({ delete: remove, update }) }), redirect, requirePageRole: vi.fn(async () => ({ id: "user", role })) }; return { d, eq, redirect }; };
+describe("운영자 moderation", () => {
+  it("member는 공지와 전체 삭제를 거부한다", async () => { const { d } = deps("member"); await expect(toggleNoticeAction("post-1", true, d)()).resolves.toEqual({ status: "error", message: "이 작업을 수행할 권한이 없습니다." }); await expect(deletePostAction("post-1", d)()).resolves.toEqual({ status: "error", message: "이 작업을 수행할 권한이 없습니다." }); });
+  it("admin은 공지를 전환하고 게시글을 삭제한다", async () => { const { d, eq, redirect } = deps("admin"); await expect(toggleNoticeAction("post-1", true, d)()).rejects.toThrow("redirect:/board/post-1"); expect(eq).toHaveBeenCalledWith("id", "post-1"); expect(redirect).toHaveBeenCalledWith("/board/post-1"); });
+  it("DB 오류 원문은 노출하지 않는다", async () => { const { d } = deps("admin", new Error("RLS detail")); await expect(deletePostAction("post-1", d)()).resolves.toEqual({ status: "error", message: "게시글을 삭제하지 못했습니다. 잠시 후 다시 시도해 주세요." }); });
+});
