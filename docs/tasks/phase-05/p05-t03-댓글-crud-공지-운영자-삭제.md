@@ -1,13 +1,13 @@
 ---
 id: P05-T03
 title: 댓글 CRUD·공지·운영자 삭제
-status: blocked
+status: ready
 type: feature
 depends_on: ["P05-T02"]
 parallel_group: ""
 owner: ""
 started_at: ""
-blocked_reason: dependency
+blocked_reason: ""
 owned_files: ["src/features/comments/actions.ts", "src/features/comments/actions.test.ts", "src/features/moderation/actions.ts", "src/app/board/[postId]/page.tsx"]
 shared_files: []
 implementation_commit: ""

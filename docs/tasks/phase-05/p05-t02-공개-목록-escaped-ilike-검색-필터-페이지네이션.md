@@ -1,7 +1,7 @@
 ---
 id: P05-T02
 title: 공개 목록·escaped ILIKE 검색·필터·페이지네이션
-status: review
+status: done
 type: feature
 depends_on: ["P05-T01"]
 parallel_group: ""
@@ -11,8 +11,8 @@ blocked_reason: ""
 owned_files: ["src/features/posts/search.ts", "src/features/posts/search.test.ts", "src/app/board/page.tsx", "src/app/board/page.test.tsx"]
 shared_files: ["src/components/site-header.tsx"]
 implementation_commit: "f682de3"
-reviewer: ""
-review_commit: ""
+reviewer: "Codex/p04_t02"
+review_commit: "1978c80"
 ---
 
 # 목표
@@ -82,6 +82,7 @@ P05-T01가 모두 done이면 ready로 전환한다.
 - 검증: `npm run lint`, `npm run typecheck`, 전체 unit 150개, E2E 16개와 `./scripts/check-harness.sh`가 통과했다. 구현 완료 시 build와 audit 0건도 확인했다.
 - 구현 커밋: `f682de3` (검색 파서 `9f0ea6b`, 공개 페이지 `aed5d08` 포함)
 - 독립 리뷰: `Codex/p04_t02`가 공개 접근, 검색 escape, 필터·정렬·범위, 오류 비노출과 페이지 상한을 검토해 Critical/Important 없음으로 승인했다.
+- 승인 커밋: `1978c80` (`리뷰: P05-T02 독립 승인`)
 
 # 커밋
 
