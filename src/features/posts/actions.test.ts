@@ -127,6 +127,26 @@ describe("게시글 서버 액션", () => {
     expect(deleteByAuthor).toHaveBeenCalledWith("author_id", "author-1");
   });
 
+  it("생성 보상 삭제가 0행이면 한 번 재시도하고 일반 cleanup 오류만 반환한다", async () => {
+    const createdPostId = "00000000-0000-4000-8000-000000000010";
+    const insert = vi.fn().mockReturnValue({ select: vi.fn().mockReturnValue({ single: vi.fn().mockResolvedValue({ data: { id: createdPostId }, error: null }) }) });
+    const selectDeleted = vi.fn().mockResolvedValue({ data: [], error: null });
+    const byAuthor = vi.fn().mockReturnValue({ select: selectDeleted });
+    const byPost = vi.fn().mockReturnValue({ eq: byAuthor });
+    const remove = vi.fn().mockReturnValue({ eq: byPost });
+    const deps = {
+      createClient: async () => ({ from: vi.fn().mockReturnValue({ delete: remove, insert, update: vi.fn() }) }),
+      redirect: vi.fn(),
+      requirePageRole: vi.fn().mockResolvedValue({ id: "author-1", role: "member" }),
+      savePostAttachments: vi.fn().mockResolvedValue({ ok: false, reason: "save_failed" }),
+    } as unknown as PostActionDependencies;
+    const action = createPostAction(deps);
+    const input = { get: (name: string) => name === "content" ? validContent : "제목", getAll: (name: string) => name === "files" ? [{ name: "guide.pdf", size: 1, type: "application/pdf" }] : [] } as PostFormData;
+
+    await expect(action(initialState, input)).resolves.toEqual({ status: "error", message: "게시글 저장을 정리하지 못했습니다. 잠시 후 다시 시도해 주세요." });
+    expect(selectDeleted).toHaveBeenCalledTimes(2);
+  });
+
   it("수정은 인증 전에 입력을 읽지 않고 post ID와 작성자 ID를 함께 조건으로 사용한다", async () => {
     const { authorId, deps, events, postId, redirect } = dependencies({ userId: "author-1" });
     const action = createUpdatePostAction("post-1", deps);

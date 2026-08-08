@@ -37,12 +37,14 @@ function file(name = "guide.pdf") {
 function dependencies({
   deleteError = null,
   insertError = null,
+  moveError = null,
   removeError = null,
   restoreError = null,
   uploadError = null,
 }: {
   deleteError?: unknown;
   insertError?: unknown;
+  moveError?: unknown;
   removeError?: unknown;
   restoreError?: unknown;
   uploadError?: unknown;
@@ -62,6 +64,7 @@ function dependencies({
   const deleteById = vi.fn().mockResolvedValue({ data: { id: attachmentId }, error: deleteError });
   const restore = vi.fn().mockResolvedValue({ data: null, error: restoreError });
   const upload = vi.fn().mockResolvedValue({ data: null, error: uploadError });
+  const move = vi.fn().mockResolvedValue({ data: null, error: moveError });
   const remove = vi.fn().mockResolvedValue({ data: null, error: removeError });
   const createSignedUrl = vi.fn().mockResolvedValue({
     data: { signedUrl: "https://signed.example/download" },
@@ -80,7 +83,7 @@ function dependencies({
       restore,
     }),
     requireRole,
-    storageFactory: async () => ({ createSignedUrl, remove, upload }),
+    storageFactory: async () => ({ createSignedUrl, move, remove, upload }),
   };
 
   return {
@@ -92,6 +95,7 @@ function dependencies({
     findOwnedPost,
     insert,
     listForPost,
+    move,
     remove,
     requireRole,
     restore,
@@ -131,7 +135,19 @@ describe("게시글 첨부 저장", () => {
   it("메타데이터 기록 실패면 업로드한 객체를 정리하고 상세 오류를 노출하지 않는다", async () => {
     const { deps, remove } = dependencies({ insertError: new Error("RLS details") });
 
-    await expect(savePostAttachments(postId, authorId, [file()], deps)).resolves.toEqual({ ok: false });
+    await expect(savePostAttachments(postId, authorId, [file()], deps)).resolves.toEqual({ ok: false, reason: "save_failed" });
+    expect(remove).toHaveBeenCalledWith([storagePath]);
+  });
+
+  it("메타데이터 실패 뒤 객체 정리는 한 번 재시도하고 실패를 cleanup 오류로 구분한다", async () => {
+    const { deps, remove } = dependencies({ insertError: new Error("RLS") });
+    remove.mockResolvedValue({ data: null, error: new Error("storage") });
+
+    await expect(savePostAttachments(postId, authorId, [file()], deps)).resolves.toEqual({
+      ok: false,
+      reason: "cleanup_failed",
+    });
+    expect(remove).toHaveBeenCalledTimes(2);
     expect(remove).toHaveBeenCalledWith([storagePath]);
   });
 
@@ -139,7 +155,7 @@ describe("게시글 첨부 저장", () => {
     const { deps, remove, upload } = dependencies();
     upload.mockResolvedValueOnce({ data: null, error: null }).mockResolvedValueOnce({ data: null, error: new Error("storage") });
 
-    await expect(savePostAttachments(postId, authorId, [file(), file("other.pdf")], deps)).resolves.toEqual({ ok: false });
+    await expect(savePostAttachments(postId, authorId, [file(), file("other.pdf")], deps)).resolves.toEqual({ ok: false, reason: "save_failed" });
     expect(remove).toHaveBeenCalledWith([storagePath]);
   });
 
@@ -163,24 +179,37 @@ describe("게시글 첨부 다운로드와 삭제", () => {
     expect(redirect).toHaveBeenCalledWith("https://signed.example/download");
   });
 
-  it("삭제는 작성자 소유권을 확인하고 DB 삭제 실패 때 객체를 건드리지 않는다", async () => {
-    const { deleteById, deps, findOwnedPost, remove } = dependencies({ deleteError: new Error("RLS") });
+  it("signed URL 리디렉션의 제어 흐름 예외를 오류로 바꾸지 않는다", async () => {
+    const { deps } = dependencies();
+    const redirect = vi.fn((path: string): never => {
+      throw new Error(`redirect:${path}`);
+    });
+
+    await expect(
+      downloadPostAttachment(formData({ attachment_id: attachmentId }), { ...deps, redirect }),
+    ).rejects.toThrow("redirect:https://signed.example/download");
+    expect(redirect).toHaveBeenCalledTimes(1);
+  });
+
+  it("삭제는 작성자 소유권을 확인한 뒤 원본을 trash로 이동하고 DB 실패면 되돌린다", async () => {
+    const { deleteById, deps, findOwnedPost, move, remove } = dependencies({ deleteError: new Error("RLS") });
 
     await deletePostAttachment(formData({ attachment_id: attachmentId, post_id: postId }), deps);
 
     expect(findOwnedPost).toHaveBeenCalledWith(postId, authorId);
     expect(deleteById).toHaveBeenCalledWith(attachmentId);
+    expect(move).toHaveBeenNthCalledWith(1, storagePath, expect.stringMatching(/^trash\/posts\//));
+    expect(move).toHaveBeenNthCalledWith(2, expect.stringMatching(/^trash\/posts\//), storagePath);
     expect(remove).not.toHaveBeenCalled();
     expect(redirect).toHaveBeenCalledWith(`/board/${postId}?error=attachment-delete`);
   });
 
-  it("객체 삭제 실패면 삭제한 메타데이터를 복구하고 성공으로 처리하지 않는다", async () => {
-    const { attachment, deps, remove, restore } = dependencies({ removeError: new Error("storage") });
+  it("trash 정리 실패는 경로를 노출하지 않는 일반 오류로 남긴다", async () => {
+    const { deps, move, remove } = dependencies({ removeError: new Error("storage") });
 
     await deletePostAttachment(formData({ attachment_id: attachmentId, post_id: postId }), deps);
 
-    expect(remove).toHaveBeenCalledWith([storagePath]);
-    expect(restore).toHaveBeenCalledWith(attachment);
+    expect(remove).toHaveBeenCalledWith([move.mock.calls[0]?.[1]]);
     expect(redirect).toHaveBeenCalledWith(`/board/${postId}?error=attachment-delete`);
   });
 });

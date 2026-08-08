@@ -7,6 +7,26 @@ import {
 } from "../../../features/attachments/post-files";
 import { createClient } from "../../../lib/supabase/server";
 
+type AttachmentFormData = { get: (name: string) => unknown; getAll: (name: string) => unknown[] };
+
+async function uploadPostAttachmentAction(formData: AttachmentFormData) {
+  "use server";
+
+  return uploadPostAttachments(formData);
+}
+
+async function downloadPostAttachmentAction(formData: AttachmentFormData) {
+  "use server";
+
+  return downloadPostAttachment(formData);
+}
+
+async function deletePostAttachmentAction(formData: AttachmentFormData) {
+  "use server";
+
+  return deletePostAttachment(formData);
+}
+
 type Attachment = { id: string; original_filename: string; size_bytes: number };
 type Post = {
   id: string;
@@ -20,6 +40,7 @@ type Post = {
 type Comment = { id: string; body: string; author_id: string; created_at: string };
 
 export type PostDetailClient = {
+  auth: { getUser: () => Promise<{ data: { user: { id: string } | null }; error: unknown }> };
   from: (table: "posts" | "comments") => {
     select: (columns: string) => {
       eq: (column: string, value: string) => {
@@ -37,13 +58,14 @@ export async function loadPostDetail(
 ) {
   try {
     const client = await factory();
+    const viewer = await client.auth.getUser();
     const post = await client
       .from("posts")
       .select("id,title,content,author_id,is_notice,created_at,attachments(id,original_filename,size_bytes)")
       .eq("id", id)
       .maybeSingle();
     if (post.error || !post.data) {
-      return { post: null, comments: [], hasLoadError: Boolean(post.error) };
+      return { post: null, comments: [], viewerId: null, hasLoadError: Boolean(post.error) };
     }
 
     const comments = await client
@@ -51,9 +73,9 @@ export async function loadPostDetail(
       .select("id,body,author_id,created_at")
       .eq("post_id", id)
       .order("created_at", { ascending: true });
-    return { post: post.data, comments: comments.data ?? [], hasLoadError: Boolean(comments.error) };
+    return { post: post.data, comments: comments.data ?? [], viewerId: viewer.error ? null : viewer.data.user?.id ?? null, hasLoadError: Boolean(comments.error) };
   } catch {
-    return { post: null, comments: [], hasLoadError: true };
+    return { post: null, comments: [], viewerId: null, hasLoadError: true };
   }
 }
 
@@ -76,12 +98,13 @@ export async function renderPostPage(
   }
 
   const attachments = result.post?.attachments ?? [];
+  const isAuthor = result.viewerId === result.post?.author_id;
   return (
     <main className="mx-auto max-w-[var(--reading-max-width)] px-[var(--page-padding)] py-16">
       <h1>{result.post?.title}</h1>
       <section aria-label="첨부 파일" className="mt-6">
         <h2 className="text-lg font-semibold">첨부 파일</h2>
-        <form action={uploadPostAttachments} className="mt-2 space-y-2" encType="multipart/form-data">
+        {isAuthor ? <form action={uploadPostAttachmentAction} className="mt-2 space-y-2" encType="multipart/form-data">
           <input name="post_id" type="hidden" value={postId} />
           <label className="block text-sm font-medium">
             첨부 파일
@@ -97,25 +120,25 @@ export async function renderPostPage(
           <button className="min-h-11 border border-[var(--border)] px-3 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2" type="submit">
             첨부 업로드
           </button>
-        </form>
+        </form> : null}
         {attachments.length ? (
           <ul className="mt-3 space-y-2">
             {attachments.map((attachment) => (
               <li className="flex flex-wrap items-center gap-2" key={attachment.id}>
                 <span>{attachment.original_filename} ({attachment.size_bytes} bytes)</span>
-                <form action={downloadPostAttachment}>
+                <form action={downloadPostAttachmentAction}>
                   <input name="attachment_id" type="hidden" value={attachment.id} />
                   <button className="min-h-11 px-2 text-sm underline focus-visible:outline-2 focus-visible:outline-offset-2" type="submit">
                     {attachment.original_filename} 다운로드
                   </button>
                 </form>
-                <form action={deletePostAttachment}>
+                {isAuthor ? <form action={deletePostAttachmentAction}>
                   <input name="attachment_id" type="hidden" value={attachment.id} />
                   <input name="post_id" type="hidden" value={postId} />
                   <button className="min-h-11 px-2 text-sm underline focus-visible:outline-2 focus-visible:outline-offset-2" type="submit">
                     첨부 삭제
                   </button>
-                </form>
+                </form> : null}
               </li>
             ))}
           </ul>

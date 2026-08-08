@@ -10,6 +10,7 @@ import { validatePostInput } from "./content";
 import type { PostEditorState, PostFormData } from "./editor";
 
 const CREATE_ERROR_MESSAGE = "게시글을 저장하지 못했습니다. 잠시 후 다시 시도해 주세요.";
+const CLEANUP_ERROR_MESSAGE = "게시글 저장을 정리하지 못했습니다. 잠시 후 다시 시도해 주세요.";
 const UPDATE_ERROR_MESSAGE = "게시글을 수정하지 못했습니다. 잠시 후 다시 시도해 주세요.";
 
 type PostClient = {
@@ -107,11 +108,32 @@ function attachmentFiles(formData: PostFormData) {
 }
 
 export function createPostAction(dependencies: PostActionDependencies = defaultDependencies) {
-  return async function createPost(
-    _previousState: PostEditorState,
-    formData: PostFormData,
-  ): Promise<PostEditorState> {
-    "use server";
+  return (previousState: PostEditorState, formData: PostFormData) =>
+    createPostWithDependencies(previousState, formData, dependencies);
+}
+
+async function removeCreatedPost(client: PostClient, postId: string, authorId: string) {
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const result = await client
+        .from("posts")
+        .delete()
+        .eq("id", postId)
+        .eq("author_id", authorId)
+        .select("id");
+      if (!result.error && result.data?.length === 1) return true;
+    } catch {
+      // 재시도 후 일반 cleanup 오류를 반환한다.
+    }
+  }
+  return false;
+}
+
+async function createPostWithDependencies(
+  _previousState: PostEditorState,
+  formData: PostFormData,
+  dependencies: PostActionDependencies,
+): Promise<PostEditorState> {
 
     const profile = await dependencies.requirePageRole("member", { nextPath: "/board/new" });
     const input = parsedInput(formData);
@@ -143,13 +165,11 @@ export function createPostAction(dependencies: PostActionDependencies = defaultD
       if (files.length) {
         const attachments = await dependencies.savePostAttachments(post.id, profile.id, files);
         if (!attachments.ok) {
-          await supabase
-            .from("posts")
-            .delete()
-            .eq("id", post.id)
-            .eq("author_id", profile.id)
-            .select("id");
-          return { status: "error", message: CREATE_ERROR_MESSAGE };
+          const removed = await removeCreatedPost(supabase, post.id, profile.id);
+          return {
+            status: "error",
+            message: removed ? CREATE_ERROR_MESSAGE : CLEANUP_ERROR_MESSAGE,
+          };
         }
       }
     } catch {
@@ -157,7 +177,6 @@ export function createPostAction(dependencies: PostActionDependencies = defaultD
     }
 
     return dependencies.redirect("/board");
-  };
 }
 
 export async function createPost(
@@ -166,18 +185,23 @@ export async function createPost(
 ): Promise<PostEditorState> {
   "use server";
 
-  return createPostAction(defaultDependencies)(previousState, formData);
+  return createPostWithDependencies(previousState, formData, defaultDependencies);
 }
 
 export function createUpdatePostAction(
   postId: string,
   dependencies: PostActionDependencies = defaultDependencies,
 ) {
-  return async function updatePost(
-    _previousState: PostEditorState,
-    formData: PostFormData,
-  ): Promise<PostEditorState> {
-    "use server";
+  return (previousState: PostEditorState, formData: PostFormData) =>
+    updatePostWithDependencies(postId, previousState, formData, dependencies);
+}
+
+async function updatePostWithDependencies(
+  postId: string,
+  _previousState: PostEditorState,
+  formData: PostFormData,
+  dependencies: PostActionDependencies,
+): Promise<PostEditorState> {
 
     const profile = await dependencies.requirePageRole("member", {
       nextPath: `/board/${encodeURIComponent(postId)}/edit`,
@@ -208,7 +232,6 @@ export function createUpdatePostAction(
     }
 
     return dependencies.redirect(`/board/${encodeURIComponent(postId)}`);
-  };
 }
 
 export async function updatePost(
@@ -218,5 +241,5 @@ export async function updatePost(
 ): Promise<PostEditorState> {
   "use server";
 
-  return createUpdatePostAction(postId, defaultDependencies)(previousState, formData);
+  return updatePostWithDependencies(postId, previousState, formData, defaultDependencies);
 }

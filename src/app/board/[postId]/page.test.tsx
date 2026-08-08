@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { loadPostDetail, renderPostPage, type PostDetailClient } from "./page";
 
-const client = (post: any, comments: any[], error: any = null) => {
+const client = (post: any, comments: any[], error: any = null, viewerId: string | null = null) => {
   const maybeSingle = vi.fn().mockResolvedValue({ data: post, error });
   const eq = vi.fn().mockReturnValue({
     maybeSingle,
@@ -12,7 +12,10 @@ const client = (post: any, comments: any[], error: any = null) => {
     eq,
     order: vi.fn().mockResolvedValue({ data: comments, error }),
   });
-  return { from: vi.fn(() => ({ select })) } as unknown as PostDetailClient;
+  return {
+    auth: { getUser: vi.fn().mockResolvedValue({ data: { user: viewerId ? { id: viewerId } : null }, error: null }) },
+    from: vi.fn(() => ({ select })),
+  } as unknown as PostDetailClient;
 };
 
 const text = (node: any): string =>
@@ -36,7 +39,7 @@ describe("공개 게시글 상세", () => {
         created_at: "2026-01-01",
         attachments: [{ id: "a", original_filename: "guide.pdf", size_bytes: 1024 }],
       },
-      [{ id: "c", body: "댓글", author_id: "b", created_at: "2026-01-01" }],
+      [{ id: "c", body: "댓글", author_id: "b", created_at: "2026-01-01" }], null, "a",
     );
 
     await expect(loadPostDetail("p", async () => loaded)).resolves.toMatchObject({
@@ -49,6 +52,16 @@ describe("공개 게시글 상세", () => {
     expect(text(page)).toContain("첨부 업로드");
     expect(text(page)).toContain("guide.pdf 다운로드");
     expect(text(page)).toContain("첨부 삭제");
+  });
+
+  it("비작성자에게는 다운로드만 보이고 업로드·삭제 폼은 숨긴다", async () => {
+    const page = await renderPostPage(
+      Promise.resolve({ postId: "p" }),
+      async () => client({ id: "p", title: "제목", content: {}, author_id: "author", is_notice: false, created_at: "2026", attachments: [{ id: "a", original_filename: "guide.pdf", size_bytes: 1 }] }, [], null, "other"),
+    );
+    expect(text(page)).toContain("guide.pdf 다운로드");
+    expect(text(page)).not.toContain("첨부 업로드");
+    expect(text(page)).not.toContain("첨부 삭제");
   });
 
   it("빈 댓글과 오류 상태를 안내한다", async () => {

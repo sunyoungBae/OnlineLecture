@@ -35,11 +35,11 @@ type PostAttachmentRepository = {
   findOwnedPost: (postId: string, authorId: string) => Promise<Result<{ id: string } | null>>;
   insert: (attachments: PostAttachmentInsert[]) => Promise<Result<null>>;
   listForPost: (postId: string) => Promise<Result<PostAttachment[] | null>>;
-  restore: (attachment: PostAttachment) => Promise<Result<null>>;
 };
 
 type AttachmentStorage = {
   createSignedUrl: (path: string, expiresIn: number) => Promise<Result<{ signedUrl: string } | null>>;
+  move: (fromPath: string, toPath: string) => Promise<Result<null>>;
   remove: (paths: string[]) => Promise<Result<null>>;
   upload: (path: string, file: UploadFile) => Promise<Result<null>>;
 };
@@ -56,7 +56,9 @@ export type PostUploadValidation =
   | { valid: true }
   | { valid: false; reason: string };
 
-export type PostAttachmentSaveResult = { ok: true } | { ok: false };
+export type PostAttachmentSaveResult =
+  | { ok: true }
+  | { ok: false; reason: "save_failed" | "cleanup_failed" };
 
 const ATTACHMENT_BUCKET = "attachments";
 const DOWNLOAD_URL_TTL_SECONDS = 60;
@@ -120,6 +122,22 @@ function boardPath(postId: string) {
   return `/board/${encodeURIComponent(postId)}`;
 }
 
+async function cleanupPaths(storage: AttachmentStorage, paths: string[]) {
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const removed = await storage.remove(paths);
+      if (!removed.error) return true;
+    } catch {
+      // 두 번 모두 실패하면 호출자에게 경로 없는 cleanup 오류만 돌려준다.
+    }
+  }
+  return false;
+}
+
+function trashPathFor(attachment: PostAttachment) {
+  return `trash/posts/${attachment.post_id}/${attachment.id}-${globalThis.crypto.randomUUID()}`;
+}
+
 /**
  * Stores attachments after the caller has authenticated the post author.
  * A failed metadata insert removes every newly uploaded object.
@@ -131,19 +149,19 @@ export async function savePostAttachments(
   dependencies: PostFileDependencies = defaultDependencies,
 ): Promise<PostAttachmentSaveResult> {
   if (!isValidId(postId) || !isValidId(authorId) || files.length === 0) {
-    return { ok: false };
+    return { ok: false, reason: "save_failed" };
   }
 
   try {
     const repository = await dependencies.repositoryFactory();
     const ownedPost = await repository.findOwnedPost(postId, authorId);
     if (ownedPost.error || !ownedPost.data) {
-      return { ok: false };
+      return { ok: false, reason: "save_failed" };
     }
 
     const existing = await repository.listForPost(postId);
     if (existing.error || !existing.data || !validatePostUpload(existing.data.length, files).valid) {
-      return { ok: false };
+      return { ok: false, reason: "save_failed" };
     }
 
     const storage = await dependencies.storageFactory();
@@ -153,9 +171,9 @@ export async function savePostAttachments(
       const uploaded = await storage.upload(path, file);
       if (uploaded.error) {
         if (paths.length) {
-          await storage.remove(paths);
+          if (!(await cleanupPaths(storage, paths))) return { ok: false, reason: "cleanup_failed" };
         }
-        return { ok: false };
+        return { ok: false, reason: "save_failed" };
       }
       paths.push(path);
     }
@@ -170,13 +188,15 @@ export async function savePostAttachments(
       })),
     );
     if (inserted.error) {
-      await storage.remove(paths);
-      return { ok: false };
+      return {
+        ok: false,
+        reason: (await cleanupPaths(storage, paths)) ? "save_failed" : "cleanup_failed",
+      };
     }
 
     return { ok: true };
   } catch {
-    return { ok: false };
+    return { ok: false, reason: "save_failed" };
   }
 }
 
@@ -193,7 +213,7 @@ export async function uploadPostAttachments(
 
   const saved = await savePostAttachments(postId, profile.id, files, dependencies);
   return dependencies.redirect(
-    `${boardPath(postId)}?${saved.ok ? "notice=attachment-uploaded" : "error=attachment-save"}`,
+    `${boardPath(postId)}?${saved.ok ? "notice=attachment-uploaded" : `error=attachment-${saved.reason === "cleanup_failed" ? "cleanup" : "save"}`}`,
   );
 }
 
@@ -207,6 +227,7 @@ export async function downloadPostAttachment(
     return dependencies.redirect("/board");
   }
 
+  let signedUrl: string | null = null;
   try {
     const repository = await dependencies.repositoryFactory();
     const attachment = await repository.findById(attachmentId);
@@ -223,10 +244,12 @@ export async function downloadPostAttachment(
       return dependencies.redirect("/board");
     }
 
-    return dependencies.redirect(signed.data.signedUrl);
+    signedUrl = signed.data.signedUrl;
   } catch {
     return dependencies.redirect("/board");
   }
+
+  return dependencies.redirect(signedUrl);
 }
 
 export async function deletePostAttachment(
@@ -254,15 +277,24 @@ export async function deletePostAttachment(
       return dependencies.redirect(`${boardPath(postId)}?error=attachment-delete`);
     }
 
-    const deleted = await repository.deleteById(attachmentId);
-    if (deleted.error || !deleted.data) {
+    const storage = await dependencies.storageFactory();
+    const trashPath = trashPathFor(attachment.data);
+    const moved = await storage.move(attachment.data.storage_path, trashPath);
+    if (moved.error) {
       return dependencies.redirect(`${boardPath(postId)}?error=attachment-delete`);
     }
 
-    const storage = await dependencies.storageFactory();
-    const removed = await storage.remove([attachment.data.storage_path]);
+    const deleted = await repository.deleteById(attachmentId);
+    if (deleted.error || !deleted.data) {
+      const restored = await storage.move(trashPath, attachment.data.storage_path);
+      if (restored.error) {
+        return dependencies.redirect(`${boardPath(postId)}?error=attachment-delete`);
+      }
+      return dependencies.redirect(`${boardPath(postId)}?error=attachment-delete`);
+    }
+
+    const removed = await storage.remove([trashPath]);
     if (removed.error) {
-      await repository.restore(attachment.data);
       return dependencies.redirect(`${boardPath(postId)}?error=attachment-delete`);
     }
   } catch {
@@ -312,10 +344,6 @@ async function createPostAttachmentRepository(): Promise<PostAttachmentRepositor
         .eq("post_id", postId);
       return result as unknown as Result<PostAttachment[] | null>;
     },
-    restore: async (attachment) => {
-      const result = await supabase.from("attachments").insert(attachment);
-      return { data: null, error: result.error };
-    },
   };
 }
 
@@ -331,6 +359,10 @@ async function createAttachmentStorage(): Promise<AttachmentStorage> {
     createSignedUrl: async (path, expiresIn) => {
       const result = await storage.createSignedUrl(path, expiresIn);
       return result as unknown as Result<{ signedUrl: string } | null>;
+    },
+    move: async (fromPath, toPath) => {
+      const result = await storage.move(fromPath, toPath);
+      return { data: null, error: result.error };
     },
     remove: async (paths) => {
       const result = await storage.remove(paths);
