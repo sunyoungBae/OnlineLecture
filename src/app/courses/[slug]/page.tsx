@@ -122,7 +122,7 @@ export async function renderCourseDetailPage(
                     <ul className="mt-2 space-y-2">
                       {lesson.attachments.map((attachment) => (
                         <li key={attachment.id}>
-                          <form action={downloadLessonAttachment}>
+                          <form action={downloadLessonAttachmentAction}>
                             <input name="attachment_id" type="hidden" value={attachment.id} />
                             <button className="min-h-11 border-b border-[var(--foreground)] text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2" type="submit">
                               {attachment.original_filename} 다운로드
@@ -160,6 +160,11 @@ export async function renderCourseDetailPage(
 
 export default async function CourseDetailPage({ params }: CoursePageProps) {
   return renderCourseDetailPage(await params);
+}
+
+async function downloadLessonAttachmentAction(formData: Parameters<typeof downloadLessonAttachment>[0]) {
+  "use server";
+  return downloadLessonAttachment(formData);
 }
 
 function CourseError() {

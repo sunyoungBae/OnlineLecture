@@ -47,6 +47,7 @@ type LessonAttachmentRepository = {
 
 type AttachmentStorage = {
   createSignedUrl: (path: string, expiresIn: number) => Promise<Result<{ signedUrl: string } | null>>;
+  move: (fromPath: string, toPath: string) => Promise<Result<null>>;
   remove: (paths: string[]) => Promise<Result<null>>;
   upload: (path: string, file: UploadFile) => Promise<Result<null>>;
 };
@@ -83,6 +84,10 @@ function validId(value: string) {
 function adminLessonsPath(formData: FormDataLike) {
   const courseId = formValue(formData, "course_id");
   return validId(courseId) ? `/admin/courses/${courseId}/lessons` : "/admin/courses";
+}
+
+function trashPathFor(attachment: LessonAttachment) {
+  return `trash/${attachment.lesson_id}/${attachment.id}-${globalThis.crypto.randomUUID()}`;
 }
 
 function dependencyRedirect(
@@ -215,13 +220,21 @@ export async function deleteLessonAttachment(
     }
 
     const storage = await dependencies.storageFactory();
-    const removed = await storage.remove([attachment.data.storage_path]);
-    if (removed.error) {
+    const trashPath = trashPathFor(attachment.data);
+    const moved = await storage.move(attachment.data.storage_path, trashPath);
+    if (moved.error) {
       return dependencyRedirect(dependencies, formData, "error=attachment-delete");
     }
 
     const deleted = await repository.deleteById(attachmentId);
     if (deleted.error || !deleted.data) {
+      await storage.move(trashPath, attachment.data.storage_path);
+      return dependencyRedirect(dependencies, formData, "error=attachment-delete");
+    }
+
+    const removed = await storage.remove([trashPath]);
+    if (removed.error) {
+      // DB 메타데이터는 이미 삭제됐으므로 경로를 노출하지 않고 잔여 trash 객체는 운영 정리 대상으로 둔다.
       return dependencyRedirect(dependencies, formData, "error=attachment-delete");
     }
   } catch {
@@ -277,6 +290,10 @@ async function createAttachmentStorage(): Promise<AttachmentStorage> {
     createSignedUrl: async (path, expiresIn) => {
       const result = await storage.createSignedUrl(path, expiresIn);
       return result as unknown as Result<{ signedUrl: string } | null>;
+    },
+    move: async (fromPath, toPath) => {
+      const result = await storage.move(fromPath, toPath);
+      return { data: null, error: result.error };
     },
     remove: async (paths) => {
       const result = await storage.remove(paths);
