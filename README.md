@@ -42,6 +42,7 @@ npm run build
 | @types/react-dom | 19.2.4 | MIT |
 | @base-ui/react | 1.6.0 | MIT |
 | @tiptap/react / @tiptap/starter-kit / @tiptap/extension-link | 3.29.2 | MIT |
+| Zod | 4.4.3 | MIT |
 
 ## MVP 범위
 

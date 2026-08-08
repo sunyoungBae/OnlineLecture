@@ -24,7 +24,8 @@
     "postcss": "8.5.25",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "tailwindcss": "4.1.18"
+    "tailwindcss": "4.1.18",
+    "zod": "4.4.3"
   },
   "devDependencies": {
     "@playwright/test": "1.62.1",
