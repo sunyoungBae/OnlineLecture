@@ -8,7 +8,7 @@ parallel_group: ""
 owner: "Codex/p05_t03"
 started_at: "2026-08-08T09:41:13+09:00"
 blocked_reason: ""
-owned_files: ["src/features/comments/actions.ts", "src/features/comments/actions.test.ts", "src/features/moderation/actions.ts", "src/app/board/[postId]/page.tsx"]
+owned_files: ["src/features/comments/actions.ts", "src/features/comments/actions.test.ts", "src/features/moderation/actions.ts", "src/features/moderation/actions.test.ts", "src/app/board/[postId]/page.tsx", "src/app/board/[postId]/page.test.tsx"]
 shared_files: []
 implementation_commit: ""
 reviewer: ""
@@ -24,7 +24,9 @@ review_commit: ""
 - 생성 또는 수정: src/features/comments/actions.ts
 - 생성 또는 수정: src/features/comments/actions.test.ts
 - 생성 또는 수정: src/features/moderation/actions.ts
+- 생성 또는 수정: src/features/moderation/actions.test.ts
 - 생성 또는 수정: src/app/board/[postId]/page.tsx
+- 생성 또는 수정: src/app/board/[postId]/page.test.tsx
 - 공유 파일 수정 없음
 
 # 제외
@@ -40,7 +42,9 @@ P05-T02가 모두 done이면 ready로 전환한다.
 - src/features/comments/actions.ts
 - src/features/comments/actions.test.ts
 - src/features/moderation/actions.ts
+- src/features/moderation/actions.test.ts
 - src/app/board/[postId]/page.tsx
+- src/app/board/[postId]/page.test.tsx
 
 # 인터페이스
 
