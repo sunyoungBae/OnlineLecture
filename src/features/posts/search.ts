@@ -1,8 +1,15 @@
 import { z } from "zod";
 
+export const MAX_POST_SEARCH_PAGE = 10_000;
+
 const searchParamsSchema = z.object({
   course: z.string().regex(/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i).optional(),
-  page: z.string().regex(/^[1-9]\d*$/).transform(Number).optional(),
+  page: z
+    .string()
+    .regex(/^[1-9]\d*$/)
+    .transform(Number)
+    .refine((value) => Number.isSafeInteger(value) && value <= MAX_POST_SEARCH_PAGE)
+    .optional(),
   q: z.string().trim().min(1).max(120).optional(),
 });
 
