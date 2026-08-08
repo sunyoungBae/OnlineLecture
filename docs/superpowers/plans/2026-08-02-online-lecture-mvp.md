@@ -64,7 +64,7 @@ flowchart TD
 | P04-T02 | 운영자 강의 CRUD | blocked | P03-T03 | C-A | 관리자 강의 라우트·서버 액션 | 관리자 내비게이션은 통합 소유 |
 | P04-T03 | 운영자 회차 CRUD·위아래 순서 이동 | blocked | P04-T02 | - | 회차 관리·순서 로직·관리자 전용 원자 이동 RPC migration·pgTAP·DB 타입 | 강의 관리자 화면과 생성 DB 타입 통합 소유 |
 | P05-T01 | Tiptap 제한 편집기와 게시글 CRUD | blocked | P03-T03 | B-A | 게시글 편집 라우트·Zod 콘텐츠 검증·인증 우선 서버 액션과 권한·오류 테스트·Tiptap 패키지 | `package.json`, lockfile과 README 라이선스 기록은 P05-T01이 통합 소유 |
-| P05-T02 | 공개 목록·escaped ILIKE 검색·필터·페이지네이션 | blocked | P05-T01 | - | 게시판 조회 라우트·검색 파서 | 게시판 내비게이션 |
+| P05-T02 | 공개 목록·escaped ILIKE 검색·필터·페이지네이션 | blocked | P05-T01 | - | 게시판 조회 라우트·서버 페이지 테스트·검색 파서 | 게시판 내비게이션 |
 | P05-T03 | 댓글 CRUD·공지·운영자 삭제 | blocked | P05-T02 | - | 댓글·관리 액션 | 게시글 본문 화면 |
 | P06-T01 | 파일 allowlist·10MB/3개·80/95% 용량 로직 | blocked | P02-T03 | U-A | 파일·용량 순수 검증 모듈 | 없음 |
 | P06-T02 | 게시글 첨부 업로드·서명 다운로드·정리 | blocked | P05-T03,P06-T01 | U-B | 게시글 첨부 서버 로직 | 게시글 편집·본문 통합 소유자 P06-T02 |
