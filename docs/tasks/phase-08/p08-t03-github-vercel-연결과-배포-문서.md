@@ -1,13 +1,13 @@
 ---
 id: P08-T03
 title: GitHub·Vercel 연결과 배포 문서
-status: ready
+status: blocked
 type: config
 depends_on: ["P08-T01"]
 parallel_group: "R-A"
 owner: ""
 started_at: ""
-blocked_reason: ""
+blocked_reason: external
 owned_files: ["docs/operations/deployment.md", "vercel.json"]
 shared_files: []
 implementation_commit: ""
