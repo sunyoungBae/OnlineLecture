@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { redirect } from "next/navigation";
 
 import { moveLessonInOrder } from "./lesson-order";
-import { moveLesson, type LessonMutationClient } from "../../app/admin/courses/[courseId]/lessons/actions";
+import { deleteLesson, moveLesson, updateLesson, type LessonMutationClient } from "../../app/admin/courses/[courseId]/lessons/actions";
 import { AuthorizationError, requireRole } from "@/lib/auth/require-role";
 
 vi.mock("next/navigation", () => ({ redirect: vi.fn() }));
@@ -76,5 +76,17 @@ describe("관리자 회차 이동 액션", () => {
 
     expect(rpc).not.toHaveBeenCalled();
     expect(redirect).toHaveBeenCalledWith("/admin/courses?error=forbidden");
+  });
+
+  it.each(["update", "delete"])("%s는 영향 행이 없으면 저장 오류로 처리한다", async (operation) => {
+    const maybeSingle = vi.fn().mockResolvedValue({ data: null, error: null });
+    const select = vi.fn().mockReturnValue({ maybeSingle });
+    const eq = vi.fn().mockReturnValue({ select });
+    const client = { from: vi.fn().mockReturnValue({ update: vi.fn().mockReturnValue({ eq }), delete: vi.fn().mockReturnValue({ eq }) }) } as unknown as LessonMutationClient;
+    const formData = new globalThis.FormData();
+    formData.set("course_id", "00000000-0000-4000-8000-000000000002"); formData.set("lesson_id", "00000000-0000-4000-8000-000000000001"); formData.set("title", "회차"); formData.set("description", "설명"); formData.set("youtube_url", "https://youtu.be/dQw4w9WgXcQ");
+    await (operation === "update" ? updateLesson(formData, async () => client) : deleteLesson(formData, async () => client));
+    expect(select).toHaveBeenCalledWith("id");
+    expect(redirect).toHaveBeenCalledWith("/admin/courses/00000000-0000-4000-8000-000000000002/lessons?error=save");
   });
 });
