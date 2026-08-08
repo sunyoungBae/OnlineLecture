@@ -104,4 +104,20 @@ describe("관리자 회차 이동 액션", () => {
     await createLesson(formData, async () => client);
     expect(from).not.toHaveBeenCalled(); expect(redirect).toHaveBeenCalledWith("/admin/courses/00000000-0000-4000-8000-000000000002/lessons?error=invalid");
   });
+
+  it.each(["create", "update"] as const)("%s는 2001자 설명을 저장하지 않는다", async (operation) => {
+    const from = vi.fn(); const client = { from } as unknown as LessonMutationClient;
+    const formData = new globalThis.FormData(); formData.set("course_id", "00000000-0000-4000-8000-000000000002"); formData.set("lesson_id", "00000000-0000-4000-8000-000000000001"); formData.set("position", "1"); formData.set("title", "회차"); formData.set("description", "x".repeat(2001)); formData.set("youtube_url", "https://youtu.be/dQw4w9WgXcQ");
+    await (operation === "create" ? createLesson(formData, async () => client) : updateLesson(formData, async () => client));
+    expect(from).not.toHaveBeenCalled(); expect(redirect).toHaveBeenCalledWith("/admin/courses/00000000-0000-4000-8000-000000000002/lessons?error=invalid");
+  });
+
+  it.each(["create", "update", "delete"] as const)("%s DB 원문은 일반 저장 오류로 숨긴다", async (operation) => {
+    const error = { message: "sensitive db detail" }; const maybeSingle = vi.fn().mockResolvedValue({ data: null, error }); const select = vi.fn().mockReturnValue({ maybeSingle }); const eq = vi.fn().mockReturnValue({ select });
+    const client = { from: vi.fn().mockReturnValue({ insert: vi.fn().mockResolvedValue({ error }), update: vi.fn().mockReturnValue({ eq }), delete: vi.fn().mockReturnValue({ eq }) }) } as unknown as LessonMutationClient;
+    const formData = new globalThis.FormData(); formData.set("course_id", "00000000-0000-4000-8000-000000000002"); formData.set("lesson_id", "00000000-0000-4000-8000-000000000001"); formData.set("position", "1"); formData.set("title", "회차"); formData.set("description", "설명"); formData.set("youtube_url", "https://youtu.be/dQw4w9WgXcQ");
+    await ({ create: createLesson, update: updateLesson, delete: deleteLesson }[operation])(formData, async () => client);
+    const target = "/admin/courses/00000000-0000-4000-8000-000000000002/lessons?error=save";
+    expect(redirect).toHaveBeenCalledWith(target); expect(String(vi.mocked(redirect).mock.calls)).not.toContain("sensitive db detail");
+  });
 });
