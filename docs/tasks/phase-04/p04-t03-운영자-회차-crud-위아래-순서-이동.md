@@ -8,7 +8,7 @@ parallel_group: ""
 owner: "Codex/p04_t03"
 started_at: "2026-08-08T09:18:07+09:00"
 blocked_reason: ""
-owned_files: ["src/app/admin/courses/[courseId]/lessons/page.tsx", "src/app/admin/courses/[courseId]/lessons/actions.ts", "src/features/admin/lesson-order.ts", "src/features/admin/lesson-order.test.ts", "supabase/migrations/202608080001_move_lesson.sql", "supabase/tests/move_lesson.sql"]
+owned_files: ["src/app/admin/courses/[courseId]/lessons/page.tsx", "src/app/admin/courses/[courseId]/lessons/page.test.tsx", "src/app/admin/courses/[courseId]/lessons/actions.ts", "src/features/admin/lesson-order.ts", "src/features/admin/lesson-order.test.ts", "supabase/migrations/202608080001_move_lesson.sql", "supabase/tests/move_lesson.sql"]
 shared_files: ["src/app/admin/courses/page.tsx", "src/types/database.ts"]
 implementation_commit: ""
 reviewer: ""
@@ -22,6 +22,7 @@ review_commit: ""
 # 범위
 
 - 생성 또는 수정: src/app/admin/courses/[courseId]/lessons/page.tsx
+- 생성 또는 수정: src/app/admin/courses/[courseId]/lessons/page.test.tsx
 - 생성 또는 수정: src/app/admin/courses/[courseId]/lessons/actions.ts
 - 생성 또는 수정: src/features/admin/lesson-order.ts
 - 생성 또는 수정: src/features/admin/lesson-order.test.ts
@@ -41,6 +42,7 @@ P04-T02가 모두 done이면 ready로 전환한다.
 # 파일
 
 - src/app/admin/courses/[courseId]/lessons/page.tsx
+- src/app/admin/courses/[courseId]/lessons/page.test.tsx
 - src/app/admin/courses/[courseId]/lessons/actions.ts
 - src/features/admin/lesson-order.ts
 - src/features/admin/lesson-order.test.ts
