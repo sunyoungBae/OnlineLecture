@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { redirect } from "next/navigation";
 
 import { moveLessonInOrder } from "./lesson-order";
-import { deleteLesson, moveLesson, updateLesson, type LessonMutationClient } from "../../app/admin/courses/[courseId]/lessons/actions";
+import { createLesson, deleteLesson, moveLesson, updateLesson, type LessonMutationClient } from "../../app/admin/courses/[courseId]/lessons/actions";
 import { AuthorizationError, requireRole } from "@/lib/auth/require-role";
 
 vi.mock("next/navigation", () => ({ redirect: vi.fn() }));
@@ -88,5 +88,20 @@ describe("관리자 회차 이동 액션", () => {
     await (operation === "update" ? updateLesson(formData, async () => client) : deleteLesson(formData, async () => client));
     expect(select).toHaveBeenCalledWith("id");
     expect(redirect).toHaveBeenCalledWith("/admin/courses/00000000-0000-4000-8000-000000000002/lessons?error=save");
+  });
+
+  it.each(["create", "update", "delete"] as const)("%s는 회원을 입력과 DB 호출 전에 거부한다", async (operation) => {
+    vi.mocked(requireRole).mockRejectedValue(new AuthorizationError());
+    const from = vi.fn(); const client = { from } as unknown as LessonMutationClient;
+    const formData = new globalThis.FormData(); formData.set("course_id", "00000000-0000-4000-8000-000000000002"); formData.set("lesson_id", "00000000-0000-4000-8000-000000000001");
+    await ({ create: createLesson, update: updateLesson, delete: deleteLesson }[operation])(formData, async () => client);
+    expect(from).not.toHaveBeenCalled(); expect(redirect).toHaveBeenCalledWith("/admin/courses/00000000-0000-4000-8000-000000000002/lessons?error=forbidden");
+  });
+
+  it.each(["", "x".repeat(121), "https://example.com/video"])("잘못된 제목 또는 YouTube URL은 DB에 저장하지 않는다", async (titleOrUrl) => {
+    const from = vi.fn(); const client = { from } as unknown as LessonMutationClient;
+    const formData = new globalThis.FormData(); formData.set("course_id", "00000000-0000-4000-8000-000000000002"); formData.set("position", "1"); formData.set("title", titleOrUrl.startsWith("http") ? "회차" : titleOrUrl); formData.set("description", "설명"); formData.set("youtube_url", titleOrUrl.startsWith("http") ? titleOrUrl : "https://youtu.be/dQw4w9WgXcQ");
+    await createLesson(formData, async () => client);
+    expect(from).not.toHaveBeenCalled(); expect(redirect).toHaveBeenCalledWith("/admin/courses/00000000-0000-4000-8000-000000000002/lessons?error=invalid");
   });
 });
