@@ -1,7 +1,7 @@
 ---
 id: P04-T03
 title: 운영자 회차 CRUD·위아래 순서 이동
-status: review
+status: done
 type: feature
 depends_on: ["P04-T02"]
 parallel_group: ""
@@ -11,8 +11,8 @@ blocked_reason: ""
 owned_files: ["src/app/admin/courses/[courseId]/lessons/page.tsx", "src/app/admin/courses/[courseId]/lessons/page.test.tsx", "src/app/admin/courses/[courseId]/lessons/actions.ts", "src/features/admin/lesson-order.ts", "src/features/admin/lesson-order.test.ts", "supabase/migrations/202608080001_move_lesson.sql", "supabase/tests/move_lesson.sql"]
 shared_files: ["src/app/admin/courses/page.tsx", "src/types/database.ts"]
 implementation_commit: "9c9dd78"
-reviewer: ""
-review_commit: ""
+reviewer: "Codex/p04_t02"
+review_commit: "5ed024b"
 ---
 
 # 목표
@@ -92,6 +92,7 @@ P04-T02가 모두 done이면 ready로 전환한다.
 - 공통 검사: 구현 최종 보강 시 전체 unit 163개, lint, typecheck, build, E2E 16개와 `./scripts/check-harness.sh`가 통과했다. 이후 독립 검증의 좁은 19개도 통과했다.
 - 구현 커밋: `9c9dd78` (원자 RPC `dbbb8ee`, CRUD UI `5fc78d0`, pgTAP `ae544be`, 리뷰 보강 `055f3e5`, `2240f37`, `1f0855d` 포함)
 - 독립 리뷰: `Codex/p04_t02`가 RPC 권한·잠금·유일성, CRUD 권한·입력·영향 행·오류 및 페이지 피드백을 검토해 Critical/Important 없음으로 승인했다.
+- 승인 커밋: `5ed024b` (`리뷰: P04-T03 독립 승인`)
 
 # 커밋
 
