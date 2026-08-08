@@ -71,7 +71,7 @@ flowchart TD
 | P06-T03 | 회차 자료 업로드·다운로드·삭제 | blocked | P04-T01,P04-T03,P06-T01 | U-B | 회차 첨부 서버 로직 | 회차 관리자·플레이어 통합 소유자 P06-T03 |
 | P06-T04 | 80% Resend 1회·재무장·95% 차단/복구 | blocked | P06-T02,P06-T03 | - | 서버 전용 원자 usage/claim RPC migration·pgTAP, 검증 발신자 경고 발송, 게시글·회차 업로드/삭제 통합과 관리자 저장량 페이지 테스트 | storage_settings·첨부 서버 경로·생성 DB 타입·`.env.example` 통합 소유 |
 | P07-T01 | 오류·404·권한·빈 상태·로딩 공통 마감 | blocked | P04-T03,P05-T03,P06-T04 | Q-A | 공통 상태 컴포넌트·라우트와 강의·게시판·관리자 서버 페이지 회귀 테스트 | 각 기능 화면과 테스트 연결은 이 작업 소유 |
-| P07-T02 | 키보드·포커스·라벨·44px·WCAG AA·모바일 점검 | blocked | P07-T01 | - | 접근성 수정과 Playwright 검사 | 전 기능 UI |
+| P07-T02 | 키보드·포커스·라벨·44px·WCAG AA·모바일 점검 | blocked | P07-T01 | - | 전역·공통 입력 컴포넌트와 인증·게시글·회차 화면 접근성 수정 및 Playwright 검사 | 전 기능 UI 통합 소유 |
 | P08-T01 | lint·typecheck·unit·E2E·build 전체 통과 | blocked | P07-T02 | - | 결함 수정·검증 보고 | 전체 저장소 |
 | P08-T02 | 공개 읽기 30개 동시 요청 부하 스모크 | blocked | P08-T01 | R-A | 부하 스크립트·결과 문서 | 없음 |
 | P08-T03 | GitHub·Vercel 연결과 배포 문서 | blocked | P08-T01 | R-A | 배포 설정·운영 README | 환경 변수는 Vercel에서만 입력 |
