@@ -1,7 +1,7 @@
 ---
 id: P05-T03
 title: 댓글 CRUD·공지·운영자 삭제
-status: review
+status: done
 type: feature
 depends_on: ["P05-T02"]
 parallel_group: ""
@@ -11,8 +11,8 @@ blocked_reason: ""
 owned_files: ["src/features/comments/actions.ts", "src/features/comments/actions.test.ts", "src/features/moderation/actions.ts", "src/features/moderation/actions.test.ts", "src/app/board/[postId]/page.tsx", "src/app/board/[postId]/page.test.tsx"]
 shared_files: []
 implementation_commit: "1ff2c6a"
-reviewer: ""
-review_commit: ""
+reviewer: "Codex/p04_t01"
+review_commit: "33fe176"
 ---
 
 # 목표
@@ -85,6 +85,7 @@ P05-T02가 모두 done이면 ready로 전환한다.
 - 검증: 각 구현 단위의 typecheck가 통과했고 독립 재검증에서도 P05 좁은 테스트 10개와 typecheck가 통과했다.
 - 구현 커밋: `1ff2c6a` (댓글 액션 `471010d`, 관리 액션 `4d2b1da`, 공개 상세 `b4d083c` 포함)
 - 독립 리뷰: `Codex/p04_t01`이 댓글 작성자·관리자 권한, 영향 행, DB 원문 비노출과 공개 상세 경계를 검토해 Critical/Important 없음으로 승인했다.
+- 승인 커밋: `33fe176` (`리뷰: P05-T03 독립 승인`)
 
 # 커밋
 
